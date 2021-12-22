@@ -1,2 +1,0 @@
-# dpres-sip-compiler
-

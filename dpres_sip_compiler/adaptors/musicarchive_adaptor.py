@@ -42,7 +42,7 @@ class SipMetaMusicArchive(SipMeta):
 
     def _add_linking(self, csv_row):
         _linking = PremisLinkingMusicArchive(csv_row)
-        if not _linking.identifier in self.linkings:
+        if not _linking.identifier in self.premis_linkings:
             self.premis_linkings[_linking.identifier] = _linking
         self.premis_linkings[_linking.identifier].add_object(csv_row=csv_row)
         self.premis_linkings[_linking.identifier].add_agent(csv_row=csv_row)
@@ -161,8 +161,22 @@ class PremisLinkingMusicArchive(PremisLinking):
         self.identifier = csv_row["event-id"]
 
     def add_object(self, csv_row):
-        self.objects.append({"linking_object": csv_row["objekti-uuid"]})
+        if csv_row["event"] == "information package creation":
+            return
+        found = False
+        for obj in self.objects:
+            if csv_row["objekti-uuid"] in obj["linking_object"]:
+                found = True
+                break
+        if not found:
+            self.objects.append({"linking_object": csv_row["objekti-uuid"]})
 
     def add_agent(self, csv_row):
-        self.agents.append({"linking_agent": csv_row["agent-id"],
-                            "agent_role": csv_row["agent-rooli"]})
+        found = False
+        for agent in self.agents:
+            if csv_row["agent-id"] in agent["linking_agent"]:
+                found = True
+                break
+        if not found:
+            self.agents.append({"linking_agent": csv_row["agent-id"],
+                                "agent_role": csv_row["agent-rooli"]})

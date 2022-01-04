@@ -69,7 +69,8 @@ class SipCompiler(object):
                     agent_role=link["agent_role"],
                     agent_identifier=(agent.agent_identifier_type,
                                       agent.agent_identifier_value),
-                    create_agent_file="siptools-tmp-agent-file")
+                    create_agent_file="siptools-tmp-%s-agent-file"
+                                      "" % event.identifier)
             linking_objects = []
             for link in self.sip_meta.premis_linkings[
                     event.identifier].objects:
@@ -86,7 +87,8 @@ class SipCompiler(object):
                 event_detail=detail,
                 event_outcome=event.event_outcome,
                 event_outcome_detail=outcome_detail,
-                create_agent_file="siptools-tmp-agent-file",
+                create_agent_file="siptools-tmp-%s-agent-file"
+                                  "" % event.identifier,
                 add_object_links=True)
 
     def _descriptive_metadata(self):

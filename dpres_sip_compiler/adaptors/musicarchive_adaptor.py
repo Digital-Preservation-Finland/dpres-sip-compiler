@@ -19,33 +19,17 @@ class SipMetaMusicArchive(SipMeta):
         with open(csvfile) as csvfile:
             csvreader = csv.DictReader(csvfile, delimiter=',', quotechar='"')
             for csv_row in csvreader:
-                self._add_object(csv_row=csv_row, config=config,
-                                 workspace=workspace)
-                self._add_event(csv_row)
-                self._add_agent(csv_row)
-                self._add_linking(csv_row)
-
-    def _add_object(self, csv_row, config, workspace):
-        _object = PremisObjectMusicArchive(csv_row)
-        if _object.message_digest_algorithm.lower() == \
-                config.used_checksum.lower():
-            _object.find_path(workspace)
-            self.premis_objects[csv_row["objekti-uuid"]] = _object
-
-    def _add_event(self, csv_row):
-        self.premis_events[csv_row["event-id"]] = PremisEventMusicArchive(
-            csv_row)
-
-    def _add_agent(self, csv_row):
-        self.premis_agents[csv_row["agent-id"]] = PremisAgentMusicArchive(
-            csv_row)
-
-    def _add_linking(self, csv_row):
-        _linking = PremisLinkingMusicArchive(csv_row)
-        if not _linking.identifier in self.premis_linkings:
-            self.premis_linkings[_linking.identifier] = _linking
-        self.premis_linkings[_linking.identifier].add_object(csv_row=csv_row)
-        self.premis_linkings[_linking.identifier].add_agent(csv_row=csv_row)
+                p_object = PremisObjectMusicArchive(csv_row)
+                if p_object.message_digest_algorithm.lower() == \
+                        config.used_checksum.lower():
+                    p_object.find_path(workspace)
+                    self.add_object(p_object)
+                self.add_event(PremisEventMusicArchive(csv_row))
+                self.add_agent(PremisAgentMusicArchive(csv_row))
+                self.add_linking(p_linking=PremisLinkingMusicArchive(csv_row),
+                                 object_id=csv_row["objekti-uuid"],
+                                 agent_id=csv_row["agent-id"],
+                                 agent_role=csv_row["agent-rooli"])
 
 
 class PremisObjectMusicArchive(PremisObject):
@@ -158,25 +142,10 @@ class PremisLinkingMusicArchive(PremisLinking):
         """
         """
         super(PremisLinkingMusicArchive, self).__init__(csv_row=csv_row)
+        self._event_type = csv_row["event"]
         self.identifier = csv_row["event-id"]
 
-    def add_object(self, csv_row):
-        if csv_row["event"] == "information package creation":
+    def add_object(self, identifier):
+        if self._event_type == "information package creation":
             return
-        found = False
-        for obj in self.objects:
-            if csv_row["objekti-uuid"] in obj["linking_object"]:
-                found = True
-                break
-        if not found:
-            self.objects.append({"linking_object": csv_row["objekti-uuid"]})
-
-    def add_agent(self, csv_row):
-        found = False
-        for agent in self.agents:
-            if csv_row["agent-id"] in agent["linking_agent"]:
-                found = True
-                break
-        if not found:
-            self.agents.append({"linking_agent": csv_row["agent-id"],
-                                "agent_role": csv_row["agent-rooli"]})
+        super(PremisLinkingMusicArchive, self).add_object(identifier)

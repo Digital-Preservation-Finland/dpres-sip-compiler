@@ -1,4 +1,6 @@
-"""
+"""Compile SIP based on a given metadata source.
+
+Adaptors for different types of sources may be added.
 """
 import sys
 import os
@@ -17,14 +19,18 @@ from siptools.scripts.compress import compress
 from siptools.utils import read_json_streams
 from dpres_sip_compiler.config import Config
 from dpres_sip_compiler.adaptors.musicarchive_adaptor import \
-    SipMetaMusicArchive
+    SipPremisMusicArchive
 
 class SipCompiler(object):
     """Compiler to create SIPs
     """
 
     def __init__(self, workspace, config, sip_meta):
-        """Initialize compiler
+        """Initialize compiler.
+
+        :workspace: Workspace path
+        :config: Basic cnofiguration
+        :sip_meta: PREMIS metadata objects for the SIP to be compiled.
         """
         self.workspace = workspace
         self.config = config
@@ -129,13 +135,15 @@ class SipCompiler(object):
 
 def compile_sip(conf_file, workspace):
     """SIP Compiler
+    :conf_file: Configuration file path
+    :workspace: Workspace path
     """
     config = Config()
     config.configure(conf_file)
 
     sip_meta = None
     if config.module == "MusicArchive":
-        sip_meta = SipMetaMusicArchive()
+        sip_meta = SipPremisMusicArchive()
         sip_meta.populate(workspace, config)
     else:
         raise NotImplementedError("Unsupported configuration!")
@@ -150,7 +158,9 @@ def compile_sip(conf_file, workspace):
 @click.argument('configure', type=click.Path(exists=True))
 @click.argument('workspace', type=click.Path(exists=True))
 def main(configure, workspace):
-    """SIP Compiler
+    """SIP Compiler.
+    :configure: Configuration path
+    :workspace: Workspace path
     """
     compile_sip(configure, workspace)
     return 0

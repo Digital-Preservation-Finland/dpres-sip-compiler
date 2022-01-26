@@ -1,15 +1,25 @@
 """PREMIS metadata adaptor for Music Archive.
 """
 import os
+import re
 import csv
 from dpres_sip_compiler.base_adaptor import (
-    SipPremis, PremisObject, PremisEvent, PremisAgent, PremisLinking)
+    SipMetadata, PremisObject, PremisEvent, PremisAgent, PremisLinking)
 
-class SipPremisMusicArchive(SipPremis):
+
+def spaceless(string):
+    """
+    Change whitespaces to undercores.
+    :string: String to be changed.
+    :returns: Spaceless string
+    """
+    return re.sub(r"\s+", '_', string)
+
+
+class SipMetadataMusicArchive(SipMetadata):
     """
     Music Archive specific PREMIS Metadata handler for a SIP to be compiled.
     """
-
     def populate(self, workspace, config):
         """
         Populate a CSV file to PREMIS dicts.
@@ -32,12 +42,19 @@ class SipPremisMusicArchive(SipPremis):
                         config.used_checksum.lower():
                     p_object.find_path(workspace)
                     self.add_object(p_object)
-                self.add_event(PremisEventMusicArchive(csv_row))
+                p_event = PremisEventMusicArchive(csv_row)
+                self.add_event(p_event)
+                self.premis_events[p_event.identifier].add_detail_info(
+                   csv_row)
                 self.add_agent(PremisAgentMusicArchive(csv_row))
                 self.add_linking(p_linking=PremisLinkingMusicArchive(csv_row),
                                  object_id=csv_row["objekti-uuid"],
                                  agent_id=csv_row["agent-id"],
                                  agent_role=csv_row["agent-rooli"])
+                if p_event.event_type == "information package creation" \
+                        and self.objid is None \
+                        and csv_row["sip-tunniste"] is not None:
+                    self.objid = spaceless(csv_row["sip-tunniste"])
 
 
 class PremisObjectMusicArchive(PremisObject):
@@ -102,14 +119,25 @@ class PremisEventMusicArchive(PremisEvent):
     """
     Music Archive specific PREMIS Event handler.
     """
-
     CSV_KEYS = ["event-id", "event", "event-aika", "event-tulos"]
+    DETAIL_KEYS = ["tiiviste", "tiiviste-tyyppi", "pon-korvattu-nimi",
+                   "objekti-nimi", "sip-tunniste"]
 
     def __init__(self, csv_row):
         """Initialize.
         :csv_row: One row from a CSV file.
         """
+        super(PremisEventMusicArchive, self).__init__()
         self._csv_event = {key: csv_row[key] for key in self.CSV_KEYS}
+        self._detail_info = []
+
+    def add_detail_info(self, csv_row):
+        """
+        Add checksum to checksum dict used for detailed event output.
+        """
+        detail = {key: csv_row[key] for key in self.DETAIL_KEYS}
+        if detail not in self._detail_info:
+            self._detail_info.append(detail)
 
     @property
     def event_identifier_type(self):
@@ -135,6 +163,48 @@ class PremisEventMusicArchive(PremisEvent):
     def event_outcome(self):
         """Event outcome from a CSV file"""
         return self._csv_event["event-tulos"]
+
+    @property
+    def event_detail(self):
+        """Event detail"""
+        if self.event_type == "message digest calculation":
+            return "Checksum calculation for digital objects."
+        elif self.event_type == "filename change":
+            return "Filename change."
+        elif self.event_type == "information package creation":
+            return "Creation of submission information package."
+        else:
+            return None
+
+    @property
+    def event_outcome_detail(self):
+        """Event outcome detail"""
+        if self.event_outcome != "success":
+            return "Event failed."
+
+        if self.event_type == "message digest calculation":
+            # The same algorithm exists in all elements of details
+            out = "Checksum calculated with algorithm %s resulted the " \
+                  "following checksums:" \
+                  "" % self._detail_info[0]["tiiviste-tyyppi"]
+            for info in self._detail_info:
+                out = "%s\n%s: %s" % (out, info["objekti-nimi"],
+                                      info["tiiviste"])
+            return out
+
+        elif self.event_type == "filename change":
+            # There's only one element in details
+            return "Filename changed.\nOld filename: %s\nNew filename: %s\n" \
+                   "" % (self._detail_info[0]["pon-korvattu-nimi"],
+                         self._detail_info[0]["objekti-nimi"])
+
+        elif self.event_type == "information package creation":
+            # There's only one element in details
+            return "Submission information package created as: " \
+                   "%s" % spaceless(self._detail_info[0]["sip-tunniste"])
+
+        else:
+            return None
 
 
 class PremisAgentMusicArchive(PremisAgent):

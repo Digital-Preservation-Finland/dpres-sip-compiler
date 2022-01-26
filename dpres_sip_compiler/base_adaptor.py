@@ -17,9 +17,9 @@ def add_premis(premis_elem, premis_dict):
     premis_dict[premis_elem.identifier] = premis_elem
 
 
-class SipPremis(object):
+class SipMetadata(object):
     """
-    PREMIS Metadata handler for a SIP to be compiled.
+    Metadata handler for a SIP to be compiled.
     Can be overwritten with metadata type specific adaptors.
     """
 
@@ -27,7 +27,7 @@ class SipPremis(object):
         """
         Initialize SIP PREMIS handler.
         """
-
+        self.objid = None           # METS OBJID
         self.premis_objects = {}    # PREMIS Objects
         self.premis_events = {}     # PREMIS Events
         self.premis_agents = {}     # PREMIS Agents
@@ -202,8 +202,9 @@ class PremisLinking(object):
 
         :identifier: Object ID to be added.
         """
-        if identifier in [obj["linking_object"] for obj in self.objects]:
-            return
+        for obj in self.objects:
+            if identifier == obj["linking_object"]:
+                return
         self.objects.append({"linking_object": identifier})
 
     def add_agent(self, identifier, agent_role):
@@ -212,7 +213,8 @@ class PremisLinking(object):
         :identifier: Agent ID to be added.
         :agent_role: Role of the agent in linking.
         """
-        if identifier in [agent["linking_agent"] for agent in self.agents]:
-            return
+        for agent in self.agents:
+            if identifier == agent["linking_agent"]:
+                return
         self.agents.append({"linking_agent": identifier,
                             "agent_role": agent_role})

@@ -35,9 +35,9 @@ class Config(object):
         return self._conf["organization"]["sign_key"]
 
     @property
-    def module(self):
+    def adaptor(self):
         """Module name"""
-        return self._conf["script"]["module"]
+        return self._conf["script"]["adaptor"]
 
     @property
     def meta_ending(self):

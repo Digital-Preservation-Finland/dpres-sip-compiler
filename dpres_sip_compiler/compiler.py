@@ -19,7 +19,7 @@ from siptools.scripts.compress import compress
 from siptools.utils import read_json_streams
 from dpres_sip_compiler.config import Config
 from dpres_sip_compiler.adaptors.musicarchive_adaptor import \
-    SipPremisMusicArchive
+    SipMetadataMusicArchive
 
 class SipCompiler(object):
     """Compiler to create SIPs
@@ -82,17 +82,15 @@ class SipCompiler(object):
                     event.identifier].objects:
                 obj = self.sip_meta.premis_objects[link["linking_object"]]
                 linking_objects.append(("target", obj.filepath))
-            detail = "FOO DETAIL"  # TODO: Detailed info
-            outcome_detail = "FOO OUTCOME DETAIL"  # TODO: Detailed info
             premis_event(
                 event_type=event.event_type,
                 event_datetime=event.event_datetime,
                 workspace=self.workspace,
                 base_path=self.workspace,
                 linking_objects=linking_objects,
-                event_detail=detail,
+                event_detail=event.event_detail,
                 event_outcome=event.event_outcome,
-                event_outcome_detail=outcome_detail,
+                event_outcome_detail=event.event_outcome_detail,
                 create_agent_file="siptools-tmp-%s-agent-file"
                                   "" % event.identifier,
                 add_object_links=True)
@@ -115,7 +113,7 @@ class SipCompiler(object):
     def create_mets(self):
         """Create full METS document
         """
-        objid = os.path.basename(os.path.relpath(self.workspace))
+        objid = self.sip_meta.objid
         self._technical_metadata()
         self._provenance_metadata()
         self._descriptive_metadata()
@@ -142,8 +140,9 @@ def compile_sip(conf_file, workspace):
     config.configure(conf_file)
 
     sip_meta = None
-    if config.module == "MusicArchive":
-        sip_meta = SipPremisMusicArchive()
+    
+    if config.adaptor == "musicarchive":
+        sip_meta = SipMetadataMusicArchive()
         sip_meta.populate(workspace, config)
     else:
         raise NotImplementedError("Unsupported configuration!")

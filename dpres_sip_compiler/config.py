@@ -1,6 +1,7 @@
 """Reader for configuration info
 """
 import configparser
+import six
 
 
 class Config(object):
@@ -19,32 +20,17 @@ class Config(object):
         conf.read(conf_file)
         self._conf = conf
 
-    @property
-    def name(self):
-        """Organization name"""
-        return self._conf["organization"]["name"]
+    def __getattr__(self, attr):
+        """
+        Set script configuration items as properties.
+        :attr: Attribute name
+        :returns: Value for given attribute
+        :raises: AttributeError if does not exist.
+        """
+        try:
+            if attr in self._conf["organization"]:
+                return self._conf["organization"][attr]
 
-    @property
-    def contract(self):
-        """Contract identifier"""
-        return self._conf["organization"]["contract"]
-
-    @property
-    def sign_key(self):
-        """Path to SIP signature key"""
-        return self._conf["organization"]["sign_key"]
-
-    @property
-    def adaptor(self):
-        """Module name"""
-        return self._conf["script"]["adaptor"]
-
-    @property
-    def meta_ending(self):
-        """Filename ending of a metadata file"""
-        return self._conf["script"]["meta_ending"]
-
-    @property
-    def used_checksum(self):
-        """Checksum used for PREMIS Objects."""
-        return self._conf["script"]["used_checksum"]
+            return self._conf["script"][attr]
+        except Exception as exception:
+            raise AttributeError(six.text_type(exception))

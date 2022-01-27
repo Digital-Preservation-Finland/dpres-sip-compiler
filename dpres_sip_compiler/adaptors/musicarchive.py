@@ -133,7 +133,12 @@ class PremisEventMusicArchive(PremisEvent):
 
     def add_detail_info(self, csv_row):
         """
-        Add checksum to checksum dict used for detailed event output.
+        Add detailed information.
+
+        This can not be in __init__() because if the event instance
+        already exists, we just add more details to.
+
+        :csv_row: One row from a CSV file.
         """
         detail = {key: csv_row[key] for key in self.DETAIL_KEYS}
         if detail not in self._detail_info:

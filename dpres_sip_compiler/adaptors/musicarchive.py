@@ -29,7 +29,7 @@ class SipMetadataMusicArchive(SipMetadata):
         """
         csvfile = None
         for filepath in os.listdir(workspace):
-            if filepath.endswith("%s.csv" % config.meta_ending):
+            if filepath.endswith(config.csv_ending):
                 csvfile = os.path.join(workspace, filepath)
                 break
         if not csvfile:

@@ -18,7 +18,7 @@ from siptools.scripts.sign_mets import sign_mets
 from siptools.scripts.compress import compress
 from siptools.utils import read_json_streams
 from dpres_sip_compiler.config import Config
-from dpres_sip_compiler.adaptors.musicarchive_adaptor import \
+from dpres_sip_compiler.adaptors.musicarchive import \
     SipMetadataMusicArchive
 
 class SipCompiler(object):
@@ -100,7 +100,7 @@ class SipCompiler(object):
         """
         found = False
         for filepath in os.listdir(self.workspace):
-            if filepath.endswith("%s.xml" % self.config.meta_ending):
+            if filepath.endswith(self.config.meta_ending):
                 import_description(
                     dmdsec_location=os.path.join(self.workspace, filepath),
                     workspace=self.workspace,
@@ -128,7 +128,7 @@ class SipCompiler(object):
         sign_mets(self.config.sign_key, self.workspace)
         # TODO: add exclude option to compress
         # compress(self.workspace, os.path.join(self.workspace, objid+".tar"),
-        #          exclude="*%s.*" % self.config.meta_ending)
+        #          exclude="*%s" % self.config.meta_ending)
 
 
 def compile_sip(conf_file, workspace):

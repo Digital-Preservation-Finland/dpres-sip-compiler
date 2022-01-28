@@ -1,5 +1,5 @@
-"""Compile SIP based on a given metadata source.
-
+"""
+Compile SIP based on a given metadata source.
 Adaptors for different types of sources may be added.
 """
 import sys
@@ -39,7 +39,12 @@ class SipCompiler(object):
     def _technical_metadata(self):
         """Create technical metadata
         """
+        print "Creating technical metadata for %d file(s)." \
+              "" % len(self.sip_meta.premis_objects)
         for obj in self.sip_meta.objects:
+            file_format = ()
+            if obj.filepath.endswith(".csv"):
+                file_format = ("text/csv", "")
             import_object(filepaths=[obj.filepath],
                           workspace=self.workspace,
                           base_path=self.workspace,
@@ -60,10 +65,23 @@ class SipCompiler(object):
                    for stream in streams.values()):
                 create_audiomd(obj.filepath, workspace=self.workspace,
                                base_path=self.workspace)
+            if streams[0]["mimetype"] == "text/csv":
+                create_addml(obj.filepath,
+                             workspace=self.workspace,
+                             base_path=self.workspace,
+                             header=True,
+                             charset=streams[0]["charset"],
+                             delim=streams[0]["delimiter"],
+                             sep=streams[0]["separator"],
+                             quot="\"")  # TODO: Add quote sniffer
+        print "Technical metadata created for %d file(s)." \
+              "" % len(self.sip_meta.premis_objects)
 
     def _provenance_metadata(self):
         """Create provenance matadata
         """
+        print "Creating provenance metadata for %d event(s)." \
+              "" % len(self.sip_meta.premis_events)
         for event in self.sip_meta.events:
             for link in self.sip_meta.premis_linkings[
                     event.identifier].agents:
@@ -94,13 +112,18 @@ class SipCompiler(object):
                 create_agent_file="siptools-tmp-%s-agent-file"
                                   "" % event.identifier,
                 add_object_links=True)
+        print "Provenance metadata created for %d event(s)." \
+              "" % len(self.sip_meta.premis_events)
 
     def _descriptive_metadata(self):
         """Create descriptive metadata
         """
         found = False
+        count = 0
+        print("Importing descriptive metadata.")
         for filepath in os.listdir(self.workspace):
             if filepath.endswith(self.config.meta_ending):
+                count += 1
                 import_description(
                     dmdsec_location=os.path.join(self.workspace, filepath),
                     workspace=self.workspace,
@@ -109,14 +132,18 @@ class SipCompiler(object):
                 found = True
         if not found:
             raise IOError("Descriptive metadata file was not found!")
+        print "Descriptive metadata imported from %d file(s)." % count
 
     def create_mets(self):
         """Create full METS document
         """
+        print "Packaging process started. Different steps create separate " \
+              "provenance metadata about the process in the SIP."
         objid = self.sip_meta.objid
         self._technical_metadata()
         self._provenance_metadata()
         self._descriptive_metadata()
+        print "Compiling..."
         compile_structmap(self.workspace)
         compile_mets(mets_profile="ch",
                      organization_name=self.config.name,
@@ -127,8 +154,10 @@ class SipCompiler(object):
                      clean=True)
         sign_mets(self.config.sign_key, self.workspace)
         # TODO: add exclude option to compress
-        # compress(self.workspace, os.path.join(self.workspace, objid+".tar"),
+        # compress(self.workspace, os.path.join(self.workspace, "%s.tar" % objid),
         #          exclude="*%s" % self.config.meta_ending)
+        print "Compiling done. The SIP is signed and packaged to " \
+              "%s.tar" % os.path.join(self.workspace, objid)
 
 
 def compile_sip(conf_file, workspace):
@@ -145,7 +174,9 @@ def compile_sip(conf_file, workspace):
         sip_meta = SipMetadataMusicArchive()
         sip_meta.populate(workspace, config)
     else:
-        raise NotImplementedError("Unsupported configuration!")
+        raise NotImplementedError(
+            "Unsupported configuration! Maybe the adaptor name is incorrect "
+            "in configuration file?")
 
     compiler = SipCompiler(workspace=workspace,
                            config=config,
@@ -157,9 +188,13 @@ def compile_sip(conf_file, workspace):
 @click.argument('configure', type=click.Path(exists=True))
 @click.argument('workspace', type=click.Path(exists=True))
 def main(configure, workspace):
-    """SIP Compiler.
-    :configure: Configuration path
-    :workspace: Workspace path
+    """
+    SIP Compiler takes care of all steps of Pre-Ingest Tool automatically,
+    with using a given configuration and adaptor tool.
+
+    :configure: Configuration path. See dpres_sip_compiler/conf for configuration
+                templates.
+    :workspace: Workspace path with the data to be packaged to SIP.
     """
     compile_sip(configure, workspace)
     return 0

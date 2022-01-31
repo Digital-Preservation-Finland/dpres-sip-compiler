@@ -84,7 +84,7 @@ class SipCompiler(object):
               "" % len(self.sip_meta.premis_events)
         for event in self.sip_meta.events:
             for link in self.sip_meta.premis_linkings[
-                    event.identifier].agents:
+                    event.identifier].agent_links:
                 agent = self.sip_meta.premis_agents[link["linking_agent"]]
                 create_agent(
                     agent_name=agent.agent_name,
@@ -97,7 +97,7 @@ class SipCompiler(object):
                                       "" % event.identifier)
             linking_objects = []
             for link in self.sip_meta.premis_linkings[
-                    event.identifier].objects:
+                    event.identifier].object_links:
                 obj = self.sip_meta.premis_objects[link["linking_object"]]
                 linking_objects.append(("target", obj.filepath))
             premis_event(

@@ -259,7 +259,7 @@ class PremisLinkingMusicArchive(PremisLinking):
         self._event_type = csv_row["event"]
         self.identifier = csv_row["event-id"]
 
-    def add_object(self, identifier):
+    def add_object_link(self, identifier):
         """
         Add object to linking. Skip object adding if event type is
         'information package creation'
@@ -267,4 +267,4 @@ class PremisLinkingMusicArchive(PremisLinking):
         """
         if self._event_type == "information package creation":
             return
-        super(PremisLinkingMusicArchive, self).add_object(identifier)
+        super(PremisLinkingMusicArchive, self).add_object_link(identifier)

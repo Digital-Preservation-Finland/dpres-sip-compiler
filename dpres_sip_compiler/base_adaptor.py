@@ -66,11 +66,9 @@ class SipMetadata(object):
         :agent_role: Role of the PREMIS Agent in linking
         """
         add_premis(p_linking, self.premis_linkings)
-        if object_id is not None:
-            self.premis_linkings[p_linking.identifier].add_object(object_id)
-        if agent_id is not None:
-            self.premis_linkings[p_linking.identifier].add_agent(
-                agent_id, agent_role)
+        self.premis_linkings[p_linking.identifier].add_object_link(object_id)
+        self.premis_linkings[p_linking.identifier].add_agent_link(
+            agent_id, agent_role)
 
     @property
     def objects(self):
@@ -194,27 +192,31 @@ class PremisLinking(object):
         """Initialize Linking.
         """
         self.identifier = None  # Identifier of the linking
-        self.objects = []       # List of object IDs
-        self.agents = []        # List of agent IDs and roles
+        self.object_links = []  # List of object IDs
+        self.agent_links = []   # List of agent IDs and roles
 
-    def add_object(self, identifier):
+    def add_object_link(self, identifier):
         """Add object to linking, if it does not exist.
 
         :identifier: Object ID to be added.
         """
-        for obj in self.objects:
+        if identifier is None:
+            return
+        for obj in self.object_links:
             if identifier == obj["linking_object"]:
                 return
-        self.objects.append({"linking_object": identifier})
+        self.object_links.append({"linking_object": identifier})
 
-    def add_agent(self, identifier, agent_role):
+    def add_agent_link(self, identifier, agent_role):
         """Add agent to linking, if it does not exist.
 
         :identifier: Agent ID to be added.
         :agent_role: Role of the agent in linking.
         """
-        for agent in self.agents:
+        if identifier is None:
+            return
+        for agent in self.agent_links:
             if identifier == agent["linking_agent"]:
                 return
-        self.agents.append({"linking_agent": identifier,
-                            "agent_role": agent_role})
+        self.agent_links.append({"linking_agent": identifier,
+                                 "agent_role": agent_role})

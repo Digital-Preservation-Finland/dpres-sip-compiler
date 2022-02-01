@@ -48,6 +48,7 @@ class SipCompiler(object):
             import_object(filepaths=[obj.filepath],
                           workspace=self.workspace,
                           base_path=self.workspace,
+                          original_name=obj.original_name,
                           identifier=(obj.object_identifier_type,
                                       obj.object_identifier_value),
                           checksum=(obj.message_digest_algorithm,
@@ -73,7 +74,7 @@ class SipCompiler(object):
                              charset=streams[0]["charset"],
                              delim=streams[0]["delimiter"],
                              sep=streams[0]["separator"],
-                             quot="\"")  # TODO: Add quote sniffer
+                             quot=streams[0]["quotechar"])
         print "Technical metadata created for %d file(s)." \
               "" % len(self.sip_meta.premis_objects)
 
@@ -153,11 +154,16 @@ class SipCompiler(object):
                      objid=objid,
                      clean=True)
         sign_mets(self.config.sign_key, self.workspace)
-        # TODO: add exclude option to compress
-        # compress(self.workspace, os.path.join(self.workspace, "%s.tar" % objid),
-        #          exclude="*%s" % self.config.meta_ending)
-        print "Compiling done. The SIP is signed and packaged to " \
-              "%s.tar" % os.path.join(self.workspace, objid)
+        returncode = compress(
+            self.workspace,
+            os.path.join(self.workspace, "%s.tar" % objid),
+            exclude="*%s" % self.config.meta_ending)
+        if returncode == 0:
+            print "Compiling done. The SIP is signed and packaged to " \
+                  "%s.tar" % os.path.join(self.workspace, objid)
+        else:
+            raise IOError("Packaging to a TAR file did not succeed, the " \
+                          "return code was: %d" % returncode)
 
 
 def compile_sip(conf_file, workspace):

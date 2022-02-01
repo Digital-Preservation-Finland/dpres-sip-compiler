@@ -56,6 +56,18 @@ class SipMetadataMusicArchive(SipMetadata):
                         and csv_row["sip-tunniste"] is not None:
                     self.objid = spaceless(csv_row["sip-tunniste"])
 
+    def descriptive_files(self, desc_path, config):
+        """
+        Iterator for descriptive metadata files.
+
+        :desc_path: Path to descrptive metadata files
+        :config: Additional needed configuration
+        :returns: Descriptive metadata file
+        """
+        for filepath in os.listdir(desc_path):
+            if filepath.endswith(config.meta_ending):
+                 yield os.path.join(desc_path, filepath)
+
 
 class PremisObjectMusicArchive(PremisObject):
     """
@@ -136,7 +148,7 @@ class PremisEventMusicArchive(PremisEvent):
         Add detailed information.
 
         This can not be in __init__() because if the event instance
-        already exists, we just add more details to.
+        already exists, we just add more details to it.
 
         :csv_row: One row from a CSV file.
         """
@@ -179,7 +191,8 @@ class PremisEventMusicArchive(PremisEvent):
         elif self.event_type == "information package creation":
             return "Creation of submission information package."
         else:
-            return None
+            raise NotImplemented("Not implemented event type '%s'."
+                                 "" % self.event_type)
 
     @property
     def event_outcome_detail(self):
@@ -209,7 +222,8 @@ class PremisEventMusicArchive(PremisEvent):
                    "%s" % spaceless(self._detail_info[0]["sip-tunniste"])
 
         else:
-            return None
+            raise NotImplemented("Not implemented event type '%s'."
+                                 "" % self.event_type)
 
 
 class PremisAgentMusicArchive(PremisAgent):
@@ -262,7 +276,7 @@ class PremisLinkingMusicArchive(PremisLinking):
     def add_object_link(self, identifier):
         """
         Add object to linking. Skip object adding if event type is
-        'information package creation'
+        'information package creation'.
         :identifier: PREMIS Object identifier
         """
         if self._event_type == "information package creation":

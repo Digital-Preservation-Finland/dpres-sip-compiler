@@ -121,15 +121,15 @@ class SipCompiler(object):
         found = False
         count = 0
         print("Importing descriptive metadata.")
-        for filepath in os.listdir(self.workspace):
-            if filepath.endswith(self.config.meta_ending):
-                count += 1
-                import_description(
-                    dmdsec_location=os.path.join(self.workspace, filepath),
-                    workspace=self.workspace,
-                    base_path=self.workspace,
-                    dmd_agent=(os.path.basename(__file__), "software"))
-                found = True
+        for filepath in self.sip_meta.descriptive_files(
+                self.workspace, self.config):
+            count += 1
+            import_description(
+                dmdsec_location=filepath,
+                workspace=self.workspace,
+                base_path=self.workspace,
+                dmd_agent=(os.path.basename(__file__), "software"))
+            found = True
         if not found:
             raise IOError("Descriptive metadata file was not found!")
         print "Descriptive metadata imported from %d file(s)." % count

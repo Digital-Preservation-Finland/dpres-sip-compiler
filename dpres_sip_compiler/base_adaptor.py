@@ -33,6 +33,16 @@ class SipMetadata(object):
         self.premis_agents = {}     # PREMIS Agents
         self.premis_linkings = {}   # Linkings inside PREMIS
 
+    def descriptive_files(self, desc_path, config):
+        """
+        Iterator for descriptive metadata files.
+
+        :desc_path: Path to descrptive metadata files
+        :config: Additional needed configuration needed
+        :returns: Descriptive metadata file
+        """
+        yield
+
     def add_object(self, p_object):
         """Add PREMIS Object.
         :p_object: PREMIS Object

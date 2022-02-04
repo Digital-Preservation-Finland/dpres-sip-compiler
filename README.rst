@@ -1,17 +1,17 @@
 SIP Compiler
-------------
+============
 
 This is a tool which combines the commands of Pre-Ingest Tool according to
 given structured metadata and creates an OAIS Submission Information Package
 with a low number of commands. The tool can be extended with new adaptors,
 where different types of metadata is normalized and then given to the
-Pre-Ingest tool.
+Pre-Ingest Tool.
 
 This tool helps especially smaller use cases in manual workflows, where
 the content and metadata is gathered in some agreed way, and then
 packaged and transferred to DPS.
 
-For more information about Pre-Ingest tool, see:
+For more information about Pre-Ingest Tool, see:
 https://github.com/Digital-Preservation-Finland/dpres-siptools
 
 This tool is currently a work-in-progress project, and therefore
@@ -28,8 +28,9 @@ Installation and usage requires Python 2.7, or 3.6 or newer.
 
 If Pre-Ingest Tool (dpres-siptools) is installed, then it is enough to
 reactivate the environment, update the latest versions of the installed packages
-and install this software::
+and install this software with the following commands::
 
+    source venv/bin/activate       # Example command
     pip install -r requirements_github.txt --upgrade
     pip install .
 
@@ -44,7 +45,7 @@ For Python 2.7, get python-virtualenv software and create a virtual environment:
     yum install python-virtualenv
     virtualenv venv
 
-For Python 3.6, create a virtual envirnoment::
+For Python 3.6 or newer, create a virtual envirnoment::
 
     python3 -mvenv venv
 
@@ -52,7 +53,7 @@ Run the following to activate the virtual environment::
 
     source venv/bin/activate
 
-Install the required software with command::
+Install the required software with commands::
 
     pip install --upgrade pip setuptools          # Only for Python 2.7
     pip install --upgrade pip==20.2.4 setuptools  # Only for Python 3.6 or newer
@@ -82,7 +83,7 @@ The software assumes that the content to be packaged is in the given workspace
 path.
 
 For Music Archive data, the descriptive metadata of a package needs to be in
-the workspace root named as ``*___metadata.xml`` (where ``*`` is any prefix).
+the workspace root named as ``*___metadata.xml`` (where ``*`` is any string).
 There may be several descriptive metadata files. The structured administrative
 metadata must be given as as single ``*___metadata.csv`` file. The CSV
 structure has been agreed separately.
@@ -92,7 +93,7 @@ Usage
 
 Compile a given workspace with the content by using the following command::
 
-    sip-complier compile <path-to-configuration-file> <path-to-workspace>
+    sip-compiler compile <path-to-configuration-file> <path-to-workspace>
 
 The software creates ``<identifier>.tar`` file in workspace, which can be submitted
 to the Digital Preservation Service.

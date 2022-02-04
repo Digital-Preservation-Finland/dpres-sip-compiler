@@ -70,7 +70,7 @@ class SipCompiler(object):
                 create_audiomd(obj.filepath, workspace=self.workspace,
                                base_path=self.workspace)
             if streams[0]["mimetype"] == "text/csv":
-                create_addml(obj.filepath,
+                create_addml(filename=obj.filepath,
                              workspace=self.workspace,
                              base_path=self.workspace,
                              header=True,

@@ -11,13 +11,13 @@ def cli():
 
 
 @cli.command(
-    "compile",
+    name="compile",
     help="Compile Submission Information Package"
 )
 @click.argument('config', type=click.Path(exists=True))
 @click.argument('workspace', type=click.Path(exists=True))
 @click.pass_context
-def compile(ctx, config, workspace):
+def compile_command(config, workspace):
     """
     Compile Submission Information Package.
 
@@ -29,12 +29,12 @@ def compile(ctx, config, workspace):
 
 
 @cli.command(
-    "clean",
+    name="clean",
     help="Clean workspace"
 )
 @click.argument('workspace', type=click.Path(exists=True))
 @click.pass_context
-def clean(workspace):
+def clean_command(workspace):
     """
     Clean workspace from temporary files.
 

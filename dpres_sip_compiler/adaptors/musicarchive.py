@@ -34,7 +34,7 @@ class SipMetadataMusicArchive(SipMetadata):
                 break
         if not csvfile:
             raise IOError("CSV metadata file was not found!")
-        with open(csvfile) as csvfile:
+        with open(csvfile, encoding="utf-8") as csvfile:
             csvreader = csv.DictReader(csvfile, delimiter=',', quotechar='"')
             for csv_row in csvreader:
                 p_object = PremisObjectMusicArchive(csv_row)
@@ -66,7 +66,7 @@ class SipMetadataMusicArchive(SipMetadata):
         """
         for filepath in os.listdir(desc_path):
             if filepath.endswith(config.meta_ending):
-                 yield os.path.join(desc_path, filepath)
+                yield os.path.join(desc_path, filepath)
 
 
 class PremisObjectMusicArchive(PremisObject):
@@ -81,7 +81,6 @@ class PremisObjectMusicArchive(PremisObject):
         """
         super(PremisObjectMusicArchive, self).__init__()
         self._csv_object = {key: csv_row[key] for key in self.CSV_KEYS}
-
 
     def find_path(self, workspace):
         """
@@ -99,7 +98,7 @@ class PremisObjectMusicArchive(PremisObject):
 
         if not found:
             raise IOError("Digital object %s was not found!"
-                          "" % self._csv_object["objekti-nimi"])
+                          "" % (self._csv_object["objekti-nimi"]))
 
     @property
     def object_identifier_type(self):
@@ -190,9 +189,9 @@ class PremisEventMusicArchive(PremisEvent):
             return "Filename change."
         elif self.event_type == "information package creation":
             return "Creation of submission information package."
-        else:
-            raise NotImplemented("Not implemented event type '%s'."
-                                 "" % self.event_type)
+
+        raise NotImplementedError(
+            "Not implemented event type '%s'." % (self.event_type))
 
     @property
     def event_outcome_detail(self):
@@ -221,9 +220,8 @@ class PremisEventMusicArchive(PremisEvent):
             return "Submission information package created as: " \
                    "%s" % spaceless(self._detail_info[0]["sip-tunniste"])
 
-        else:
-            raise NotImplemented("Not implemented event type '%s'."
-                                 "" % self.event_type)
+        raise NotImplementedError(
+            "Not implemented event type '%s'." % (self.event_type))
 
 
 class PremisAgentMusicArchive(PremisAgent):

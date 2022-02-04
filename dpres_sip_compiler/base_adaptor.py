@@ -4,6 +4,7 @@ Base adaptor for handling PREMIS metadata in packaging.
 Adaptors can overwrite the required methods and properties as needed.
 """
 
+
 def add_premis(premis_elem, premis_dict):
     """
     Add PREMIS metadata object to a dict.

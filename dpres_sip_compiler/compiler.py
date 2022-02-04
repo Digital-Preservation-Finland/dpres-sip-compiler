@@ -2,13 +2,14 @@
 Compile SIP based on a given metadata source.
 Adaptors for different types of sources may be added.
 """
-import sys
+from __future__ import print_function
+
 import os
-import click
 from siptools.scripts.import_object import import_object
 from siptools.scripts.create_mix import create_mix
 from siptools.scripts.create_videomd import create_videomd
 from siptools.scripts.create_audiomd import create_audiomd
+from siptools.scripts.create_addml import create_addml
 from siptools.scripts.import_description import import_description
 from siptools.scripts.premis_event import premis_event
 from siptools.scripts.create_agent import create_agent
@@ -20,6 +21,7 @@ from siptools.utils import read_json_streams
 from dpres_sip_compiler.config import Config
 from dpres_sip_compiler.adaptors.musicarchive import \
     SipMetadataMusicArchive
+
 
 class SipCompiler(object):
     """Compiler to create SIPs
@@ -39,8 +41,8 @@ class SipCompiler(object):
     def _technical_metadata(self):
         """Create technical metadata
         """
-        print "Creating technical metadata for %d file(s)." \
-              "" % len(self.sip_meta.premis_objects)
+        print("Creating technical metadata for %d file(s)."
+              "" % (len(self.sip_meta.premis_objects)))
         for obj in self.sip_meta.objects:
             file_format = ()
             if obj.filepath.endswith(".csv"):
@@ -49,6 +51,7 @@ class SipCompiler(object):
                           workspace=self.workspace,
                           base_path=self.workspace,
                           original_name=obj.original_name,
+                          file_format=file_format,
                           identifier=(obj.object_identifier_type,
                                       obj.object_identifier_value),
                           checksum=(obj.message_digest_algorithm,
@@ -75,14 +78,14 @@ class SipCompiler(object):
                              delim=streams[0]["delimiter"],
                              sep=streams[0]["separator"],
                              quot=streams[0]["quotechar"])
-        print "Technical metadata created for %d file(s)." \
-              "" % len(self.sip_meta.premis_objects)
+        print("Technical metadata created for %d file(s)."
+              "" % (len(self.sip_meta.premis_objects)))
 
     def _provenance_metadata(self):
         """Create provenance matadata
         """
-        print "Creating provenance metadata for %d event(s)." \
-              "" % len(self.sip_meta.premis_events)
+        print("Creating provenance metadata for %d event(s)."
+              "" % (len(self.sip_meta.premis_events)))
         for event in self.sip_meta.events:
             for link in self.sip_meta.premis_linkings[
                     event.identifier].agent_links:
@@ -113,8 +116,8 @@ class SipCompiler(object):
                 create_agent_file="siptools-tmp-%s-agent-file"
                                   "" % event.identifier,
                 add_object_links=True)
-        print "Provenance metadata created for %d event(s)." \
-              "" % len(self.sip_meta.premis_events)
+        print("Provenance metadata created for %d event(s)."
+              "" % (len(self.sip_meta.premis_events)))
 
     def _descriptive_metadata(self):
         """Create descriptive metadata
@@ -133,18 +136,18 @@ class SipCompiler(object):
             found = True
         if not found:
             raise IOError("Descriptive metadata file was not found!")
-        print "Descriptive metadata imported from %d file(s)." % count
+        print("Descriptive metadata imported from %d file(s)." % (count))
 
     def create_mets(self):
         """Create full METS document
         """
-        print "Packaging process started. Different steps create separate " \
-              "provenance metadata about the process in the SIP."
+        print("Packaging process started. Different steps create separate "
+              "provenance metadata about the process in the SIP.")
         objid = self.sip_meta.objid
         self._technical_metadata()
         self._provenance_metadata()
         self._descriptive_metadata()
-        print "Compiling..."
+        print("Compiling...")
         compile_structmap(self.workspace)
         compile_mets(mets_profile="ch",
                      organization_name=self.config.name,
@@ -159,11 +162,11 @@ class SipCompiler(object):
             os.path.join(self.workspace, "%s.tar" % objid),
             exclude="*%s" % self.config.meta_ending)
         if returncode == 0:
-            print "Compiling done. The SIP is signed and packaged to " \
-                  "%s.tar" % os.path.join(self.workspace, objid)
+            print("Compiling done. The SIP is signed and packaged to "
+                  "%s.tar" % (os.path.join(self.workspace, objid)))
         else:
-            raise IOError("Packaging to a TAR file did not succeed, the " \
-                          "return code was: %d" % returncode)
+            raise IOError("Packaging to a TAR file did not succeed, the "
+                          "return code was: %d" % (returncode))
 
 
 def compile_sip(conf_file, workspace):
@@ -175,7 +178,7 @@ def compile_sip(conf_file, workspace):
     config.configure(conf_file)
 
     sip_meta = None
-    
+
     if config.adaptor == "musicarchive":
         sip_meta = SipMetadataMusicArchive()
         sip_meta.populate(workspace, config)
@@ -190,22 +193,16 @@ def compile_sip(conf_file, workspace):
     compiler.create_mets()
 
 
-@click.command()
-@click.argument('configure', type=click.Path(exists=True))
-@click.argument('workspace', type=click.Path(exists=True))
-def main(configure, workspace):
+def clean_workspace(workspace):
+    """Clean workspace from temporary files.
+    This is currently needed if the packaging gets iterrupted.
+    :workspace: Workspace path
     """
-    SIP Compiler takes care of all steps of Pre-Ingest Tool automatically,
-    with using a given configuration and adaptor tool.
-
-    :configure: Configuration path. See dpres_sip_compiler/conf for configuration
-                templates.
-    :workspace: Workspace path with the data to be packaged to SIP.
-    """
-    compile_sip(configure, workspace)
-    return 0
-
-
-if __name__ == '__main__':
-    RETVAL = main()  # pylint: disable=no-value-for-parameter
-    sys.exit(RETVAL)
+    for root, _, files in os.walk(workspace, topdown=False):
+        for name in files:
+            if (name.endswith(('-amd.xml', 'dmdsec.xml', 'structmap.xml',
+                               'filesec.xml', 'rightsmd.xml',
+                               'md-references.jsonl',
+                               '-scraper.json', '-amd.json'))):
+                os.remove(os.path.join(root, name))
+    print("Temporary files were cleaned from workspace.")

@@ -1,5 +1,12 @@
 """
 """
+from dpres_sip_compiler.adaptors.musicarchive import (
+    PremisObjectMusicArchive,
+    PremisEventMusicArchive,
+    PremisAgentMusicArchive,
+    PremisLinkingMusicArchive
+)
+
 
 def test_object_properties():
     """
@@ -13,10 +20,10 @@ def test_object_properties():
     obj = PremisObjectMusicArchive(source_dict)
     assert obj.identifier == "object-id-123"
     assert obj.object_identifier_type == "UUID"
-    assert obj.object_identifier_value == "object-id"
+    assert obj.object_identifier_value == "object-id-123"
     assert obj.original_name == "filename"
     assert obj.message_digest_algorithm == "MD5"
-    assert obj.message_digest = "abc"
+    assert obj.message_digest == "abc"
 
 
 def test_event_properties():
@@ -27,7 +34,7 @@ def test_event_properties():
         "event": "message digest calculation",
         "event-aika": "2022-02-01T14:00:00",
         "event-tulos": "success",
-        "tiviste": "abc",
+        "tiiviste": "abc",
         "tiiviste-tyyppi": "MD5",
         "pon-korvattu-nimi": None,
         "objekti-nimi": "filename",
@@ -36,14 +43,14 @@ def test_event_properties():
     event = PremisEventMusicArchive(source_dict)
     event.add_detail_info(source_dict)
     assert event.identifier == "event-id-123"
-    assert event.event_identifier_type = "local"
-    assert event.event_identifier_value = "event-id-123"
-    assert event.event_type = "message digest calculation"
-    assert event.timestamp = "2022-02-01T14:00:00"
-    assert event.event_outcome = "success"
-    assert event.event_detail = "Checksum calculation for digital objects."
-    assert event.event_outcome_detail = \
-        "Checksum calculated with algorithm MD5 resulted the following "
+    assert event.event_identifier_type == "local"
+    assert event.event_identifier_value == "event-id-123"
+    assert event.event_type == "message digest calculation"
+    assert event.event_datetime == "2022-02-01T14:00:00"
+    assert event.event_outcome == "success"
+    assert event.event_detail == "Checksum calculation for digital objects."
+    assert event.event_outcome_detail == \
+        "Checksum calculated with algorithm MD5 resulted the following " \
         "checksums:\nfilename: abc"
 
 

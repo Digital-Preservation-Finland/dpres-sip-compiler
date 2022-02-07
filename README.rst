@@ -82,11 +82,17 @@ Content Preparation
 The software assumes that the content to be packaged is in the given workspace
 path.
 
+The file names with the following patterns in the workspace root are considered
+as temporary files internal to the tool and will be removed in the process:
+``*-amd.xml``, ``*dmdsec.xml``, ``*structmap.xml``, ``*filesec.xml``,
+``*rightsmd.xml``, ``*md-references.jsonl``, ``*-scraper.json``, ``*-amd.json``.
+
 For Music Archive data, the descriptive metadata of a package needs to be in
 the workspace root named as ``*___metadata.xml`` (where ``*`` is any string).
 There may be several descriptive metadata files. The structured administrative
 metadata must be given as as single ``*___metadata.csv`` file. The CSV
-structure has been agreed separately.
+structure has been agreed separately. These files are utilized in packaging,
+but these will not be included in the package as separate files.
 
 Usage
 -----

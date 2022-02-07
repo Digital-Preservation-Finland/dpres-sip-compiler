@@ -5,6 +5,7 @@ Adaptors for different types of sources may be added.
 from __future__ import print_function
 
 import os
+import re
 from siptools.scripts.import_object import import_object
 from siptools.scripts.create_mix import create_mix
 from siptools.scripts.create_videomd import create_videomd
@@ -19,8 +20,7 @@ from siptools.scripts.sign_mets import sign_mets
 from siptools.scripts.compress import compress
 from siptools.utils import read_json_streams
 from dpres_sip_compiler.config import Config
-from dpres_sip_compiler.adaptors.musicarchive import \
-    SipMetadataMusicArchive
+from dpres_sip_compiler.selector import select
 
 
 class SipCompiler(object):
@@ -157,16 +157,13 @@ class SipCompiler(object):
                      objid=objid,
                      clean=True)
         sign_mets(self.config.sign_key, self.workspace)
-        returncode = compress(
+        tar_file = re.sub('[^0-9a-zA-Z]+', '_', objid)
+        compress(
             dir_to_tar=self.workspace,
-            tar_filename=os.path.join(self.workspace, "%s.tar" % objid),
+            tar_filename="%s.tar" % (tar_file),
             exclude=self.sip_meta.exclude_files(self.config))
-        if returncode == 0:
-            print("Compiling done. The SIP is signed and packaged to "
-                  "%s.tar" % (os.path.join(self.workspace, objid)))
-        else:
-            raise IOError("Packaging to a TAR file did not succeed, the "
-                          "return code was: %d" % (returncode))
+        print("Compiling done. The SIP is signed and packaged to "
+              "%s.tar" % (os.path.join(self.workspace, tar_file)))
 
 
 def compile_sip(conf_file, workspace):
@@ -177,16 +174,7 @@ def compile_sip(conf_file, workspace):
     config = Config()
     config.configure(conf_file)
 
-    sip_meta = None
-
-    if config.adaptor == "musicarchive":
-        sip_meta = SipMetadataMusicArchive()
-        sip_meta.populate(workspace, config)
-    else:
-        raise NotImplementedError(
-            "Unsupported configuration! Maybe the adaptor name is incorrect "
-            "in configuration file?")
-
+    sip_meta = select(workspace, config)
     compiler = SipCompiler(workspace=workspace,
                            config=config,
                            sip_meta=sip_meta)

@@ -44,6 +44,15 @@ class SipMetadata(object):
         """
         yield
 
+    def exclude_files(config):
+        """
+        Exclude files from Submission Information Package.
+
+        :config: Additional needed configuration
+        :returns: Patterns for metadata files to be excluded.
+        """
+        return ()
+
     def add_object(self, p_object):
         """Add PREMIS Object.
         :p_object: PREMIS Object
@@ -143,6 +152,23 @@ class PremisObject(object):
         """
         return None
 
+    @property
+    def original_name():
+        """Original name.
+        """
+        return None
+
+    @property
+    def message_digest_algorithm():
+        """Checksum algorithm.
+        """
+        return None
+
+    @property
+    def message_digest():
+        """Checksum.
+        """
+        return None
 
 class PremisEvent(object):
     """Class for a PREMIS Event.
@@ -168,6 +194,35 @@ class PremisEvent(object):
         """
         return None
 
+    @property
+    def event_type():
+        """Event type.
+        """
+        return None
+
+    @property
+    def event_datetime():
+        """Event datetime..
+        """
+        return None
+
+    @property
+    def event_detail():
+        """Event detail.
+        """
+        return None
+
+    @property
+    def event_outcome():
+        """Event outcome.
+        """
+        return None
+
+    @property
+    def event_outcome_detail():
+        """Event outcome detail.
+        """
+        return None
 
 class PremisAgent(object):
     """Class for a PREMIS Event.
@@ -190,6 +245,18 @@ class PremisAgent(object):
     @property
     def agent_identifier_value(self):
         """Value corresponding to PREMIS agentIdentifierValue.
+        """
+        return None
+
+    @property
+    def agent_name():
+        """Agent name.
+        """
+        return None
+
+    @property
+    def agent_type():
+        """Agent type.
         """
         return None
 

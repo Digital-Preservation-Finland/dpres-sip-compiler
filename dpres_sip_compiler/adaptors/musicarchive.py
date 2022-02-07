@@ -1,7 +1,9 @@
 """PREMIS metadata adaptor for Music Archive.
 """
 import os
+from io import open as io_open
 import re
+import six
 import csv
 from dpres_sip_compiler.base_adaptor import (
     SipMetadata, PremisObject, PremisEvent, PremisAgent, PremisLinking)
@@ -20,6 +22,20 @@ class SipMetadataMusicArchive(SipMetadata):
     """
     Music Archive specific PREMIS Metadata handler for a SIP to be compiled.
     """
+
+    def _open_csv_file(self, filename, charset):
+        """
+        Open the file in mode dependent on the python version.
+
+        :filename: CSV filename
+        :charset: File encoding
+        :returns: handle to the newly-opened file
+        :raises: IOError if the file cannot be read
+        """
+        if six.PY2:
+            return io_open(filename, "rb")
+        return io_open(filename, "rt", encoding=charset)
+
     def populate(self, workspace, config):
         """
         Populate a CSV file to PREMIS dicts.
@@ -28,13 +44,15 @@ class SipMetadataMusicArchive(SipMetadata):
         :config: Basic configuration
         """
         csvfile = None
+        csvpath = None
         for filepath in os.listdir(workspace):
             if filepath.endswith(config.csv_ending):
-                csvfile = os.path.join(workspace, filepath)
+                csvpath = os.path.join(workspace, filepath)
                 break
-        if not csvfile:
+        if not csvpath:
             raise IOError("CSV metadata file was not found!")
-        with open(csvfile, encoding="utf-8") as csvfile:
+        try:
+            csvfile = self._open_csv_file(csvpath, "utf-8")
             csvreader = csv.DictReader(csvfile, delimiter=',', quotechar='"')
             for csv_row in csvreader:
                 p_object = PremisObjectMusicArchive(csv_row)
@@ -55,6 +73,9 @@ class SipMetadataMusicArchive(SipMetadata):
                         and self.objid is None \
                         and csv_row["sip-tunniste"] is not None:
                     self.objid = spaceless(csv_row["sip-tunniste"])
+        finally:
+            if csvfile:
+                csvfile.close()
 
     def descriptive_files(self, desc_path, config):
         """
@@ -68,9 +89,11 @@ class SipMetadataMusicArchive(SipMetadata):
             if filepath.endswith(config.meta_ending):
                 yield os.path.join(desc_path, filepath)
 
-    def exclude_files(config):
+    def exclude_files(self, config):
         """
         Exclude files from Submission Information Package.
+
+        :config: Additional needed configuration
         :returns: Patterns for metadata files to be excluded.
         """
         return ("*%s" % config.meta_ending,

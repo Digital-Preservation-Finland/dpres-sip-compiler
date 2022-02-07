@@ -17,7 +17,7 @@ def cli():
 @click.argument('config', type=click.Path(exists=True))
 @click.argument('workspace', type=click.Path(exists=True))
 @click.pass_context
-def compile_command(config, workspace):
+def compile_command(ctx, config, workspace):
     """
     Compile Submission Information Package.
 
@@ -34,7 +34,7 @@ def compile_command(config, workspace):
 )
 @click.argument('workspace', type=click.Path(exists=True))
 @click.pass_context
-def clean_command(workspace):
+def clean_command(ctx, workspace):
     """
     Clean workspace from temporary files.
 

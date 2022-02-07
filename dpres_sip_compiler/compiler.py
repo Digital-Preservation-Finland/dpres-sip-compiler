@@ -158,9 +158,9 @@ class SipCompiler(object):
                      clean=True)
         sign_mets(self.config.sign_key, self.workspace)
         returncode = compress(
-            self.workspace,
-            os.path.join(self.workspace, "%s.tar" % objid),
-            exclude="*%s" % self.config.meta_ending)
+            dir_to_tar=self.workspace,
+            tar_filename=os.path.join(self.workspace, "%s.tar" % objid),
+            exclude=self.sip_meta.exclude_files(self.config))
         if returncode == 0:
             print("Compiling done. The SIP is signed and packaged to "
                   "%s.tar" % (os.path.join(self.workspace, objid)))

@@ -45,7 +45,7 @@ class SipMetadataMusicArchive(SipMetadata):
                 p_event = PremisEventMusicArchive(csv_row)
                 self.add_event(p_event)
                 self.premis_events[p_event.identifier].add_detail_info(
-                   csv_row)
+                    csv_row)
                 self.add_agent(PremisAgentMusicArchive(csv_row))
                 self.add_linking(p_linking=PremisLinkingMusicArchive(csv_row),
                                  object_id=csv_row["objekti-uuid"],
@@ -67,6 +67,14 @@ class SipMetadataMusicArchive(SipMetadata):
         for filepath in os.listdir(desc_path):
             if filepath.endswith(config.meta_ending):
                 yield os.path.join(desc_path, filepath)
+
+    def exclude_files(config):
+        """
+        Exclude files from Submission Information Package.
+        :returns: Patterns for metadata files to be excluded.
+        """
+        return ("*%s" % config.meta_ending,
+                "*%s" % config.csv_ending)
 
 
 class PremisObjectMusicArchive(PremisObject):

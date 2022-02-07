@@ -33,9 +33,9 @@ def test_descriptive_files():
     for desc in sip_meta.descriptive_files(
             "tests/data/musicarchive/workspace1", config):
         desc_files.append(desc)
-    assert desc_files == [
+    assert set(desc_files) == set([
         "tests/data/musicarchive/workspace1/test1___metadata.xml",
-        "tests/data/musicarchive/workspace1/test2___metadata.xml"]
+        "tests/data/musicarchive/workspace1/test2___metadata.xml"])
 
 
 def test_find_path():

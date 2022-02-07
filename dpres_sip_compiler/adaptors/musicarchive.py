@@ -89,6 +89,14 @@ class SipMetadataMusicArchive(SipMetadata):
             if filepath.endswith(config.meta_ending):
                 yield os.path.join(desc_path, filepath)
 
+    def desc_root_remove(self, config):
+        """
+        Resolve whether descriptive metadata root should be removed.
+        :config: Additional needed configuration
+        :returns: True/False
+        """
+        return config.desc_root_remove.lower() == "true"
+
     def exclude_files(self, config):
         """
         Exclude files from Submission Information Package.
@@ -204,7 +212,7 @@ class PremisEventMusicArchive(PremisEvent):
     @property
     def event_datetime(self):
         """Event timestamp from a CSV file"""
-        return self._csv_event["event-aika"]
+        return self._csv_event["event-aika"].replace(" ", "T")
 
     @property
     def event_outcome(self):

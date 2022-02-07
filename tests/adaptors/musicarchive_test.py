@@ -1,15 +1,59 @@
-"""
+"""Test Music Archive adaptor.
 """
 from dpres_sip_compiler.adaptors.musicarchive import (
+    SipMetadataMusicArchive,
     PremisObjectMusicArchive,
     PremisEventMusicArchive,
     PremisAgentMusicArchive,
     PremisLinkingMusicArchive
 )
+from dpres_sip_compiler.config import Config
+
+
+def test_populate():
+    """Test that CSV is populated.
+    """
+    sip_meta = SipMetadataMusicArchive()
+    config = Config()
+    config.configure("tests/data/musicarchive/config.conf")
+    sip_meta.populate("tests/data/musicarchive/workspace1", config)
+    assert len(sip_meta.premis_objects) == 4
+    assert len(sip_meta.premis_events) == 7
+    assert len(sip_meta.premis_agents) == 3
+    assert len(sip_meta.premis_linkings) == 7
+
+
+def test_descriptive_files():
+    """Check that descriptive metadata files are found.
+    """
+    sip_meta = SipMetadataMusicArchive()
+    config = Config()
+    config.configure("tests/data/musicarchive/config.conf")
+    desc_files = []
+    for desc in sip_meta.descriptive_files(
+            "tests/data/musicarchive/workspace1", config):
+        desc_files.append(desc)
+    assert desc_files == [
+        "tests/data/musicarchive/workspace1/test1___metadata.xml",
+        "tests/data/musicarchive/workspace1/test2___metadata.xml"]
+
+
+def test_find_path():
+    """Check that path is found.
+    """
+    source_dict = {
+        "objekti-uuid": "object-id-123",
+        "objekti-nimi": "testfile1.wav",
+        "tiiviste-tyyppi": "MD5",
+        "tiiviste": "abc"
+    }
+    obj = PremisObjectMusicArchive(source_dict)
+    obj.find_path("tests/data/musicarchive/workspace1")
+    assert obj.filepath == "audio/testfile1.wav"
 
 
 def test_object_properties():
-    """
+    """Test that object properties result values from given dict.
     """
     source_dict = {
         "objekti-uuid": "object-id-123",
@@ -27,12 +71,12 @@ def test_object_properties():
 
 
 def test_event_properties():
-    """
+    """Test that event properties result values from given dict.
     """
     source_dict = {
         "event-id": "event-id-123",
         "event": "message digest calculation",
-        "event-aika": "2022-02-01T14:00:00",
+        "event-aika": "2022-02-01 14:00:00",
         "event-tulos": "success",
         "tiiviste": "abc",
         "tiiviste-tyyppi": "MD5",
@@ -54,8 +98,35 @@ def test_event_properties():
         "checksums:\nfilename: abc"
 
 
-def test_agent_properties():
+def test_add_detail_info():
+    """Test that detailed info is added without duplicates.
     """
+    source_dict = {
+        "event-id": "event-id-123",
+        "event": "message digest calculation",
+        "event-aika": "2022-02-01T14:00:00",
+        "event-tulos": "success",
+        "tiiviste": "abc",
+        "tiiviste-tyyppi": "MD5",
+        "pon-korvattu-nimi": None,
+        "objekti-nimi": "filename1",
+        "sip-tunniste": "sip-123"
+    }
+    event = PremisEventMusicArchive(source_dict)
+    event.add_detail_info(source_dict)
+    copy_dict = source_dict.copy()
+    copy_dict["tiiviste"] = "def"
+    copy_dict["objekti-nimi"] = "filename2"
+    event.add_detail_info(copy_dict)
+    event.add_detail_info(source_dict)
+    detail = "Checksum calculated with algorithm MD5 resulted the " \
+             "following checksums:\nfilename1: abc\nfilename2: def"
+    assert event.event_outcome_detail == detail
+    assert len(event._detail_info) == 2
+
+
+def test_agent_properties():
+    """Test that agent properties result values from given dict.
     """
     source_dict = {
         "agent-id": "agent-id-123",
@@ -71,7 +142,8 @@ def test_agent_properties():
 
 
 def test_skip_object():
-    """
+    """Test that object linking is skipped if event type is related to
+    information package creation.
     """
     source_row = {
         "event-id": "event-id-123",

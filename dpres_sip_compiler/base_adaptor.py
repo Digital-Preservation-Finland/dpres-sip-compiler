@@ -39,10 +39,18 @@ class SipMetadata(object):
         Iterator for descriptive metadata files.
 
         :desc_path: Path to descrptive metadata files
-        :config: Additional needed configuration needed
+        :config: Additional needed configuration
         :returns: Descriptive metadata file
         """
         yield
+
+    def desc_root_remove(self, config):
+        """
+        Resolve whether descriptive metadata root should be removed.
+        :config: Additional needed configuration
+        :returns: True/False
+        """
+        return False
 
     def exclude_files(config):
         """

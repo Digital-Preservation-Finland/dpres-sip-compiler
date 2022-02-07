@@ -1,4 +1,4 @@
-"""
+"""Test Base adaptor.
 """
 from dpres_sip_compiler.base_adaptor import (
     SipMetadata, PremisObject, PremisEvent, PremisAgent, PremisLinking
@@ -6,72 +6,72 @@ from dpres_sip_compiler.base_adaptor import (
 
 
 class PremisObjectTest(PremisObject):
-    """
+    """Test class for objects.
     """
     def __init__(self, identifier):
-        """
+        """Set given identifier.
         """
         super(PremisObjectTest, self).__init__()
         self._identifier = identifier
 
     @property
     def identifier(self):
-        """
+        """Return given identifier.
         """
         return self._identifier
 
 
 class PremisEventTest(PremisEvent):
-    """
+    """Test class for events.
     """
     def __init__(self, identifier):
-        """
+        """Set given identifier.
         """
         super(PremisEventTest, self).__init__()
         self._identifier = identifier
 
     @property
     def identifier(self):
-        """
+        """Return given identifier.
         """
         return self._identifier
 
 
 class PremisAgentTest(PremisAgent):
-    """
+    """Test class for agents.
     """
     def __init__(self, identifier):
-        """
+        """Set given identifier.
         """
         super(PremisAgentTest, self).__init__()
         self._identifier = identifier
 
     @property
     def identifier(self):
-        """
+        """Return given identifier.
         """
         return self._identifier
 
 
 class PremisLinkingTest(PremisLinking):
-    """
+    """Test class for linkings.
     """
     def __init__(self, identifier):
-        """
+        """Set given identifier as identifier.
         """
         super(PremisLinkingTest, self).__init__()
         self.identifier = identifier
 
 
 def test_objects():
-    """
+    """Tests that objects can be added without duplicates.
     """
     test_object1 = PremisObjectTest(1)
     test_object2 = PremisObjectTest(2)
     sip_meta = SipMetadata()
     sip_meta.add_object(test_object1)
     sip_meta.add_object(test_object2)
-    sip_meta.add_object(test_object1)
+    sip_meta.add_object(test_object1)  # Duplicate, not added
     assert len(sip_meta.premis_objects) == 2
     assert sip_meta.premis_objects[1]
     assert sip_meta.premis_objects[2]
@@ -83,14 +83,14 @@ def test_objects():
 
 
 def test_events():
-    """
+    """Test that events can be added without duplicates.
     """
     test_event1 = PremisEventTest(1)
     test_event2 = PremisEventTest(2)
     sip_meta = SipMetadata()
     sip_meta.add_event(test_event1)
     sip_meta.add_event(test_event2)
-    sip_meta.add_event(test_event1)
+    sip_meta.add_event(test_event1)  # Duplicate, not added
     assert len(sip_meta.premis_events) == 2
     assert sip_meta.premis_events[1]
     assert sip_meta.premis_events[2]
@@ -102,14 +102,14 @@ def test_events():
 
 
 def test_agents():
-    """
+    """Test that agents can be added without duplicates.
     """
     test_agent1 = PremisAgentTest(1)
     test_agent2 = PremisAgentTest(2)
     sip_meta = SipMetadata()
     sip_meta.add_agent(test_agent1)
     sip_meta.add_agent(test_agent2)
-    sip_meta.add_agent(test_agent1)
+    sip_meta.add_agent(test_agent1)  # Duplicate, not added
     assert len(sip_meta.premis_agents) == 2
     assert sip_meta.premis_agents[1]
     assert sip_meta.premis_agents[2]
@@ -121,14 +121,14 @@ def test_agents():
 
 
 def test_linkings():
-    """
+    """Test that linkings can be added without duplicates.
     """
     linking1 = PremisLinkingTest(1)
     linking2 = PremisLinkingTest(2)
     sip_meta = SipMetadata()
     sip_meta.add_linking(linking1, 1, 2, "tester")
     sip_meta.add_linking(linking2, 3, 4, "tester")
-    sip_meta.add_linking(linking1, 1, 2, "tester")
+    sip_meta.add_linking(linking1, 1, 2, "tester")  # Duplicate, not added
     assert len(sip_meta.premis_linkings) == 2
     assert sip_meta.premis_linkings[1]
     assert sip_meta.premis_linkings[2]
@@ -140,23 +140,23 @@ def test_linkings():
 
 
 def test_add_object_link():
-    """
+    """Test that object links can be added without duplicates.
     """
     linking = PremisLinking()
     linking.add_object_link(1)
     linking.add_object_link(2)
-    linking.add_object_link(1)  # Not added
+    linking.add_object_link(1)  # Duplicate, not added
     assert linking.object_links == [
         {"linking_object": 1}, {"linking_object": 2}]
 
 
 def test_add_agent_link():
-    """
+    """Test that agent links can be added without duplicates.
     """
     linking = PremisLinking()
     linking.add_agent_link(1, "tester")
     linking.add_agent_link(2, "improver")
-    linking.add_agent_link(1, "tester")  # Not added
+    linking.add_agent_link(1, "tester")  # Duplicate, not added
     assert linking.agent_links == [
         {"linking_agent": 1, "agent_role": "tester"},
         {"linking_agent": 2, "agent_role": "improver"}]

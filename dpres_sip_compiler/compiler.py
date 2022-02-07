@@ -132,6 +132,7 @@ class SipCompiler(object):
                 dmdsec_location=filepath,
                 workspace=self.workspace,
                 base_path=self.workspace,
+                remove_root=self.sip_meta.desc_root_remove(self.config),
                 dmd_agent=(os.path.basename(__file__), "software"))
             found = True
         if not found:

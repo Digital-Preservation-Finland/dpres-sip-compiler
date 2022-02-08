@@ -112,6 +112,8 @@ following command::
 
     sip-compiler clean <path-to-workspace>
 
+This also removes possible ``mets.xml``, ``signature.sig`` and TAR package.
+
 Copyright
 ---------
 Copyright (C) 2022 CSC - IT Center for Science Ltd.

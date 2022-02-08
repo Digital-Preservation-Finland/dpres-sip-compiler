@@ -189,9 +189,10 @@ def clean_workspace(workspace):
     """
     for root, _, files in os.walk(workspace, topdown=False):
         for name in files:
-            if (name.endswith(('-amd.xml', 'dmdsec.xml', 'structmap.xml',
-                               'filesec.xml', 'rightsmd.xml',
-                               'md-references.jsonl',
-                               '-scraper.json', '-amd.json'))):
+            if (name.endswith(("-amd.xml", "dmdsec.xml", "structmap.xml",
+                               "filesec.xml", "rightsmd.xml",
+                               "md-references.jsonl",
+                               "-scraper.json", "-amd.json",
+                               "mets.xml", "signature.sig", ".tar"))):
                 os.remove(os.path.join(root, name))
     print("Temporary files were cleaned from workspace.")

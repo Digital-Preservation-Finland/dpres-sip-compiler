@@ -50,16 +50,16 @@ def _get_provenance(workspace):
     event_xml = None
     for path in event_paths:
         event_xml = lxml.etree.parse(path)
-        if event_xml.xpath(".//premis:eventType",
-                           namespaces=NAMESPACES
-                          )[0].text == "message digest calculation":
+        if event_xml.xpath(
+                ".//premis:eventType", namespaces=NAMESPACES)[0].text == \
+                "message digest calculation":
             break
     agent_xml = None
     for path in agent_paths:
         agent_xml = lxml.etree.parse(path)
-        if agent_xml.xpath(".//premis:agentName",
-                           namespaces=NAMESPACES
-                          )[0].text == "Testaaja, Teppo":
+        if agent_xml.xpath(
+                ".//premis:agentName", namespaces=NAMESPACES)[0].text == \
+                "Testaaja, Teppo":
             break
     return (event_xml, agent_xml)
 
@@ -107,27 +107,28 @@ def test_provenance(tmpdir):
     compiler._technical_metadata()
     compiler._provenance_metadata()
     (event_xml, agent_xml) = _get_provenance(workspace)
-    assert event_xml.xpath(".//premis:eventType",
-                           namespaces=NAMESPACES
-                          )[0].text == "message digest calculation"
-    assert event_xml.xpath(".//premis:eventDateTime",
-                           namespaces=NAMESPACES
-                          )[0].text == "2022-02-02T00:00:00"
+    assert event_xml.xpath(
+        ".//premis:eventType", namespaces=NAMESPACES)[0].text == \
+        "message digest calculation"
+    assert event_xml.xpath(
+        ".//premis:eventDateTime", namespaces=NAMESPACES)[0].text == \
+        "2022-02-02T00:00:00"
     assert event_xml.xpath(".//premis:eventOutcome",
                            namespaces=NAMESPACES)[0].text == "success"
-    assert event_xml.xpath(".//premis:eventDetail",
-                           namespaces=NAMESPACES
-                          )[0].text == "Checksum calculation for digital " \
-                                       "objects."
-    assert event_xml.xpath(".//premis:eventOutcomeDetailNote",
-                           namespaces=NAMESPACES)[0].text == \
+    assert event_xml.xpath(
+        ".//premis:eventDetail", namespaces=NAMESPACES)[0].text == \
+        "Checksum calculation for digital objects."
+    assert event_xml.xpath(
+        ".//premis:eventOutcomeDetailNote",
+        namespaces=NAMESPACES)[0].text == \
         "Checksum calculated with algorithm MD5 resulted the following " \
         "checksums:\ntestfile1.wav: abc123"
     assert event_xml.xpath(".//premis:linkingObjectIdentifierType",
                            namespaces=NAMESPACES)[0].text == "UUID"
-    assert event_xml.xpath(".//premis:linkingObjectIdentifierValue",
-                           namespaces=NAMESPACES
-                          )[0].text == "882d63db-c9b6-4f44-83ba-901b300821cc"
+    assert event_xml.xpath(
+        ".//premis:linkingObjectIdentifierValue",
+        namespaces=NAMESPACES)[0].text == \
+        "882d63db-c9b6-4f44-83ba-901b300821cc"
     assert event_xml.xpath(".//premis:linkingObjectRole",
                            namespaces=NAMESPACES)[0].text == "target"
     assert event_xml.xpath(".//premis:linkingAgentIdentifierType",
@@ -140,9 +141,9 @@ def test_provenance(tmpdir):
                            namespaces=NAMESPACES)[0].text == "local"
     assert agent_xml.xpath(".//premis:agentIdentifierValue",
                            namespaces=NAMESPACES)[0].text == "1"
-    assert agent_xml.xpath(".//premis:agentName",
-                           namespaces=NAMESPACES
-                          )[0].text == "Testaaja, Teppo"
+    assert agent_xml.xpath(
+        ".//premis:agentName", namespaces=NAMESPACES)[0].text == \
+        "Testaaja, Teppo"
     assert agent_xml.xpath(".//premis:agentType",
                            namespaces=NAMESPACES)[0].text == "person"
 
@@ -161,6 +162,7 @@ def test_descriptive(tmpdir):
             if name.endswith("dmdsec.xml"):
                 count = count + 1
     assert count == 2
+
 
 def test_create_mets(tmpdir):
     """

@@ -2,6 +2,7 @@
 """
 from dpres_sip_compiler.config import Config
 
+
 def test_configure():
     """Test that configuration file is loaded as properties.
     """

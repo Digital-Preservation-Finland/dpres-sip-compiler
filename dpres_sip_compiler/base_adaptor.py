@@ -24,6 +24,8 @@ class SipMetadata(object):
     Can be overwritten with metadata type specific adaptors.
     """
 
+    # pylint: disable=no-self-use
+
     def __init__(self):
         """
         Initialize SIP PREMIS handler.
@@ -136,6 +138,8 @@ class PremisObject(object):
     Can be overwritten with metadata type specific adaptors.
     """
 
+    # pylint: disable=no-self-use
+
     def __init__(self):
         """Initialize object.
         """
@@ -161,27 +165,30 @@ class PremisObject(object):
         return None
 
     @property
-    def original_name():
+    def original_name(self):
         """Original name.
         """
         return None
 
     @property
-    def message_digest_algorithm():
+    def message_digest_algorithm(self):
         """Checksum algorithm.
         """
         return None
 
     @property
-    def message_digest():
+    def message_digest(self):
         """Checksum.
         """
         return None
+
 
 class PremisEvent(object):
     """Class for a PREMIS Event.
     Can be overwritten with metadata type specific adaptors.
     """
+
+    # pylint: disable=no-self-use
 
     @property
     def identifier(self):
@@ -203,39 +210,42 @@ class PremisEvent(object):
         return None
 
     @property
-    def event_type():
+    def event_type(self):
         """Event type.
         """
         return None
 
     @property
-    def event_datetime():
+    def event_datetime(self):
         """Event datetime..
         """
         return None
 
     @property
-    def event_detail():
+    def event_detail(self):
         """Event detail.
         """
         return None
 
     @property
-    def event_outcome():
+    def event_outcome(self):
         """Event outcome.
         """
         return None
 
     @property
-    def event_outcome_detail():
+    def event_outcome_detail(self):
         """Event outcome detail.
         """
         return None
+
 
 class PremisAgent(object):
     """Class for a PREMIS Event.
     Can be overwritten with metadata type specific adaptors.
     """
+
+    # pylint: disable=no-self-use
 
     @property
     def identifier(self):
@@ -257,13 +267,13 @@ class PremisAgent(object):
         return None
 
     @property
-    def agent_name():
+    def agent_name(self):
         """Agent name.
         """
         return None
 
     @property
-    def agent_type():
+    def agent_type(self):
         """Agent type.
         """
         return None

@@ -3,8 +3,8 @@
 import os
 from io import open as io_open
 import re
-import six
 import csv
+import six
 from dpres_sip_compiler.base_adaptor import (
     SipMetadata, PremisObject, PremisEvent, PremisAgent, PremisLinking)
 
@@ -18,23 +18,24 @@ def spaceless(string):
     return re.sub(r"\s+", '_', string)
 
 
+def open_csv_file(filename, charset):
+    """
+    Open the file in mode dependent on the python version.
+
+    :filename: CSV filename
+    :charset: File encoding
+    :returns: handle to the newly-opened file
+    :raises: IOError if the file cannot be read
+    """
+    if six.PY2:
+        return io_open(filename, "rb")
+    return io_open(filename, "rt", encoding=charset)
+
+
 class SipMetadataMusicArchive(SipMetadata):
     """
     Music Archive specific PREMIS Metadata handler for a SIP to be compiled.
     """
-
-    def _open_csv_file(self, filename, charset):
-        """
-        Open the file in mode dependent on the python version.
-
-        :filename: CSV filename
-        :charset: File encoding
-        :returns: handle to the newly-opened file
-        :raises: IOError if the file cannot be read
-        """
-        if six.PY2:
-            return io_open(filename, "rb")
-        return io_open(filename, "rt", encoding=charset)
 
     def populate(self, workspace, config):
         """
@@ -52,7 +53,7 @@ class SipMetadataMusicArchive(SipMetadata):
         if not csvpath:
             raise IOError("CSV metadata file was not found!")
         try:
-            csvfile = self._open_csv_file(csvpath, "utf-8")
+            csvfile = open_csv_file(csvpath, "utf-8")
             csvreader = csv.DictReader(csvfile, delimiter=',', quotechar='"')
             for csv_row in csvreader:
                 p_object = PremisObjectMusicArchive(csv_row)
@@ -224,9 +225,11 @@ class PremisEventMusicArchive(PremisEvent):
         """Event detail"""
         if self.event_type == "message digest calculation":
             return "Checksum calculation for digital objects."
-        elif self.event_type == "filename change":
+
+        if self.event_type == "filename change":
             return "Filename change."
-        elif self.event_type == "information package creation":
+
+        if self.event_type == "information package creation":
             return "Creation of submission information package."
 
         raise NotImplementedError(
@@ -248,13 +251,13 @@ class PremisEventMusicArchive(PremisEvent):
                                       info["tiiviste"])
             return out
 
-        elif self.event_type == "filename change":
+        if self.event_type == "filename change":
             # There's only one element in details
             return "Filename changed.\nOld filename: %s\nNew filename: %s\n" \
                    "" % (self._detail_info[0]["pon-korvattu-nimi"],
                          self._detail_info[0]["objekti-nimi"])
 
-        elif self.event_type == "information package creation":
+        if self.event_type == "information package creation":
             # There's only one element in details
             return "Submission information package created as: " \
                    "%s" % spaceless(self._detail_info[0]["sip-tunniste"])

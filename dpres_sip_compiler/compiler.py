@@ -23,6 +23,7 @@ from dpres_sip_compiler.config import Config
 from dpres_sip_compiler.selector import select
 
 
+# pylint: disable=too-few-public-methods
 class SipCompiler(object):
     """Compiler to create SIPs
     """

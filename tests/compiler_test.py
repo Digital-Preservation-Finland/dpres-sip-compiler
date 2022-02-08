@@ -1,11 +1,9 @@
 """Test SIP compilation.
 """
 import os
-from shutil import copytree
 import lxml.etree
 from siptools.scripts.compile_structmap import compile_structmap
 from dpres_sip_compiler.selector import select
-from dpres_sip_compiler.config import Config
 from dpres_sip_compiler.compiler import (SipCompiler, compile_sip,
                                          clean_workspace)
 
@@ -16,20 +14,6 @@ NAMESPACES = {
     'fi': 'http://digitalpreservation.fi/schemas/mets/fi-extensions',
     'audiomd': 'http://www.loc.gov/audioMD/',
 }
-
-
-def _prepare_test_path(tmp_path, workspace="workspace2"):
-    """
-    Prepare temporary workspace.
-    :tmp_path: Temporary test path
-    :workspace: Workspace case from test data
-    :returns: Test workspace path and configuration (tuple)
-    """
-    destination = os.path.join(str(tmp_path), workspace)
-    config = Config()
-    config.configure("tests/data/musicarchive/config.conf")
-    copytree(os.path.join("tests/data/musicarchive", workspace), destination)
-    return (destination, config)
 
 
 def _get_provenance(workspace):
@@ -64,11 +48,11 @@ def _get_provenance(workspace):
     return (event_xml, agent_xml)
 
 
-def test_technical(tmpdir):
+def test_technical(tmpdir, prepare_workspace):
     """
     Test technical metadata.
     """
-    (workspace, config) = _prepare_test_path(tmpdir)
+    (workspace, config) = prepare_workspace(tmpdir)
     sip_meta = select(workspace, config)
     compiler = SipCompiler(workspace, config, sip_meta)
     compiler._technical_metadata()
@@ -97,11 +81,11 @@ def test_technical(tmpdir):
                             namespaces=NAMESPACES)[0].text == "audio/x-wav"
 
 
-def test_provenance(tmpdir):
+def test_provenance(tmpdir, prepare_workspace):
     """
     Test provenance metadata.
     """
-    (workspace, config) = _prepare_test_path(tmpdir)
+    (workspace, config) = prepare_workspace(tmpdir)
     sip_meta = select(workspace, config)
     compiler = SipCompiler(workspace, config, sip_meta)
     compiler._technical_metadata()
@@ -148,11 +132,11 @@ def test_provenance(tmpdir):
                            namespaces=NAMESPACES)[0].text == "person"
 
 
-def test_descriptive(tmpdir):
+def test_descriptive(tmpdir, prepare_workspace):
     """
     Test that descriptive metadata exists.
     """
-    (workspace, config) = _prepare_test_path(tmpdir, "workspace1")
+    (workspace, config) = prepare_workspace(tmpdir, "workspace1")
     sip_meta = select(workspace, config)
     compiler = SipCompiler(workspace, config, sip_meta)
     compiler._descriptive_metadata()
@@ -164,11 +148,11 @@ def test_descriptive(tmpdir):
     assert count == 2
 
 
-def test_create_mets(tmpdir):
+def test_create_mets(tmpdir, prepare_workspace):
     """
     Thest METS creation.
     """
-    (workspace, config) = _prepare_test_path(tmpdir)
+    (workspace, config) = prepare_workspace(tmpdir)
     sip_meta = select(workspace, config)
     compiler = SipCompiler(workspace, config, sip_meta)
     compiler.create_mets()
@@ -191,11 +175,11 @@ def test_create_mets(tmpdir):
         "Package_2022-02-07_123"
 
 
-def test_compile_sip(tmpdir):
+def test_compile_sip(tmpdir, prepare_workspace):
     """
     Tset SIP compilation.
     """
-    (workspace, _) = _prepare_test_path(tmpdir, "workspace1")
+    (workspace, _) = prepare_workspace(tmpdir, "workspace1")
     compile_sip("tests/data/musicarchive/config.conf", workspace)
     assert os.path.isfile(os.path.join(workspace, "mets.xml"))
     assert os.path.isfile(os.path.join(workspace, "signature.sig"))
@@ -203,11 +187,11 @@ def test_compile_sip(tmpdir):
                                        "Package_2022_02_07_123.tar"))
 
 
-def test_clean_workspace(tmpdir):
+def test_clean_workspace(tmpdir, prepare_workspace):
     """
     Test workspace cleaning.
     """
-    (workspace, config) = _prepare_test_path(tmpdir)
+    (workspace, config) = prepare_workspace(tmpdir)
     sip_meta = select(workspace, config)
     compiler = SipCompiler(workspace, config, sip_meta)
     compiler._technical_metadata()

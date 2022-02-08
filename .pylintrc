@@ -12,6 +12,9 @@
 # useless-object-inheritance:
 # We want to keep the new-style classes for Python 2 also when it isn't
 # strictly necessary and then do a cleanup when Python 2 support is dropped.
-disable=consider-using-f-string, super-with-arguments, useless-object-inheritance
+#
+# raise-missing-from:
+# Python2 does not support raise...from.
+disable=consider-using-f-string, super-with-arguments, useless-object-inheritance, raise-missing-from
 
 extension-pkg-whitelist=lxml

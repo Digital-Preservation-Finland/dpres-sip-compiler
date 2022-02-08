@@ -36,9 +36,11 @@ class SipMetadata(object):
         self.premis_agents = {}     # PREMIS Agents
         self.premis_linkings = {}   # Linkings inside PREMIS
 
+    #pylint: disable=unused-argument
     def descriptive_files(self, desc_path, config):
         """
         Iterator for descriptive metadata files.
+        Implemented in adaptors.
 
         :desc_path: Path to descrptive metadata files
         :config: Additional needed configuration
@@ -46,17 +48,22 @@ class SipMetadata(object):
         """
         yield
 
+    #pylint: disable=unused-argument
     def desc_root_remove(self, config):
         """
         Resolve whether descriptive metadata root should be removed.
+        Implemented in adaptors.
+
         :config: Additional needed configuration
         :returns: True/False
         """
         return False
 
-    def exclude_files(config):
+    #pylint: disable=unused-argument
+    def exclude_files(self, config):
         """
         Exclude files from Submission Information Package.
+        Implemented in adaptors.
 
         :config: Additional needed configuration
         :returns: Patterns for metadata files to be excluded.

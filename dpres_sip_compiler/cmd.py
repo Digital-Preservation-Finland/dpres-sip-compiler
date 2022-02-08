@@ -10,6 +10,7 @@ def cli():
     """SIP Compiler"""
 
 
+#pylint: disable=unused-argument
 @cli.command(
     name="compile",
     help="Compile Submission Information Package"
@@ -28,6 +29,7 @@ def compile_command(ctx, config, workspace):
     compile_sip(config, workspace)
 
 
+#pylint: disable=unused-argument
 @cli.command(
     name="clean",
     help="Clean workspace"

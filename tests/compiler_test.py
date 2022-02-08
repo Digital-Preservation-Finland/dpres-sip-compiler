@@ -181,10 +181,25 @@ def test_compile_sip(tmpdir, prepare_workspace):
     """
     (workspace, _) = prepare_workspace(tmpdir, "workspace1")
     compile_sip("tests/data/musicarchive/config.conf", workspace)
+    mets_xml = lxml.etree.parse(os.path.join(workspace, "mets.xml"))
     assert os.path.isfile(os.path.join(workspace, "mets.xml"))
     assert os.path.isfile(os.path.join(workspace, "signature.sig"))
     assert os.path.isfile(os.path.join(workspace,
                                        "Package_2022_02_07_123.tar"))
+    assert len(mets_xml.xpath(".//mets:dmdSec",
+                              namespaces=NAMESPACES)) == 2
+    assert len(mets_xml.xpath(".//mets:techMD//premis:object",
+                              namespaces=NAMESPACES)) == 4
+    assert len(mets_xml.xpath(".//mets:techMD//audiomd:AUDIOMD",
+                              namespaces=NAMESPACES)) == 1
+    assert len(mets_xml.xpath(".//mets:digiprovMD//premis:event",
+                              namespaces=NAMESPACES)) == 22
+    assert len(mets_xml.xpath(".//mets:digiprovMD//premis:agent",
+                              namespaces=NAMESPACES)) == 13
+    assert len(mets_xml.xpath(".//mets:file",
+                              namespaces=NAMESPACES)) == 4
+    assert len(mets_xml.xpath(".//mets:structMap",
+                              namespaces=NAMESPACES)) == 1
 
 
 def test_clean_workspace(tmpdir, prepare_workspace):

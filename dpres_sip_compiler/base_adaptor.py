@@ -36,7 +36,7 @@ class SipMetadata(object):
         self.premis_agents = {}     # PREMIS Agents
         self.premis_linkings = {}   # Linkings inside PREMIS
 
-    #pylint: disable=unused-argument
+    # pylint: disable=unused-argument
     def descriptive_files(self, desc_path, config):
         """
         Iterator for descriptive metadata files.
@@ -48,7 +48,7 @@ class SipMetadata(object):
         """
         yield
 
-    #pylint: disable=unused-argument
+    # pylint: disable=unused-argument
     def desc_root_remove(self, config):
         """
         Resolve whether descriptive metadata root should be removed.
@@ -59,7 +59,7 @@ class SipMetadata(object):
         """
         return False
 
-    #pylint: disable=unused-argument
+    # pylint: disable=unused-argument
     def exclude_files(self, config):
         """
         Exclude files from Submission Information Package.

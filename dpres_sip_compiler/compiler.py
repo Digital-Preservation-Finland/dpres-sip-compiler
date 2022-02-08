@@ -196,4 +196,4 @@ def clean_workspace(workspace):
                                "-scraper.json", "-amd.json",
                                "mets.xml", "signature.sig", ".tar"))):
                 os.remove(os.path.join(root, name))
-    print("Temporary files were cleaned from workspace.")
+    print("Temporary and result files were cleaned from workspace.")

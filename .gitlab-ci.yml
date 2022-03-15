@@ -2,7 +2,6 @@
 
 variables:
   CI_PYTHON_UNIVERSAL: "yes"
-  CI_SKIP_SYSTEM_UNIT_TESTS: "yes"
 
 include:
   - project: 'dpres/gitlab-ci-pipeline'

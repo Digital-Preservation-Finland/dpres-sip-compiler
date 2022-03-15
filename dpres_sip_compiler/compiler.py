@@ -33,7 +33,7 @@ class SipCompiler(object):
 
         :workspace: Workspace path
         :config: Basic configuration
-        :sip_meta: PREMIS metadata objects for the SIP to be compiler.
+        :sip_meta: PREMIS metadata objects for the SIP to be compiled.
         """
         self.workspace = workspace
         self.config = config

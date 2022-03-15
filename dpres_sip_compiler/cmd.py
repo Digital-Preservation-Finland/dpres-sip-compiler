@@ -13,7 +13,6 @@ def cli():
 # pylint: disable=unused-argument
 @cli.command(
     name="compile",
-    help="Compile Submission Information Package"
 )
 @click.argument('config', type=click.Path(exists=True))
 @click.argument('workspace', type=click.Path(exists=True))

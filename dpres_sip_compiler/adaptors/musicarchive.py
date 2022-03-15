@@ -40,6 +40,8 @@ class SipMetadataMusicArchive(SipMetadata):
     def populate(self, workspace, config):
         """
         Populate a CSV file to PREMIS dicts.
+        The CSV file must be in the root directory of workspace as it is
+        not actual digital object in the content.
 
         :workspace: Data workspace
         :config: Basic configuration

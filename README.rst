@@ -18,9 +18,12 @@ This tool is currently a work-in-progress project, and therefore
 the possible command line interface updates may be incompatible with the
 previous versions.
 
+<<<<<<< HEAD
 The tool currently supports only packaging of Music Archive data,
 with agreed content preparation rules.
 
+=======
+>>>>>>> PASMM-59 Fix README and various typos in documentation.
 Installation
 ------------
 
@@ -73,8 +76,7 @@ Copy file ``dpres_sip_compiler/conf/config_<adaptor>_template.conf`` to a proper
 directory and modify organization name, contract ID and SIP signing key to it.
 Here, ``<adaptor>`` is an agreed and implemented adaptor name.
 
-For Music Archive data, the configuration template is located at
-``dpres_sip_compiler/conf/config_musicarchive_template.conf``
+See adaptor specific details below.
 
 Content Preparation
 -------------------
@@ -87,12 +89,18 @@ as temporary files internal to the tool and will be removed in the process:
 ``*-amd.xml``, ``*dmdsec.xml``, ``*structmap.xml``, ``*filesec.xml``,
 ``*rightsmd.xml``, ``*md-references.jsonl``, ``*-scraper.json``, ``*-amd.json``.
 
-For Music Archive data, the descriptive metadata of a package needs to be in
-the workspace root named as ``*___metadata.xml`` (where ``*`` is any string).
-There may be several descriptive metadata files. The structured administrative
-metadata must be given as as single ``*___metadata.csv`` file. The CSV
-structure has been agreed separately. These files are utilized in packaging,
-but these will not be included in the package as separate files.
+See adaptor specific details below.
+
+Adaptor Specific Details
+------------------------
+
+For details about adaptor specific configuration and content preparation,
+select the adaptor below:
+
+   * `Music Archive <./doc/musicarchive.rst>`_
+
+The tool currently supports only packaging of Music Archive data,
+with advancely agreed content preparation rules.
 
 Usage
 -----

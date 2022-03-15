@@ -92,10 +92,15 @@ class SipMetadata(object):
         """
         Create PREMIS linkings between events and objects/agents.
 
-        Normally, the keys in `p_linking` dict is same as event identifier, and
-        the value contains identifiers to objects and agents. Create a new
-        linking with creating a nesw linking object referring to an event or
-        append new object/agent linking to an existing linking object.
+        The links are appended to a dict structure: A key in a link is an
+        event identifier, and the corresponding value contains identifiers of
+        the PREMIS objects and agents, which are related to the event.
+
+        This method adds linkings between a PREMIS event, and a PREMIS object
+        and agent. More objects/agent can be added with multiple calls: If
+        the key (i.e. event identifier) exists already, the method appends
+        the given PREMIS object and agent linkings along with the existing
+        ones.
 
         :p_linking: Linking object
         :object_id: PREMIS Object ID

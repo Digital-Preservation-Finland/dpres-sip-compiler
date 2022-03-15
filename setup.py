@@ -8,7 +8,7 @@ def main():
         name='dpres-sip-compiler',
         packages=['dpres_sip_compiler'],
         package_dir={
-            "dpres_access_rest_api_client": "dpres_access_rest_api_client"
+            "dpres_sip_compiler": "dpres_sip_compiler"
         },
         include_package_data=True,
         install_requires=[

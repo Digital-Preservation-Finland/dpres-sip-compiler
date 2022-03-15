@@ -1,12 +1,12 @@
 """Install SIP Compiler."""
-from setuptools import setup
+from setuptools import setup, find_packages
 
 
 def main():
     """Install SIP Compiler."""
     setup(
-        name='dpres-sip-compiler',
-        packages=['dpres_sip_compiler'],
+        name='dpres_sip_compiler',
+        packages=find_packages(exclude=["tests", "tests.*"]),
         package_dir={
             "dpres_sip_compiler": "dpres_sip_compiler"
         },

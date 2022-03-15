@@ -32,8 +32,8 @@ class SipCompiler(object):
         """Initialize compiler.
 
         :workspace: Workspace path
-        :config: Basic cnofiguration
-        :sip_meta: PREMIS metadata objects for the SIP to be compiled.
+        :config: Basic configuration
+        :sip_meta: PREMIS metadata objects for the SIP to be compiler.
         """
         self.workspace = workspace
         self.config = config
@@ -185,7 +185,7 @@ def compile_sip(conf_file, workspace):
 
 def clean_workspace(workspace):
     """Clean workspace from temporary files.
-    This is currently needed if the packaging gets iterrupted.
+    This is currently needed if the packaging gets interrupted.
     :workspace: Workspace path
     """
     for root, _, files in os.walk(workspace, topdown=False):

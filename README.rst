@@ -4,7 +4,7 @@ SIP Compiler
 This is a tool which combines the commands of Pre-Ingest Tool according to
 given structured metadata and creates an OAIS Submission Information Package
 with a low number of commands. The tool can be extended with new adaptors,
-where different types of metadata is normalized and then given to the
+where different types of metadata are normalized and then given to the
 Pre-Ingest Tool.
 
 This tool helps especially smaller use cases in manual workflows, where
@@ -19,7 +19,7 @@ the possible command line interface updates may be incompatible with the
 previous versions.
 
 The tool currently supports only packaging of Music Archive data,
-with an agreed content preparation rules.
+with agreed content preparation rules.
 
 Installation
 ------------
@@ -45,9 +45,9 @@ For Python 2.7, get python-virtualenv software and create a virtual environment:
     yum install python-virtualenv
     virtualenv venv
 
-For Python 3.6 or newer, create a virtual envirnoment::
+For Python 3.6 or newer, create a virtual environment::
 
-    python3 -mvenv venv
+    python3 -m venv venv
 
 Run the following to activate the virtual environment::
 

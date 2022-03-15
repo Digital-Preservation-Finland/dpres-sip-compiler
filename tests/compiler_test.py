@@ -150,7 +150,7 @@ def test_descriptive(tmpdir, prepare_workspace):
 
 def test_create_mets(tmpdir, prepare_workspace):
     """
-    Thest METS creation.
+    Test METS creation.
     """
     (workspace, config) = prepare_workspace(tmpdir)
     sip_meta = select(workspace, config)
@@ -177,7 +177,7 @@ def test_create_mets(tmpdir, prepare_workspace):
 
 def test_compile_sip(tmpdir, prepare_workspace):
     """
-    Tset SIP compilation.
+    Test SIP compilation.
     """
     (workspace, _) = prepare_workspace(tmpdir, "workspace1")
     compile_sip("tests/data/musicarchive/config.conf", workspace)

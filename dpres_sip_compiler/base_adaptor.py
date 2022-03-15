@@ -42,7 +42,7 @@ class SipMetadata(object):
         Iterator for descriptive metadata files.
         Implemented in adaptors.
 
-        :desc_path: Path to descrptive metadata files
+        :desc_path: Path to descriptive metadata files
         :config: Additional needed configuration
         :returns: Descriptive metadata file
         """
@@ -92,9 +92,9 @@ class SipMetadata(object):
         """
         Create PREMIS linkings between events and objects/agents.
 
-        Normally, the keys in linkings dict is same as event identifier, and
+        Normally, the keys in `p_linking` dict is same as event identifier, and
         the value contains identifiers to objects and agents. Create a new
-        linking with creating a ne linking object referring to an event or
+        linking with creating a nesw linking object referring to an event or
         append new object/agent linking to an existing linking object.
 
         :p_linking: Linking object

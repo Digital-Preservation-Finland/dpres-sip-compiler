@@ -3,7 +3,8 @@ Configuration
 
 For Music Archive data, the configuration template is located at
 ``dpres_sip_compiler/conf/config_musicarchive_template.conf``
-Copy the file to any directory and modify organization name,
+Copy the file to ``~/.config/dpres-sip-compiler/config.conf``
+(or to some other path of your choice) and modify organization name,
 contract ID and SIP signing key to it.
 
 Content Preparation

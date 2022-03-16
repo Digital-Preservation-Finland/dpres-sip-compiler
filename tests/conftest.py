@@ -21,7 +21,8 @@ def prepare_workspace():
         :returns: Workspace with path and configuration
         """
         destination = os.path.join(str(tmp_path), workspace)
-        copytree(os.path.join("tests/data/musicarchive", workspace), destination)
+        copytree(os.path.join("tests/data/musicarchive", workspace),
+                 destination)
         config = Config()
         config.configure("tests/data/musicarchive/config.conf")
         return (destination, config)

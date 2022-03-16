@@ -1,7 +1,18 @@
 """Reader for configuration info
 """
+import os
 import configparser
 import six
+import click
+
+
+def get_default_config_path():
+    """
+    Get path to the default configuration file
+    """
+    return os.path.join(
+        click.get_app_dir("dpres-sip-compiler"),
+        "config.conf")
 
 
 class Config(object):

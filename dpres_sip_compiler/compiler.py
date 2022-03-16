@@ -19,7 +19,7 @@ from siptools.scripts.compile_mets import compile_mets
 from siptools.scripts.sign_mets import sign_mets
 from siptools.scripts.compress import compress
 from siptools.utils import read_json_streams
-from dpres_sip_compiler.config import Config
+from dpres_sip_compiler.config import Config, get_default_config_path
 from dpres_sip_compiler.selector import select
 
 
@@ -168,11 +168,14 @@ class SipCompiler(object):
               "%s.tar" % (os.path.join(self.workspace, tar_file)))
 
 
-def compile_sip(conf_file, workspace):
+def compile_sip(workspace, conf_file=None):
     """SIP Compiler
-    :conf_file: Configuration file path
     :workspace: Workspace path
+    :conf_file: Configuration file path
     """
+    if conf_file is None:
+        conf_file = get_default_config_path()
+
     config = Config()
     config.configure(conf_file)
 

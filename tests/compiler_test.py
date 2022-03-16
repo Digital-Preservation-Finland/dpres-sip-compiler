@@ -1,11 +1,13 @@
 """Test SIP compilation.
 """
 import os
+import shutil
 import lxml.etree
 from siptools.scripts.compile_structmap import compile_structmap
 from dpres_sip_compiler.selector import select
 from dpres_sip_compiler.compiler import (SipCompiler, compile_sip,
                                          clean_workspace)
+from dpres_sip_compiler.config import get_default_config_path
 
 
 NAMESPACES = {
@@ -180,7 +182,7 @@ def test_compile_sip(tmpdir, prepare_workspace):
     Test SIP compilation.
     """
     (workspace, _) = prepare_workspace(tmpdir, "workspace1")
-    compile_sip("tests/data/musicarchive/config.conf", workspace)
+    compile_sip(workspace, "tests/data/musicarchive/config.conf")
     mets_xml = lxml.etree.parse(os.path.join(workspace, "mets.xml"))
     assert os.path.isfile(os.path.join(workspace, "mets.xml"))
     assert os.path.isfile(os.path.join(workspace, "signature.sig"))
@@ -200,6 +202,27 @@ def test_compile_sip(tmpdir, prepare_workspace):
                               namespaces=NAMESPACES)) == 4
     assert len(mets_xml.xpath(".//mets:structMap",
                               namespaces=NAMESPACES)) == 1
+
+
+def test_default_config(tmpdir, prepare_workspace):
+    """
+    Test that organization name from default config file
+    is found in METS.
+    """
+    (workspace, _) = prepare_workspace(tmpdir, "workspace1")
+    conf_path = get_default_config_path()
+    conf_dir = os.path.dirname(conf_path)
+    if not os.path.exists(conf_dir):
+        os.makedirs(conf_dir)
+    shutil.copy("tests/data/musicarchive/config.conf", conf_path)
+    compile_sip(workspace)
+    mets_xml = lxml.etree.parse(os.path.join(workspace, "mets.xml"))
+    assert os.path.isfile(os.path.join(workspace, "mets.xml"))
+    assert os.path.isfile(os.path.join(workspace, "signature.sig"))
+    assert os.path.isfile(os.path.join(workspace,
+                                       "Package_2022_02_07_123.tar"))
+    assert mets_xml.xpath("/mets:mets/mets:metsHdr/mets:agent/mets:name",
+                          namespaces=NAMESPACES)[0].text == "Archive X"
 
 
 def test_clean_workspace(tmpdir, prepare_workspace):

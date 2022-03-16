@@ -1,7 +1,9 @@
 """Test CLI.
 """
 import os
+import shutil
 from siptools.scripts.compile_structmap import compile_structmap
+from dpres_sip_compiler.config import get_default_config_path
 from dpres_sip_compiler.selector import select
 from dpres_sip_compiler.compiler import SipCompiler
 
@@ -10,8 +12,26 @@ def test_compile(tmpdir, run_cli, prepare_workspace):
     """Test compile command.
     """
     (workspace, _) = prepare_workspace(tmpdir, "workspace1")
-    result = run_cli(["compile", "tests/data/musicarchive/config.conf",
-                      workspace])
+    result = run_cli(
+        ["compile", "--config", "tests/data/musicarchive/config.conf",
+         workspace])
+    assert result.exit_code == 0
+    assert os.path.isfile(os.path.join(workspace, "mets.xml"))
+    assert os.path.isfile(os.path.join(workspace, "signature.sig"))
+    assert os.path.isfile(os.path.join(workspace,
+                                       "Package_2022_02_07_123.tar"))
+
+
+def test_default_config(tmpdir, run_cli, prepare_workspace):
+    """Test default configuration path
+    """
+    (workspace, _) = prepare_workspace(tmpdir, "workspace1")
+    conf_path = get_default_config_path()
+    conf_dir = os.path.dirname(conf_path)
+    if not os.path.exists(conf_dir):
+        os.makedirs(conf_dir)
+    shutil.copy("tests/data/musicarchive/config.conf", conf_path)
+    result = run_cli(["compile", workspace])
     assert result.exit_code == 0
     assert os.path.isfile(os.path.join(workspace, "mets.xml"))
     assert os.path.isfile(os.path.join(workspace, "signature.sig"))

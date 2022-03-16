@@ -18,12 +18,6 @@ This tool is currently a work-in-progress project, and therefore
 the possible command line interface updates may be incompatible with the
 previous versions.
 
-<<<<<<< HEAD
-The tool currently supports only packaging of Music Archive data,
-with agreed content preparation rules.
-
-=======
->>>>>>> PASMM-59 Fix README and various typos in documentation.
 Installation
 ------------
 

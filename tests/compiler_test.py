@@ -22,6 +22,7 @@ def _get_provenance(workspace):
     """
     Find 'message digest calculation' event and 'Testaaja, Teppo' agent
     from workspace.
+
     :workspace: Workspace path
     :returns: Event and agent XML trees
     """
@@ -53,6 +54,14 @@ def _get_provenance(workspace):
 def test_technical(tmpdir, prepare_workspace):
     """
     Test technical metadata.
+
+    The tests are run with the Music Archive adaptor, because in
+    the time of writing, this is the only existing adaptor.
+
+    Technical metadata is added based on existing CSV file.
+    It is tested that the PREMIS metadata meets the info found in given CSV
+    file. Also, existence of AudioMD is tested, because the test content
+    includes an audio file. 
     """
     (workspace, config) = prepare_workspace(tmpdir)
     sip_meta = select(workspace, config)
@@ -86,6 +95,13 @@ def test_technical(tmpdir, prepare_workspace):
 def test_provenance(tmpdir, prepare_workspace):
     """
     Test provenance metadata.
+
+    The tests are run with the Music Archive adaptor, because in
+    the time of writing, this is the only existing adaptor.
+
+    Provenance metadata is added based on existing CSV file.
+    It is tested that the content of an event and an agent added to METS
+    meet the info found in the given CSV file. 
     """
     (workspace, config) = prepare_workspace(tmpdir)
     sip_meta = select(workspace, config)
@@ -136,7 +152,7 @@ def test_provenance(tmpdir, prepare_workspace):
 
 def test_descriptive(tmpdir, prepare_workspace):
     """
-    Test that descriptive metadata exists.
+    Test that correct number of descriptive metadata sections exists.
     """
     (workspace, config) = prepare_workspace(tmpdir, "workspace1")
     sip_meta = select(workspace, config)
@@ -152,7 +168,15 @@ def test_descriptive(tmpdir, prepare_workspace):
 
 def test_create_mets(tmpdir, prepare_workspace):
     """
-    Test METS creation.
+    Test package and METS creation.
+
+    The following cases about the METS and packaging are tested:
+    (1) metx.xml exists.
+    (2) signature.sig exists.
+    (3) tar file with correct name exists.
+    (4) METS Header attribute values (creator agent name, type and role)
+        are correct.
+    (5) Mets root attributes (contract id and objid) are correct.
     """
     (workspace, config) = prepare_workspace(tmpdir)
     sip_meta = select(workspace, config)
@@ -180,6 +204,12 @@ def test_create_mets(tmpdir, prepare_workspace):
 def test_compile_sip(tmpdir, prepare_workspace):
     """
     Test SIP compilation.
+
+    The following cases about the SIP comilation are tested:
+    (1) metx.xml exists.
+    (2) signature.sig exists.
+    (3) tar file with correct name exists.
+    (4) Number of different metadata sections in METS is correct.
     """
     (workspace, _) = prepare_workspace(tmpdir, "workspace1")
     compile_sip(workspace, "tests/data/musicarchive/config.conf")
@@ -206,8 +236,8 @@ def test_compile_sip(tmpdir, prepare_workspace):
 
 def test_default_config(tmpdir, prepare_workspace):
     """
-    Test that organization name from default config file
-    is found in METS.
+    Test that organization name from a config file located in
+    default location is found in METS.
     """
     (workspace, _) = prepare_workspace(tmpdir, "workspace1")
     conf_path = get_default_config_path()

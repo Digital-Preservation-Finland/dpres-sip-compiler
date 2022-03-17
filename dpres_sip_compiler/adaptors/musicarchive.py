@@ -27,12 +27,18 @@ def read_csv_file(filename):
     :yields: CSV rows as dictionary
 
     """
+    def _open_file(filename):
+        """
+        Open file in binary mode for Python 2,
+        Otherwise in utf-8 text mode.
 
-    open_file = lambda filename: io_open(filename, "rt", encoding="utf-8")
-    if six.PY2:
-        open_file = lambda filename: io_open(filename, "rb")
+        :filename: File to open
+        """
+        if six.PY2:
+            return io_open(filename, "rb")
+        return io_open(filename, "rt", encoding="utf-8")
 
-    with open_file(filename) as infile:
+    with _open_file(filename) as infile:
         csvreader = csv.DictReader(infile, delimiter=',', quotechar='"')
         for row in csvreader:
             yield row

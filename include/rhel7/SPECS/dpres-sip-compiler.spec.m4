@@ -18,7 +18,7 @@ URL:            https://www.digitalpreservation.fi
 Source0:        %{file_prefix}-v%{file_version}%{?file_release_tag}-%{file_build_number}-g%{file_commit_ref}.%{file_ext}
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildArch:      noarch
-Requires:       python python-click dpres-siptools
+Requires:       python python-click dpres-siptools python-configparser
 BuildRequires:  python-setuptools file-scraper-full openssl-devel
 
 %description

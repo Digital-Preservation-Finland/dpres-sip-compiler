@@ -28,11 +28,11 @@ def read_csv_file(filename):
 
     """
 
-    mode = "rt"
+    open_file = lambda filename: io_open(filename, "rt", encoding="utf-8")
     if six.PY2:
-        mode = "rb"
+        open_file = lambda filename: io_open(filename, "rb")
 
-    with io_open(filename, mode, encoding="utf-8") as infile:
+    with open_file(filename) as infile:
         csvreader = csv.DictReader(infile, delimiter=',', quotechar='"')
         for row in csvreader:
             yield row

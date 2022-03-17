@@ -223,7 +223,7 @@ def test_compile_sip(tmpdir, prepare_workspace):
     """
     Test SIP compilation.
 
-    The following cases about the SIP comilation are tested:
+    The following cases about the SIP compilation are tested:
     (1) mets.xml exists.
     (2) signature.sig exists.
     (3) tar file with correct name exists.

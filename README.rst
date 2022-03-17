@@ -99,7 +99,7 @@ select the adaptor below:
    * `Music Archive <./doc/musicarchive.rst>`_
 
 The tool currently supports only packaging of Music Archive data,
-with advancely agreed content preparation rules.
+with content preparation rules which have been agreed in advance.
 
 Usage
 -----

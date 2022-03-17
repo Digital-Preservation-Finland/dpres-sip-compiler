@@ -3,10 +3,11 @@
 import os
 import shutil
 import lxml.etree
+import pytest
 from siptools.scripts.compile_structmap import compile_structmap
 from dpres_sip_compiler.selector import select
 from dpres_sip_compiler.compiler import (SipCompiler, compile_sip,
-                                         clean_workspace)
+                                         clean_temp_files)
 from dpres_sip_compiler.config import get_default_config_path
 
 
@@ -66,7 +67,7 @@ def test_technical(tmpdir, prepare_workspace):
     (workspace, config) = prepare_workspace(tmpdir)
     sip_meta = select(workspace, config)
     compiler = SipCompiler(workspace, config, sip_meta)
-    compiler._technical_metadata()
+    compiler._create_technical_metadata()
     audio_path = None
     premis_path = None
     for root, _, files in os.walk(workspace, topdown=False):
@@ -106,8 +107,8 @@ def test_provenance(tmpdir, prepare_workspace):
     (workspace, config) = prepare_workspace(tmpdir)
     sip_meta = select(workspace, config)
     compiler = SipCompiler(workspace, config, sip_meta)
-    compiler._technical_metadata()
-    compiler._provenance_metadata()
+    compiler._create_technical_metadata()
+    compiler._create_provenance_metadata()
     (event_xml, agent_xml) = _get_provenance(workspace)
     assert event_xml.xpath(
         ".//premis:eventType", namespaces=NAMESPACES)[0].text == \
@@ -157,7 +158,7 @@ def test_descriptive(tmpdir, prepare_workspace):
     (workspace, config) = prepare_workspace(tmpdir, "workspace1")
     sip_meta = select(workspace, config)
     compiler = SipCompiler(workspace, config, sip_meta)
-    compiler._descriptive_metadata()
+    compiler._import_descriptive_metadata()
     count = 0
     for root, _, files in os.walk(workspace, topdown=False):
         for name in files:
@@ -166,27 +167,23 @@ def test_descriptive(tmpdir, prepare_workspace):
     assert count == 2
 
 
-def test_create_mets(tmpdir, prepare_workspace):
-    """
-    Test package and METS creation.
+def test_compile_metadata(tmpdir, prepare_workspace):
+    """Test METS compilation.
 
     The following cases about the METS and packaging are tested:
-    (1) metx.xml exists.
-    (2) signature.sig exists.
-    (3) tar file with correct name exists.
-    (4) METS Header attribute values (creator agent name, type and role)
+    (1) mets.xml exists.
+    (2) METS Header attribute values (creator agent name, type and role)
         are correct.
-    (5) Mets root attributes (contract id and objid) are correct.
+    (3) Mets root attributes (contract id and objid) are correct.
     """
     (workspace, config) = prepare_workspace(tmpdir)
     sip_meta = select(workspace, config)
     compiler = SipCompiler(workspace, config, sip_meta)
-    compiler.create_mets()
+    compiler._create_technical_metadata()
+    compiler._compile_metadata()
+
     mets_xml = lxml.etree.parse(os.path.join(workspace, "mets.xml"))
     assert os.path.isfile(os.path.join(workspace, "mets.xml"))
-    assert os.path.isfile(os.path.join(workspace, "signature.sig"))
-    assert os.path.isfile(os.path.join(workspace,
-                                       "Package_2022_02_07_123.tar"))
     assert mets_xml.xpath("/mets:mets/mets:metsHdr/mets:agent/mets:name",
                           namespaces=NAMESPACES)[0].text == "Archive X"
     assert mets_xml.xpath("/mets:mets/mets:metsHdr/mets:agent/@TYPE",
@@ -200,13 +197,34 @@ def test_create_mets(tmpdir, prepare_workspace):
         "/mets:mets/@OBJID", namespaces=NAMESPACES)[0] == \
         "Package_2022-02-07_123"
 
+def test_compile_package(tmpdir, prepare_workspace):
+    """
+    Test package and METS creation.
+
+    The following cases about the packaging are tested:
+    (1) mets.xml exists.
+    (2) signature.sig exists.
+    (3) tar file with correct name exists.
+    """
+    (workspace, config) = prepare_workspace(tmpdir)
+    sip_meta = select(workspace, config)
+    compiler = SipCompiler(workspace, config, sip_meta)
+    compiler._create_technical_metadata()
+    compiler._compile_metadata()
+    compiler._compile_package()
+    mets_xml = lxml.etree.parse(os.path.join(workspace, "mets.xml"))
+    assert os.path.isfile(os.path.join(workspace, "mets.xml"))
+    assert os.path.isfile(os.path.join(workspace, "signature.sig"))
+    assert os.path.isfile(os.path.join(workspace,
+                                       "Package_2022_02_07_123.tar"))
+
 
 def test_compile_sip(tmpdir, prepare_workspace):
     """
     Test SIP compilation.
 
     The following cases about the SIP comilation are tested:
-    (1) metx.xml exists.
+    (1) mets.xml exists.
     (2) signature.sig exists.
     (3) tar file with correct name exists.
     (4) Number of different metadata sections in METS is correct.
@@ -255,22 +273,85 @@ def test_default_config(tmpdir, prepare_workspace):
                           namespaces=NAMESPACES)[0].text == "Archive X"
 
 
-def test_clean_workspace(tmpdir, prepare_workspace):
+def _count_temp_files(workspace):
+    """Count temporary files in workspace.
     """
-    Test workspace cleaning.
-    """
-    (workspace, config) = prepare_workspace(tmpdir)
-    sip_meta = select(workspace, config)
-    compiler = SipCompiler(workspace, config, sip_meta)
-    compiler._technical_metadata()
-    compiler._provenance_metadata()
-    compiler._descriptive_metadata()
-    compile_structmap(workspace)
-    clean_workspace(workspace)
     count = 0
     for root, _, files in os.walk(workspace, topdown=False):
         for name in files:
             if not name.endswith(("___metadata.xml", "___metadata.csv",
                                   "testfile1.wav")):
                 count = count + 1
-    assert count == 0
+    return count
+
+
+def test_automated_cleanup(tmpdir, prepare_workspace):
+    """
+    Test that calling the steps multiple times remove the temporary files
+    resulted from the previous call.
+    """
+    (workspace, config) = prepare_workspace(tmpdir)
+    sip_meta = select(workspace, config)
+    compiler = SipCompiler(workspace, config, sip_meta)
+    compiler.create_sip()
+    count = _count_temp_files(workspace)
+    compiler.create_sip()
+    assert _count_temp_files(workspace) == count
+
+    compile_sip(workspace, "tests/data/musicarchive/config.conf")
+    compile_sip(workspace, "tests/data/musicarchive/config.conf")
+    assert _count_temp_files(workspace) == count
+
+
+@pytest.mark.parametrize("temp_files, file_endings, file_names", [
+    (("foo-PREMIS%%3AOBJECT-amd.xml",
+      "foo-NISOIMG-amd.xml",
+      "foo-AGENTS-amd.json",
+      "import-object-md-references.jsonl",
+      "create-mix-md-references.jsonl",
+      "premis-event-md-references.jsonl",
+      "import-description-md-references.jsonl",
+      "foo-scraper.json", "foo-dmdsec.xml", "foo.tar",
+      "filesec.xml", "structmap.xml", "mets.xml",
+      "signature.sig"), None, None),
+    (("foo-matching-ending", "foo-another-match"),
+     ("matching-ending", "another-match"), None),
+    (("foo-matching-file", "foo-another-match"), None,
+     ("foo-matching-file", "foo-another-match"))
+])
+def test_clean_temp_files(tmpdir, temp_files, file_endings, file_names):
+    """
+    Test cleaning of all temporary files and a subset. The files
+    matching to given file endings or file names are removed.
+
+    :temp_files: Temporary files to be created
+    :file_endings: File endings to search
+    :file_names: File namess to search
+    """
+    for temp_file in temp_files:
+        temp_path = os.path.join(str(tmpdir), temp_file)
+        open(temp_path, "w").close()
+        assert os.path.exists(temp_path)
+
+    clean_temp_files(str(tmpdir), file_endings, file_names)
+
+    for temp_file in temp_files:
+        temp_path = os.path.join(str(tmpdir), temp_file)
+        assert not os.path.exists(temp_path)
+
+
+def test_clean_workspace(tmpdir, prepare_workspace):
+    """
+    Test workspace cleaning. First create temporary files by calling
+    different metadata creation steps. Eventually remove those.
+    Check that only source files exist.
+    """
+    (workspace, config) = prepare_workspace(tmpdir)
+    sip_meta = select(workspace, config)
+    compiler = SipCompiler(workspace, config, sip_meta)
+    compiler._create_technical_metadata()
+    compiler._create_provenance_metadata()
+    compiler._import_descriptive_metadata()
+    compiler._compile_metadata()
+    clean_temp_files(workspace)
+    assert _count_temp_files(workspace) == 0

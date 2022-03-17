@@ -2,7 +2,6 @@
 """
 import os
 import shutil
-from siptools.scripts.compile_structmap import compile_structmap
 from dpres_sip_compiler.config import get_default_config_path
 from dpres_sip_compiler.selector import select
 from dpres_sip_compiler.compiler import SipCompiler
@@ -40,15 +39,17 @@ def test_default_config(tmpdir, run_cli, prepare_workspace):
 
 
 def test_clean(tmpdir, run_cli, prepare_workspace):
-    """Test clean command.
+    """Test clean command. First create temporary files by calling
+    different metadata creation steps. Eventually clean those.
+    Check that only source files exist.
     """
     (workspace, config) = prepare_workspace(tmpdir)
     sip_meta = select(workspace, config)
     compiler = SipCompiler(workspace, config, sip_meta)
-    compiler._technical_metadata()
-    compiler._provenance_metadata()
-    compiler._descriptive_metadata()
-    compile_structmap(workspace)
+    compiler._create_technical_metadata()
+    compiler._create_provenance_metadata()
+    compiler._import_descriptive_metadata()
+    compiler._compile_metadata()
     result = run_cli(["clean", workspace])
     assert result.exit_code == 0
     count = 0

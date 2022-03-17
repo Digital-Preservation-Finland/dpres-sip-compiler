@@ -3,7 +3,7 @@ Command line interface
 """
 import click
 from dpres_sip_compiler.config import get_default_config_path
-from dpres_sip_compiler.compiler import compile_sip, clean_workspace
+from dpres_sip_compiler.compiler import compile_sip, clean_temp_files
 
 
 @click.group()
@@ -40,7 +40,7 @@ def clean_command(workspace):
 
     WORKSPACE: Workspace path.
     """
-    clean_workspace(workspace)
+    clean_temp_files(workspace)
 
 
 if __name__ == "__main__":

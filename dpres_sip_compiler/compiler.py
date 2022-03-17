@@ -39,7 +39,7 @@ class SipCompiler(object):
         self.config = config
         self.sip_meta = sip_meta
 
-    def _technical_metadata(self):
+    def _create_technical_metadata(self):
         """Create technical metadata
         """
         print("Creating technical metadata for %d file(s)."
@@ -82,7 +82,7 @@ class SipCompiler(object):
         print("Technical metadata created for %d file(s)."
               "" % (len(self.sip_meta.premis_objects)))
 
-    def _provenance_metadata(self):
+    def _create_provenance_metadata(self):
         """Create provenance matadata
         """
         print("Creating provenance metadata for %d event(s)."
@@ -120,12 +120,12 @@ class SipCompiler(object):
         print("Provenance metadata created for %d event(s)."
               "" % (len(self.sip_meta.premis_events)))
 
-    def _descriptive_metadata(self):
-        """Create descriptive metadata
+    def _import_descriptive_metadata(self):
+        """Import descriptive metadata
         """
+        print("Importing descriptive metadata.")
         found = False
         count = 0
-        print("Importing descriptive metadata.")
         for filepath in self.sip_meta.descriptive_files(
                 self.workspace, self.config):
             count += 1
@@ -140,32 +140,52 @@ class SipCompiler(object):
             raise IOError("Descriptive metadata file was not found!")
         print("Descriptive metadata imported from %d file(s)." % (count))
 
-    def create_mets(self):
-        """Create full METS document
+    def _compile_metadata(self):
         """
-        print("Packaging process started. Different steps create separate "
-              "provenance metadata about the process in the SIP.")
-        objid = self.sip_meta.objid
-        self._technical_metadata()
-        self._provenance_metadata()
-        self._descriptive_metadata()
-        print("Compiling...")
+        Compile the generated metadata.
+
+        Link the metadata files to file section and structural map and create
+        METS document.
+        """
+        print("Compiling METS file.")
         compile_structmap(self.workspace)
         compile_mets(mets_profile="ch",
                      organization_name=self.config.name,
                      contractid=self.config.contract,
                      workspace=self.workspace,
                      base_path=self.workspace,
-                     objid=objid,
+                     objid=self.sip_meta.objid,
                      clean=True)
+        print("METS file created.")
+
+    def _compile_package(self):
+        """Sign SIP and create TAR file
+        """
+        print("Signing and packaging the SIP.")
         sign_mets(self.config.sign_key, self.workspace)
-        tar_file = re.sub('[^0-9a-zA-Z]+', '_', objid)
+        tar_file = re.sub('[^0-9a-zA-Z]+', '_', self.sip_meta.objid)
         compress(
             dir_to_tar=self.workspace,
             tar_filename="%s.tar" % (tar_file),
             exclude=self.sip_meta.exclude_files(self.config))
-        print("Compiling done. The SIP is signed and packaged to "
+        print("The SIP is signed and packaged to "
               "%s.tar" % (os.path.join(self.workspace, tar_file)))
+        print("SIP signed and packaged.")
+
+    def create_sip(self):
+        """Create SIP in a TAR file
+        """
+        print("Cleaning possible old temporary files...")
+        clean_temp_files(self.workspace)
+        print("Packaging process started. Different steps create separate "
+              "provenance metadata about the process in the SIP.")
+        self._create_technical_metadata()
+        self._create_provenance_metadata()
+        self._import_descriptive_metadata()
+        print("Compiling...")
+        self._compile_metadata()
+        self._compile_package()
+        print("SIP creation finished.")
 
 
 def compile_sip(workspace, conf_file=None):
@@ -183,20 +203,40 @@ def compile_sip(workspace, conf_file=None):
     compiler = SipCompiler(workspace=workspace,
                            config=config,
                            sip_meta=sip_meta)
-    compiler.create_mets()
+    compiler.create_sip()
 
 
-def clean_workspace(workspace):
-    """Clean workspace from temporary files.
-    This is currently needed if the packaging gets interrupted.
-    :workspace: Workspace path
+def clean_temp_files(workspace, file_endings=None, file_names=None):
     """
+    Clean workspace from temporary files which match to given file endings
+    or file names. If no endings nor names are given, default endings/names
+    are used. This will clean the whole workspace from temporary files.
+
+    :workspace: Workspace path
+    :file_endings: Files matching tho the given endings will be removed.
+    :file_names: Files matching to given names will be removed.
+    """
+    if file_endings is None and file_names is None:
+        file_endings = (
+            "-PREMIS%%3AOBJECT-amd.xml", "-ADDML-amd.xml",
+            "-VideoMD-amd.xml", "-AudioMD-amd.xml", "-NISOIMG-amd.xml",
+            "-PREMIS%%3AEVENT-amd.xml", "-PREMIS%%3AAGENT-amd.xml",
+            "-AGENTS-amd.json", "-scraper.json", "-dmdsec.xml", ".tar")
+        file_names = (
+            "import-object-md-references.jsonl",
+            "create-addml-md-references.jsonl",
+            "create-audiomd-md-references.jsonl",
+            "create-videomd-md-references.jsonl",
+            "create-mix-md-references.jsonl",
+            "premis-event-md-references.jsonl",
+            "import-description-md-references.jsonl",
+            "filesec.xml", "structmap.xml", "mets.xml", "signature.sig")
+    if file_endings is None:
+        file_endings = ()
+    if file_names is None:
+        file_names = ()
+
     for root, _, files in os.walk(workspace, topdown=False):
         for name in files:
-            if (name.endswith(("-amd.xml", "dmdsec.xml", "structmap.xml",
-                               "filesec.xml", "rightsmd.xml",
-                               "md-references.jsonl",
-                               "-scraper.json", "-amd.json",
-                               "mets.xml", "signature.sig", ".tar"))):
+            if name.endswith(file_endings) or name in file_names:
                 os.remove(os.path.join(root, name))
-    print("Temporary and result files were cleaned from workspace.")

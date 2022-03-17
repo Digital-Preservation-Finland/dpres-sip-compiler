@@ -115,10 +115,10 @@ default location, use the following command::
     sip-compiler compile --config <path-to-config-file> <path-to-workspace>
 
 The software raises an exception and stops packaging immediately, if a problem
-occurs. In such case, there may be some temporary files left in the workspace,
-which must be deleted before trying again. The temporary files are currently
-left for error debugging purposes. The temporary files can be deleted with the
-following command::
+occurs. In such case, there may be some temporary files left in the workspace.
+The temporary files are currently left for error debugging purposes.
+These files are automatically removed if trying again with the same workspace.
+The temporary files can also be deleted with the following command::
 
     sip-compiler clean <path-to-workspace>
 

@@ -1,6 +1,7 @@
 """PREMIS metadata adaptor for Music Archive.
 """
 import os
+import glob
 from io import open as io_open
 import re
 import csv
@@ -18,18 +19,23 @@ def spaceless(string):
     return re.sub(r"\s+", '_', string)
 
 
-def open_csv_file(filename, charset):
+def read_csv_file(filename):
     """
-    Open the file in mode dependent on the python version.
+    Return all rows from CSV file as one dictionary per row.
 
-    :filename: CSV filename
-    :charset: File encoding
-    :returns: handle to the newly-opened file
-    :raises: IOError if the file cannot be read
+    :filename: Filename to read
+    :yields: CSV rows as dictionary
+
     """
+
+    mode = "rt"
     if six.PY2:
-        return io_open(filename, "rb")
-    return io_open(filename, "rt", encoding=charset)
+        mode = "rb"
+
+    with io_open(filename, mode, encoding="utf-8") as infile:
+        csvreader = csv.DictReader(infile, delimiter=',', quotechar='"')
+        for row in csvreader:
+            yield row
 
 
 class SipMetadataMusicArchive(SipMetadata):
@@ -46,39 +52,42 @@ class SipMetadataMusicArchive(SipMetadata):
         :workspace: Data workspace
         :config: Basic configuration
         """
-        csvfile = None
-        csvpath = None
-        for filepath in os.listdir(workspace):
-            if filepath.endswith(config.csv_ending):
-                csvpath = os.path.join(workspace, filepath)
-                break
-        if not csvpath:
-            raise IOError("CSV metadata file was not found!")
+
         try:
-            csvfile = open_csv_file(csvpath, "utf-8")
-            csvreader = csv.DictReader(csvfile, delimiter=',', quotechar='"')
-            for csv_row in csvreader:
-                p_object = PremisObjectMusicArchive(csv_row)
-                if p_object.message_digest_algorithm.lower() == \
-                        config.used_checksum.lower():
-                    p_object.find_path(workspace)
-                    self.add_object(p_object)
-                p_event = PremisEventMusicArchive(csv_row)
-                self.add_event(p_event)
-                self.premis_events[p_event.identifier].add_detail_info(
-                    csv_row)
-                self.add_agent(PremisAgentMusicArchive(csv_row))
-                self.add_linking(p_linking=PremisLinkingMusicArchive(csv_row),
-                                 object_id=csv_row["objekti-uuid"],
-                                 agent_id=csv_row["agent-id"],
-                                 agent_role=csv_row["agent-rooli"])
-                if p_event.event_type == "information package creation" \
-                        and self.objid is None \
-                        and csv_row["sip-tunniste"] is not None:
-                    self.objid = spaceless(csv_row["sip-tunniste"])
-        finally:
-            if csvfile:
-                csvfile.close()
+            filename = glob.glob(
+                os.path.join(
+                    workspace, "*{}".format(config.csv_ending)))[0]
+        except KeyError:
+            raise IOError("CSV metadata file was not found!")
+
+        for csv_row in read_csv_file(filename):
+            self.add_premis_metadata(csv_row, workspace, config)
+
+    def add_premis_metadata(self, csv_row, workspace, config):
+        """Add premis metadata from single row of CSV metadata / dictionary
+
+        :csv_row: CSV row as dict
+        :returns: None
+
+        """
+        p_object = PremisObjectMusicArchive(csv_row)
+        if p_object.message_digest_algorithm.lower() == \
+                config.used_checksum.lower():
+            p_object.find_path(workspace)
+            self.add_object(p_object)
+        p_event = PremisEventMusicArchive(csv_row)
+        self.add_event(p_event)
+        self.premis_events[p_event.identifier].add_detail_info(
+            csv_row)
+        self.add_agent(PremisAgentMusicArchive(csv_row))
+        self.add_linking(p_linking=PremisLinkingMusicArchive(csv_row),
+                         object_id=csv_row["objekti-uuid"],
+                         agent_id=csv_row["agent-id"],
+                         agent_role=csv_row["agent-rooli"])
+        if p_event.event_type == "information package creation" \
+                and self.objid is None \
+                and csv_row["sip-tunniste"] is not None:
+            self.objid = spaceless(csv_row["sip-tunniste"])
 
     def descriptive_files(self, desc_path, config):
         """

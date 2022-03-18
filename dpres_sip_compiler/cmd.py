@@ -48,13 +48,16 @@ def compile_command(source_path, tar_file, temp_path, config):
     name="clean",
 )
 @click.argument('temp-path', type=click.Path(exists=True))
-def clean_command(temp_path):
+@click.option("--delete-path", is_flag=True,
+              help="Flag to delete the directory of temporary files. "
+                   "Removed only if it is empty after cleaning.")
+def clean_command(temp_path, delete_path):
     """
     Clean directory from temporary files.
 
     DIRECTORY: Directory containing temporary files.
     """
-    clean_temp_files(temp_path)
+    clean_temp_files(temp_path, delete_path=delete_path)
 
 
 if __name__ == "__main__":

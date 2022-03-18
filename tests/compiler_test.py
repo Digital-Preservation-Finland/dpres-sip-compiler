@@ -7,6 +7,7 @@ import re
 import lxml.etree
 import pytest
 from dpres_sip_compiler.selector import select
+import dpres_sip_compiler.compiler
 from dpres_sip_compiler.compiler import (SipCompiler, compile_sip,
                                          clean_temp_files)
 from dpres_sip_compiler.config import get_default_config_path
@@ -78,7 +79,8 @@ def test_technical(tmpdir, prepare_workspace):
     """
     (source_path, _, temp_path, config) = prepare_workspace(tmpdir)
     sip_meta = select(source_path, config)
-    compiler = SipCompiler(source_path, None, temp_path, config, sip_meta)
+    compiler = SipCompiler(source_path=source_path, temp_path=temp_path,
+                           config=config, sip_meta=sip_meta)
     compiler._create_technical_metadata()
     audio_path = None
     premis_path = None
@@ -118,7 +120,8 @@ def test_provenance(tmpdir, prepare_workspace):
     """
     (source_path, _, temp_path, config) = prepare_workspace(tmpdir)
     sip_meta = select(source_path, config)
-    compiler = SipCompiler(source_path, None, temp_path, config, sip_meta)
+    compiler = SipCompiler(source_path=source_path, temp_path=temp_path,
+                           config=config, sip_meta=sip_meta)
     compiler._create_technical_metadata()
     compiler._create_provenance_metadata()
     (event_xml, agent_xml) = _get_provenance(temp_path)
@@ -169,7 +172,8 @@ def test_descriptive(tmpdir, prepare_workspace):
     """
     (source_path, _, temp_path, config) = prepare_workspace(tmpdir, "source1")
     sip_meta = select(source_path, config)
-    compiler = SipCompiler(source_path, None, temp_path, config, sip_meta)
+    compiler = SipCompiler(source_path=source_path, temp_path=temp_path,
+                           config=config, sip_meta=sip_meta)
     compiler._import_descriptive_metadata()
     count = 0
     for root, _, files in os.walk(temp_path, topdown=False):
@@ -190,7 +194,8 @@ def test_compile_metadata(tmpdir, prepare_workspace):
     """
     (source_path, _, temp_path, config) = prepare_workspace(tmpdir)
     sip_meta = select(source_path, config)
-    compiler = SipCompiler(source_path, None, temp_path, config, sip_meta)
+    compiler = SipCompiler(source_path=source_path, temp_path=temp_path,
+                           config=config, sip_meta=sip_meta)
     compiler._create_technical_metadata()
     compiler._compile_metadata()
 
@@ -216,7 +221,9 @@ def test_compile_package(tmpdir, prepare_workspace):
     """
     (source_path, tar_file, temp_path, config) = prepare_workspace(tmpdir)
     sip_meta = select(source_path, config)
-    compiler = SipCompiler(source_path, tar_file, temp_path, config, sip_meta)
+    compiler = SipCompiler(source_path=source_path, temp_path=temp_path,
+                           config=config, sip_meta=sip_meta,
+                           tar_file=tar_file)
     compiler._create_technical_metadata()
     compiler._compile_metadata()
     compiler._compile_package()
@@ -310,17 +317,49 @@ def test_default_paths(tmpdir, prepare_workspace, untar_sip):
 
     found_dirs = next(os.walk(cwd_run))[1]
     found_dirs.remove("tests")
-    date_path = found_dirs[0]
-    pattern = "[0-9]{1,4}-[0-9]{1,2}-[0-9]{1,2}T[0-9]{1,2}-[0-9]{1,2}-" \
-              "[0-9]{1,2}"
-    assert re.match(pattern, date_path)
-    assert os.path.isfile(os.path.join(cwd_run, "Package_2022_02_07_123.tar"))
+    assert not found_dirs
 
     untar_sip(os.path.join(cwd_run, "Package_2022_02_07_123.tar"),
               temp_path)
     assert os.path.isfile(os.path.join(temp_path, "mets.xml"))
     assert os.path.isfile(os.path.join(temp_path, "signature.sig"))
     assert os.path.isfile(os.path.join(temp_path, "audio", "testfile1.wav"))
+
+
+def _dummy_clean():
+    """
+    """
+    pass
+
+
+def test_temp_path_name(tmpdir, prepare_workspace, monkeypatch):
+    """Test the name of the directory of temporary files.
+    """
+    def _dummy_clean(temp_path, file_endings=None, file_names=None,
+                     delete_path=False):
+        """Monkeypatch temporary file cleaning with no cleaning.
+        """
+        pass
+
+    (source_path, _, temp_path, _) = prepare_workspace(tmpdir)
+    source_path = os.path.join(os.getcwd(), source_path)
+    conf_file = os.path.join(os.getcwd(),
+                             "tests/data/musicarchive/config.conf")
+    cert_path = os.path.join(temp_path, "tests", "data", "sign.crt")
+    os.makedirs(os.path.dirname(cert_path))
+    shutil.copy("tests/data/sign.crt", cert_path)
+    with _keep_cwd():
+        os.chdir(temp_path)
+        monkeypatch.setattr(dpres_sip_compiler.compiler, "clean_temp_files",
+                            _dummy_clean)
+        compile_sip(source_path, conf_file=conf_file)
+
+    found_dirs = next(os.walk(temp_path))[1]
+    found_dirs.remove("tests")
+    date_path = found_dirs[0]
+    pattern = "[0-9]{1,4}-[0-9]{1,2}-[0-9]{1,2}T[0-9]{1,2}-[0-9]{1,2}-" \
+              "[0-9]{1,2}"
+    assert re.match(pattern, date_path)
 
 
 def _count_temp_files(temp_path):
@@ -342,7 +381,9 @@ def test_automated_cleanup(tmpdir, prepare_workspace):
     """
     (source_path, tar_file, temp_path, config) = prepare_workspace(tmpdir)
     sip_meta = select(source_path, config)
-    compiler = SipCompiler(source_path, tar_file, temp_path, config, sip_meta)
+    compiler = SipCompiler(source_path=source_path, tar_file=tar_file,
+                           temp_path=temp_path, config=config,
+                           sip_meta=sip_meta)
     compiler.create_sip()
     count = _count_temp_files(temp_path)
     compiler.create_sip()
@@ -399,7 +440,8 @@ def test_clean_temp_steps(tmpdir, prepare_workspace):
     """
     (source_path, _, temp_path, config) = prepare_workspace(tmpdir)
     sip_meta = select(source_path, config)
-    compiler = SipCompiler(source_path, None, temp_path, config, sip_meta)
+    compiler = SipCompiler(source_path=source_path, temp_path=temp_path,
+                           config=config, sip_meta=sip_meta)
     compiler._create_technical_metadata()
     compiler._create_provenance_metadata()
     compiler._import_descriptive_metadata()

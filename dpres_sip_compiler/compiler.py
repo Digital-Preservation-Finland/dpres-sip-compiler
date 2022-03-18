@@ -30,20 +30,21 @@ class SipCompiler(object):
     """Compiler to create SIPs
     """
 
-    def __init__(self, source_path, tar_file, temp_path, config, sip_meta):
+    def __init__(self, source_path, temp_path, config, sip_meta,
+                 tar_file=None):
         """Initialize compiler.
 
         :source_path Source path of the files to be packaged
-        :tar_file: Target TAR file for the SIP
         :temp_path: Path for temporary files
         :config: Basic configuration
         :sip_meta: PREMIS metadata objects for the SIP to be compiled.
+        :tar_file: Target TAR file for the SIP
         """
         self.source_path = source_path
-        self.tar_file = tar_file
         self.temp_path = temp_path
         self.config = config
         self.sip_meta = sip_meta
+        self.tar_file = tar_file
 
     def _create_technical_metadata(self):
         """Create technical metadata
@@ -206,8 +207,10 @@ class SipCompiler(object):
             raise ValueError("TAR packaging error. Return code was: "
                              "%s" % str(proc.returncode))
 
-    def create_sip(self):
+    def create_sip(self, temp_path_created=False):
         """Create SIP in a TAR file
+        :temp_path_created: True, if directory for temporary files was created
+                            during the process, False otherwise
         """
         print("Cleaning possible old temporary files.")
         clean_temp_files(self.temp_path)
@@ -221,7 +224,7 @@ class SipCompiler(object):
         self._compile_package()
         self._append_tar()
         print("Cleaning temporary files.")
-        clean_temp_files(self.temp_path)
+        clean_temp_files(self.temp_path, delete_path=temp_path_created)
         print("Compilation finished. The SIP is signed and packaged to: "
               "%s" % self.tar_file)
 
@@ -238,8 +241,10 @@ def compile_sip(source_path, tar_file=None, temp_path=None, conf_file=None):
     if temp_path is None:
         temp_path = get_default_temp_path()
 
+    temp_path_created = False
     if not os.path.exists(temp_path):
         os.makedirs(temp_path)
+        temp_path_created = True
 
     config = Config()
     config.configure(conf_file)
@@ -250,10 +255,11 @@ def compile_sip(source_path, tar_file=None, temp_path=None, conf_file=None):
                            temp_path=temp_path,
                            config=config,
                            sip_meta=sip_meta)
-    compiler.create_sip()
+    compiler.create_sip(temp_path_created)
 
 
-def clean_temp_files(temp_path, file_endings=None, file_names=None):
+def clean_temp_files(temp_path, file_endings=None, file_names=None,
+                     delete_path=False):
     """
     Clean directory from temporary files which match to given file endings
     or file names. If no endings nor names are given, default endings/names
@@ -262,6 +268,8 @@ def clean_temp_files(temp_path, file_endings=None, file_names=None):
     :temp_path: Directory containing temporary files
     :file_endings: Files matching tho the given endings will be removed.
     :file_names: Files matching to given names will be removed.
+    :delete_path: True to remove directory of temporary files.
+                  Removed only, if it is empty after cleaning.
     """
     if file_endings is None and file_names is None:
         file_endings = (
@@ -287,3 +295,10 @@ def clean_temp_files(temp_path, file_endings=None, file_names=None):
         for name in files:
             if name.endswith(file_endings) or name in file_names:
                 os.remove(os.path.join(root, name))
+
+    if delete_path:
+        try:
+            os.rmdir(temp_path)
+        except OSError:
+            print("NOTE: Directory %s was not removed, because it includes "
+                  "files." % temp_path)

@@ -54,7 +54,8 @@ def test_clean(tmpdir, run_cli, prepare_workspace):
     """
     (source_path, _, temp_path, config) = prepare_workspace(tmpdir)
     sip_meta = select(source_path, config)
-    compiler = SipCompiler(source_path, None, temp_path, config, sip_meta)
+    compiler = SipCompiler(source_path=source_path, temp_path=temp_path,
+                           config=config, sip_meta=sip_meta)
     compiler._create_technical_metadata()
     compiler._create_provenance_metadata()
     compiler._import_descriptive_metadata()

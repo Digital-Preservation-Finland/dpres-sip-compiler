@@ -105,7 +105,8 @@ The following options can be used:
      is used.
 
 The software creates a TAR file, which can be submitted to the Digital Preservation
-Service.
+Service. The path to temporary files is deleted if it was created during the process
+and no files remain in it after cleaning.
 
 The software raises an exception and stops packaging immediately, if a problem
 occurs. In such case, there may be some temporary files left in the path for
@@ -114,6 +115,10 @@ same temporary path. The temporary files can also be deleted with the following
 command::
 
     sip-compiler clean <path-to-temp-files>
+
+The following options can be used:
+
+   * ``--delete-path`` If used and the path is empty, it will be deleted.
 
 This also removes possible ``mets.xml`` and ``signature.sig``.
 

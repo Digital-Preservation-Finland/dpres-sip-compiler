@@ -124,7 +124,8 @@ class SipMetadataMusicArchive(SipMetadata):
         :returns: Patterns for metadata files to be excluded.
         """
         return ("*%s" % config.meta_ending,
-                "*%s" % config.csv_ending)
+                "*%s" % config.csv_ending,
+                ".[^/]*")
 
 
 class PremisObjectMusicArchive(PremisObject):

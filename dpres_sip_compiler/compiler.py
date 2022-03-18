@@ -204,7 +204,7 @@ class SipCompiler(object):
         proc.communicate()
         if proc.returncode != 0:
             raise ValueError("TAR packaging error. Return code was: "
-                             "%s" % str(returncode))
+                             "%s" % str(proc.returncode))
 
     def create_sip(self):
         """Create SIP in a TAR file

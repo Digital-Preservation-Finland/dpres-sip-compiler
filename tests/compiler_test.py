@@ -4,7 +4,6 @@ import os
 import shutil
 import lxml.etree
 import pytest
-from siptools.scripts.compile_structmap import compile_structmap
 from dpres_sip_compiler.selector import select
 from dpres_sip_compiler.compiler import (SipCompiler, compile_sip,
                                          clean_temp_files)
@@ -62,7 +61,7 @@ def test_technical(tmpdir, prepare_workspace):
     Technical metadata is added based on existing CSV file.
     It is tested that the PREMIS metadata meets the info found in given CSV
     file. Also, existence of AudioMD is tested, because the test content
-    includes an audio file. 
+    includes an audio file.
     """
     (source_path, _, temp_path, config) = prepare_workspace(tmpdir)
     sip_meta = select(source_path, config)
@@ -102,7 +101,7 @@ def test_provenance(tmpdir, prepare_workspace):
 
     Provenance metadata is added based on existing CSV file.
     It is tested that the content of an event and an agent added to METS
-    meet the info found in the given CSV file. 
+    meet the info found in the given CSV file.
     """
     (source_path, _, temp_path, config) = prepare_workspace(tmpdir)
     sip_meta = select(source_path, config)
@@ -197,6 +196,7 @@ def test_compile_metadata(tmpdir, prepare_workspace):
         "/mets:mets/@OBJID", namespaces=NAMESPACES)[0] == \
         "Package_2022-02-07_123"
 
+
 def test_compile_package(tmpdir, prepare_workspace):
     """
     Test package and METS creation.
@@ -212,7 +212,6 @@ def test_compile_package(tmpdir, prepare_workspace):
     compiler._create_technical_metadata()
     compiler._compile_metadata()
     compiler._compile_package()
-    mets_xml = lxml.etree.parse(os.path.join(temp_path, "mets.xml"))
     assert os.path.isfile(os.path.join(temp_path, "mets.xml"))
     assert os.path.isfile(os.path.join(temp_path, "signature.sig"))
     assert os.path.isfile(os.path.join(tar_file))
@@ -342,7 +341,7 @@ def test_clean_temp_files(tmpdir, temp_files, file_endings, file_names):
         assert not os.path.exists(temp_path)
 
 
-def test_clean_temp_files(tmpdir, prepare_workspace):
+def test_clean_temp_steps(tmpdir, prepare_workspace):
     """
     Test cleaning of temporary files. First create temporary files by calling
     different metadata creation steps. Eventually remove those.

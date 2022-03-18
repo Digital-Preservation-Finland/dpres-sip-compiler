@@ -24,7 +24,8 @@ def test_compile(tmpdir, run_cli, prepare_workspace):
 def test_default_config(tmpdir, run_cli, prepare_workspace):
     """Test default configuration path
     """
-    (source_path, tar_file, temp_path, _) = prepare_workspace(tmpdir, "source1")
+    (source_path, tar_file, temp_path, _) = prepare_workspace(
+        tmpdir, "source1")
     conf_path = get_default_config_path()
     conf_dir = os.path.dirname(conf_path)
     if not os.path.exists(conf_dir):

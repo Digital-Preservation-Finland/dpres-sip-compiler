@@ -2,6 +2,8 @@
 """
 import os
 import shutil
+import contextlib
+import re
 import lxml.etree
 import pytest
 from dpres_sip_compiler.selector import select
@@ -16,6 +18,17 @@ NAMESPACES = {
     'fi': 'http://digitalpreservation.fi/schemas/mets/fi-extensions',
     'audiomd': 'http://www.loc.gov/audioMD/',
 }
+
+
+@contextlib.contextmanager
+def _keep_cwd():
+    """Keep directory change only in context manager
+    """
+    curdir = os.getcwd()
+    try:
+        yield
+    finally:
+        os.chdir(curdir)
 
 
 def _get_provenance(temp_path):
@@ -200,11 +213,6 @@ def test_compile_metadata(tmpdir, prepare_workspace):
 def test_compile_package(tmpdir, prepare_workspace):
     """
     Test package and METS creation.
-
-    The following cases about the packaging are tested:
-    (1) mets.xml exists.
-    (2) signature.sig exists.
-    (3) tar file with correct name exists.
     """
     (source_path, tar_file, temp_path, config) = prepare_workspace(tmpdir)
     sip_meta = select(source_path, config)
@@ -212,12 +220,12 @@ def test_compile_package(tmpdir, prepare_workspace):
     compiler._create_technical_metadata()
     compiler._compile_metadata()
     compiler._compile_package()
+    assert os.path.isfile(tar_file)
     assert os.path.isfile(os.path.join(temp_path, "mets.xml"))
     assert os.path.isfile(os.path.join(temp_path, "signature.sig"))
-    assert os.path.isfile(os.path.join(tar_file))
 
 
-def test_compile_sip(tmpdir, prepare_workspace):
+def test_compile_sip(tmpdir, prepare_workspace, untar_sip):
     """
     Test SIP compilation.
 
@@ -231,10 +239,14 @@ def test_compile_sip(tmpdir, prepare_workspace):
         tmpdir, "source1")
     compile_sip(source_path, tar_file, temp_path,
                 "tests/data/musicarchive/config.conf")
+    assert os.path.isfile(tar_file)
+    assert not os.path.isfile(os.path.join(temp_path, "mets.xml"))
+    assert not os.path.isfile(os.path.join(temp_path, "signature.sig"))
+
+    untar_sip(tar_file, temp_path)
     mets_xml = lxml.etree.parse(os.path.join(temp_path, "mets.xml"))
     assert os.path.isfile(os.path.join(temp_path, "mets.xml"))
     assert os.path.isfile(os.path.join(temp_path, "signature.sig"))
-    assert os.path.isfile(os.path.join(tar_file))
     assert len(mets_xml.xpath(".//mets:dmdSec",
                               namespaces=NAMESPACES)) == 2
     assert len(mets_xml.xpath(".//mets:techMD//premis:object",
@@ -251,7 +263,7 @@ def test_compile_sip(tmpdir, prepare_workspace):
                               namespaces=NAMESPACES)) == 1
 
 
-def test_default_config(tmpdir, prepare_workspace):
+def test_default_config(tmpdir, prepare_workspace, untar_sip):
     """
     Test that organization name from a config file located in
     default location is found in METS.
@@ -264,12 +276,51 @@ def test_default_config(tmpdir, prepare_workspace):
         os.makedirs(conf_dir)
     shutil.copy("tests/data/musicarchive/config.conf", conf_path)
     compile_sip(source_path, tar_file, temp_path)
+    assert os.path.isfile(tar_file)
+    assert not os.path.isfile(os.path.join(temp_path, "mets.xml"))
+    assert not os.path.isfile(os.path.join(temp_path, "signature.sig"))
+
+    untar_sip(tar_file, temp_path)
     mets_xml = lxml.etree.parse(os.path.join(temp_path, "mets.xml"))
     assert os.path.isfile(os.path.join(temp_path, "mets.xml"))
     assert os.path.isfile(os.path.join(temp_path, "signature.sig"))
-    assert os.path.isfile(os.path.join(tar_file))
+    assert os.path.isfile(tar_file)
     assert mets_xml.xpath("/mets:mets/mets:metsHdr/mets:agent/mets:name",
                           namespaces=NAMESPACES)[0].text == "Archive X"
+
+
+def test_default_paths(tmpdir, prepare_workspace, untar_sip):
+    """
+    Test cunctionality with default temporary and output paths.
+    The current working path in the test is the created temporary directory.
+    """
+    (source_path, _, temp_path, _) = prepare_workspace(tmpdir)
+    cwd_run = os.path.join(temp_path, "default")
+    cert_path = os.path.join(cwd_run, "tests", "data", "sign.crt")
+    os.makedirs(cwd_run)
+    os.makedirs(os.path.dirname(cert_path))
+    shutil.copy("tests/data/sign.crt", cert_path)
+
+    source_path = os.path.join(os.getcwd(), source_path)
+    conf_file = os.path.join(os.getcwd(),
+                             "tests/data/musicarchive/config.conf")
+    with _keep_cwd():
+        os.chdir(cwd_run)
+        compile_sip(source_path, conf_file=conf_file)
+
+    found_dirs = next(os.walk(cwd_run))[1]
+    found_dirs.remove("tests")
+    date_path = found_dirs[0]
+    pattern = "[0-9]{1,4}-[0-9]{1,2}-[0-9]{1,2}T[0-9]{1,2}-[0-9]{1,2}-" \
+              "[0-9]{1,2}"
+    assert re.match(pattern, date_path)
+    assert os.path.isfile(os.path.join(cwd_run, "Package_2022_02_07_123.tar"))
+
+    untar_sip(os.path.join(cwd_run, "Package_2022_02_07_123.tar"),
+              temp_path)
+    assert os.path.isfile(os.path.join(temp_path, "mets.xml"))
+    assert os.path.isfile(os.path.join(temp_path, "signature.sig"))
+    assert os.path.isfile(os.path.join(temp_path, "audio", "testfile1.wav"))
 
 
 def _count_temp_files(temp_path):
@@ -312,7 +363,7 @@ def test_automated_cleanup(tmpdir, prepare_workspace):
       "create-mix-md-references.jsonl",
       "premis-event-md-references.jsonl",
       "import-description-md-references.jsonl",
-      "foo-scraper.json", "foo-dmdsec.xml", "foo.tar",
+      "foo-scraper.json", "foo-dmdsec.xml",
       "filesec.xml", "structmap.xml", "mets.xml",
       "signature.sig"), None, None),
     (("foo-matching-ending", "foo-another-match"),

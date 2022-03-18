@@ -229,7 +229,7 @@ class PremisEvent(object):
 
     @property
     def event_datetime(self):
-        """Event datetime..
+        """Event datetime.
         """
         return None
 

@@ -20,8 +20,9 @@ def get_default_temp_path():
     """
     Get path to the default temporary path
     """
-    return os.path.join(os.getcwd(),
-                        datetime.datetime.utcnow().isoformat())
+    return os.path.join(
+        os.getcwd(),
+        datetime.datetime.now().strftime("%Y-%m-%dT%H-%M-%S"))
 
 
 class Config(object):

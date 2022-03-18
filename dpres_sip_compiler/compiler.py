@@ -226,7 +226,7 @@ class SipCompiler(object):
               "%s" % self.tar_file)
 
 
-def compile_sip(source_path, tar_file, temp_path, conf_file=None):
+def compile_sip(source_path, tar_file=None, temp_path=None, conf_file=None):
     """SIP Compiler
     :source_path: Source path of files to be packaged
     :tar_file: Target TAR file for the SIP

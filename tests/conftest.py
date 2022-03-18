@@ -1,10 +1,28 @@
 """Common fuctions and fixtures for tests.
 """
 import os
+import tarfile
 from click.testing import CliRunner
 import pytest
 from dpres_sip_compiler.config import Config
 from dpres_sip_compiler.cmd import cli
+
+
+@pytest.fixture(scope="function")
+def untar_sip():
+    """
+    Untar a a SIP TAR file.
+    """
+    def _untar(tar_file, directory):
+        """
+        Untar a SIP TAR file.
+        :tar_file: File to untar.
+        :directory: Output directory.
+        """
+        with tarfile.open(tar_file) as tar:
+            tar.extractall(directory)
+
+    return _untar
 
 
 @pytest.fixture(scope="function")

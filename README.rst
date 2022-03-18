@@ -101,8 +101,8 @@ The following options can be used:
      in the current working path and it's name is based on the SIP identifier.
    * ``--temp-path <PATH>`` - Path for temporary files. If not given, the temporary
      path will be a timestamp path in current working directory.
-   * ``--config`` - Configuration file. If not given, the default config location is
-     used.
+   * ``--config <FILE>`` - Configuration file. If not given, the default config location
+     is used.
 
 The software creates a TAR file, which can be submitted to the Digital Preservation
 Service.

@@ -209,7 +209,7 @@ class SipCompiler(object):
     def create_sip(self):
         """Create SIP in a TAR file
         """
-        print("Cleaning possible old temporary files...")
+        print("Cleaning possible old temporary files.")
         clean_temp_files(self.temp_path)
         print("Packaging process started. Different steps create separate "
               "provenance metadata about the process in the SIP.")
@@ -220,6 +220,8 @@ class SipCompiler(object):
         self._compile_metadata()
         self._compile_package()
         self._append_tar()
+        print("Cleaning temporary files.")
+        clean_temp_files(self.temp_path)
         print("Compilation finished. The SIP is signed and packaged to: "
               "%s" % self.tar_file)
 
@@ -266,7 +268,7 @@ def clean_temp_files(temp_path, file_endings=None, file_names=None):
             "-PREMIS%%3AOBJECT-amd.xml", "-ADDML-amd.xml",
             "-VideoMD-amd.xml", "-AudioMD-amd.xml", "-NISOIMG-amd.xml",
             "-PREMIS%%3AEVENT-amd.xml", "-PREMIS%%3AAGENT-amd.xml",
-            "-AGENTS-amd.json", "-scraper.json", "-dmdsec.xml", ".tar")
+            "-AGENTS-amd.json", "-scraper.json", "-dmdsec.xml")
         file_names = (
             "import-object-md-references.jsonl",
             "create-addml-md-references.jsonl",

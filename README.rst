@@ -77,19 +77,6 @@ you need to give the configuration file as a parameter when using this software.
 
 See adaptor specific details below.
 
-Content Preparation
--------------------
-
-The software assumes that the content to be packaged is in the given workspace
-path.
-
-The file names with the following patterns in the workspace root are considered
-as temporary files internal to the tool and will be removed in the process:
-``*-amd.xml``, ``*dmdsec.xml``, ``*structmap.xml``, ``*filesec.xml``,
-``*rightsmd.xml``, ``*md-references.jsonl``, ``*-scraper.json``, ``*-amd.json``.
-
-See adaptor specific details below.
-
 Adaptor Specific Details
 ------------------------
 
@@ -104,25 +91,31 @@ with content preparation rules which have been agreed in advance.
 Usage
 -----
 
-Compile a given workspace with the content by using the following command::
+Compile a given content by using the following command::
 
-    sip-compiler compile <path-to-workspace>
+    sip-compiler compile <path-to-content>
 
-The software creates ``<identifier>.tar`` file in workspace, which can be submitted
-to the Digital Preservation Service. If the configuration file is not in it's
-default location, use the following command::
+The following options can be used:
 
-    sip-compiler compile --config <path-to-config-file> <path-to-workspace>
+   * ``--tar-file <FILE>`` - Output tar file. If not given, the tar file will be
+     in the current working path and it's name is based on the SIP identifier.
+   * ``--temp-path <PATH>`` - Path for temporary files. If not given, the temporary
+     path will be a timestamp path in current working directory.
+   * ``--config`` - Configuration file. If not given, the default config location is
+     used.
+
+The software creates a TAR file, which can be submitted to the Digital Preservation
+Service.
 
 The software raises an exception and stops packaging immediately, if a problem
-occurs. In such case, there may be some temporary files left in the workspace.
-The temporary files are currently left for error debugging purposes.
-These files are automatically removed if trying again with the same workspace.
-The temporary files can also be deleted with the following command::
+occurs. In such case, there may be some temporary files left in the path for
+temporary files. These files are automatically removed if trying again with the
+same temporary path. The temporary files can also be deleted with the following
+command::
 
-    sip-compiler clean <path-to-workspace>
+    sip-compiler clean <path-to-temp-files>
 
-This also removes possible ``mets.xml``, ``signature.sig`` and TAR package.
+This also removes possible ``mets.xml`` and ``signature.sig``.
 
 Copyright
 ---------

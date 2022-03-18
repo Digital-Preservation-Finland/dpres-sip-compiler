@@ -1,5 +1,6 @@
 """Reader for configuration info
 """
+import datetime
 import os
 import configparser
 import six
@@ -13,6 +14,14 @@ def get_default_config_path():
     return os.path.join(
         click.get_app_dir("dpres-sip-compiler"),
         "config.conf")
+
+
+def get_default_temp_path():
+    """
+    Get path to the default temporary path
+    """
+    return os.path.join(os.getcwd(),
+                        datetime.datetime.utcnow().isoformat())
 
 
 class Config(object):

@@ -9,5 +9,5 @@ def test_select():
     """
     config = Config()
     config.configure("tests/data/musicarchive/config.conf")
-    sip_meta = select("tests/data/musicarchive/workspace1", config)
+    sip_meta = select("tests/data/musicarchive/source1", config)
     assert sip_meta.__class__.__name__ == "SipMetadataMusicArchive"

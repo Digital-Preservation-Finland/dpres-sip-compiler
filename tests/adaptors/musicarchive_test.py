@@ -16,7 +16,7 @@ def test_populate():
     sip_meta = SipMetadataMusicArchive()
     config = Config()
     config.configure("tests/data/musicarchive/config.conf")
-    sip_meta.populate("tests/data/musicarchive/workspace1", config)
+    sip_meta.populate("tests/data/musicarchive/source1", config)
     assert len(sip_meta.premis_objects) == 4
     assert len(sip_meta.premis_events) == 7
     assert len(sip_meta.premis_agents) == 3
@@ -31,11 +31,11 @@ def test_descriptive_files():
     config.configure("tests/data/musicarchive/config.conf")
     desc_files = []
     for desc in sip_meta.descriptive_files(
-            "tests/data/musicarchive/workspace1", config):
+            "tests/data/musicarchive/source1", config):
         desc_files.append(desc)
     assert set(desc_files) == set([
-        "tests/data/musicarchive/workspace1/test1___metadata.xml",
-        "tests/data/musicarchive/workspace1/test2___metadata.xml"])
+        "tests/data/musicarchive/source1/test1___metadata.xml",
+        "tests/data/musicarchive/source1/test2___metadata.xml"])
 
 
 def test_find_path():
@@ -48,7 +48,7 @@ def test_find_path():
         "tiiviste": "abc"
     }
     obj = PremisObjectMusicArchive(source_dict)
-    obj.find_path("tests/data/musicarchive/workspace1")
+    obj.find_path("tests/data/musicarchive/source1")
     assert obj.filepath == "audio/testfile1.wav"
 
 

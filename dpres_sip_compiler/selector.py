@@ -5,16 +5,16 @@ from dpres_sip_compiler.adaptors.musicarchive import \
     SipMetadataMusicArchive
 
 
-def select(workspace, config):
+def select(source_path, config):
     """
     Select adaptor and prepare it.
-    :workspace: Workspace path
+    :source_path: Source path
     :config: Configure info
     :returns: SIP metadata object
     """
     if config.adaptor == "musicarchive":
         sip_meta = SipMetadataMusicArchive()
-        sip_meta.populate(workspace, config)
+        sip_meta.populate(source_path, config)
     else:
         raise NotImplementedError(
             "Unsupported configuration! Maybe the adaptor name is incorrect "

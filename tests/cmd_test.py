@@ -10,32 +10,32 @@ from dpres_sip_compiler.compiler import SipCompiler
 def test_compile(tmpdir, run_cli, prepare_workspace):
     """Test compile command.
     """
-    (workspace, _) = prepare_workspace(tmpdir, "workspace1")
+    (source_path, tar_file, temp_path, _) = prepare_workspace(
+        tmpdir, "source1")
     result = run_cli(
         ["compile", "--config", "tests/data/musicarchive/config.conf",
-         workspace])
+         "--tar-file", tar_file, "--temp-path", temp_path, source_path])
     assert result.exit_code == 0
-    assert os.path.isfile(os.path.join(workspace, "mets.xml"))
-    assert os.path.isfile(os.path.join(workspace, "signature.sig"))
-    assert os.path.isfile(os.path.join(workspace,
-                                       "Package_2022_02_07_123.tar"))
+    assert os.path.isfile(os.path.join(temp_path, "mets.xml"))
+    assert os.path.isfile(os.path.join(temp_path, "signature.sig"))
+    assert os.path.isfile(os.path.join(tar_file))
 
 
 def test_default_config(tmpdir, run_cli, prepare_workspace):
     """Test default configuration path
     """
-    (workspace, _) = prepare_workspace(tmpdir, "workspace1")
+    (source_path, tar_file, temp_path, _) = prepare_workspace(tmpdir, "source1")
     conf_path = get_default_config_path()
     conf_dir = os.path.dirname(conf_path)
     if not os.path.exists(conf_dir):
         os.makedirs(conf_dir)
     shutil.copy("tests/data/musicarchive/config.conf", conf_path)
-    result = run_cli(["compile", workspace])
+    result = run_cli(["compile", "--tar-file", tar_file, "--temp-path",
+                      temp_path, source_path])
     assert result.exit_code == 0
-    assert os.path.isfile(os.path.join(workspace, "mets.xml"))
-    assert os.path.isfile(os.path.join(workspace, "signature.sig"))
-    assert os.path.isfile(os.path.join(workspace,
-                                       "Package_2022_02_07_123.tar"))
+    assert os.path.isfile(os.path.join(temp_path, "mets.xml"))
+    assert os.path.isfile(os.path.join(temp_path, "signature.sig"))
+    assert os.path.isfile(os.path.join(tar_file))
 
 
 def test_clean(tmpdir, run_cli, prepare_workspace):
@@ -43,17 +43,17 @@ def test_clean(tmpdir, run_cli, prepare_workspace):
     different metadata creation steps. Eventually clean those.
     Check that only source files exist.
     """
-    (workspace, config) = prepare_workspace(tmpdir)
-    sip_meta = select(workspace, config)
-    compiler = SipCompiler(workspace, config, sip_meta)
+    (source_path, _, temp_path, config) = prepare_workspace(tmpdir)
+    sip_meta = select(source_path, config)
+    compiler = SipCompiler(source_path, None, temp_path, config, sip_meta)
     compiler._create_technical_metadata()
     compiler._create_provenance_metadata()
     compiler._import_descriptive_metadata()
     compiler._compile_metadata()
-    result = run_cli(["clean", workspace])
+    result = run_cli(["clean", temp_path])
     assert result.exit_code == 0
     count = 0
-    for root, _, files in os.walk(workspace, topdown=False):
+    for root, _, files in os.walk(temp_path, topdown=False):
         for name in files:
             if not name.endswith(("___metadata.xml", "___metadata.csv",
                                   "testfile1.wav")):

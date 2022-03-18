@@ -5,6 +5,7 @@ Adaptors for different types of sources may be added.
 from __future__ import print_function
 
 import os
+import subprocess
 import re
 from siptools.scripts.import_object import import_object
 from siptools.scripts.create_mix import create_mix
@@ -18,8 +19,9 @@ from siptools.scripts.compile_structmap import compile_structmap
 from siptools.scripts.compile_mets import compile_mets
 from siptools.scripts.sign_mets import sign_mets
 from siptools.scripts.compress import compress
-from siptools.utils import read_json_streams
-from dpres_sip_compiler.config import Config, get_default_config_path
+from siptools.utils import read_json_streams, fsencode_path
+from dpres_sip_compiler.config import (Config, get_default_config_path,
+                                       get_default_temp_path)
 from dpres_sip_compiler.selector import select
 
 
@@ -28,14 +30,18 @@ class SipCompiler(object):
     """Compiler to create SIPs
     """
 
-    def __init__(self, workspace, config, sip_meta):
+    def __init__(self, source_path, tar_file, temp_path, config, sip_meta):
         """Initialize compiler.
 
-        :workspace: Workspace path
+        :source_path Source path of the files to be packaged
+        :tar_file: Target TAR file for the SIP
+        :temp_path: Path for temporary files
         :config: Basic configuration
         :sip_meta: PREMIS metadata objects for the SIP to be compiled.
         """
-        self.workspace = workspace
+        self.source_path = source_path
+        self.tar_file = tar_file
+        self.temp_path = temp_path
         self.config = config
         self.sip_meta = sip_meta
 
@@ -49,31 +55,31 @@ class SipCompiler(object):
             if obj.filepath.endswith(".csv"):
                 file_format = ("text/csv", "")
             import_object(filepaths=[obj.filepath],
-                          workspace=self.workspace,
-                          base_path=self.workspace,
+                          workspace=self.temp_path,
+                          base_path=self.source_path,
                           original_name=obj.original_name,
                           file_format=file_format,
                           identifier=(obj.object_identifier_type,
                                       obj.object_identifier_value),
                           checksum=(obj.message_digest_algorithm,
                                     obj.message_digest))
-            streams = read_json_streams(obj.filepath, self.workspace)
+            streams = read_json_streams(obj.filepath, self.temp_path)
             if any(stream["stream_type"] == "image"
                    for stream in streams.values()):
-                create_mix(obj.filepath, workspace=self.workspace,
-                           base_path=self.workspace)
+                create_mix(obj.filepath, workspace=self.temp_path,
+                           base_path=self.source_path)
             if any(stream["stream_type"] == "video"
                    for stream in streams.values()):
-                create_videomd(obj.filepath, workspace=self.workspace,
-                               base_path=self.workspace)
+                create_videomd(obj.filepath, workspace=self.temp_path,
+                               base_path=self.source_path)
             if any(stream["stream_type"] == "audio"
                    for stream in streams.values()):
-                create_audiomd(obj.filepath, workspace=self.workspace,
-                               base_path=self.workspace)
+                create_audiomd(obj.filepath, workspace=self.temp_path,
+                               base_path=self.source_path)
             if streams[0]["mimetype"] == "text/csv":
                 create_addml(filename=obj.filepath,
-                             workspace=self.workspace,
-                             base_path=self.workspace,
+                             workspace=self.temp_path,
+                             base_path=self.source_path,
                              header=True,
                              charset=streams[0]["charset"],
                              delim=streams[0]["delimiter"],
@@ -93,7 +99,7 @@ class SipCompiler(object):
                 agent = self.sip_meta.premis_agents[link["linking_agent"]]
                 create_agent(
                     agent_name=agent.agent_name,
-                    workspace=self.workspace,
+                    workspace=self.temp_path,
                     agent_type=agent.agent_type,
                     agent_role=link["agent_role"],
                     agent_identifier=(agent.agent_identifier_type,
@@ -108,8 +114,8 @@ class SipCompiler(object):
             premis_event(
                 event_type=event.event_type,
                 event_datetime=event.event_datetime,
-                workspace=self.workspace,
-                base_path=self.workspace,
+                workspace=self.temp_path,
+                base_path=self.source_path,
                 linking_objects=linking_objects,
                 event_detail=event.event_detail,
                 event_outcome=event.event_outcome,
@@ -127,12 +133,12 @@ class SipCompiler(object):
         found = False
         count = 0
         for filepath in self.sip_meta.descriptive_files(
-                self.workspace, self.config):
+                self.source_path, self.config):
             count += 1
             import_description(
                 dmdsec_location=filepath,
-                workspace=self.workspace,
-                base_path=self.workspace,
+                workspace=self.temp_path,
+                base_path=self.source_path,
                 remove_root=self.sip_meta.desc_root_remove(self.config),
                 dmd_agent=(os.path.basename(__file__), "software"))
             found = True
@@ -148,12 +154,12 @@ class SipCompiler(object):
         METS document.
         """
         print("Compiling METS file.")
-        compile_structmap(self.workspace)
+        compile_structmap(self.temp_path)
         compile_mets(mets_profile="ch",
                      organization_name=self.config.name,
                      contractid=self.config.contract,
-                     workspace=self.workspace,
-                     base_path=self.workspace,
+                     workspace=self.temp_path,
+                     base_path=self.source_path,
                      objid=self.sip_meta.objid,
                      clean=True)
         print("METS file created.")
@@ -162,21 +168,49 @@ class SipCompiler(object):
         """Sign SIP and create TAR file
         """
         print("Signing and packaging the SIP.")
-        sign_mets(self.config.sign_key, self.workspace)
-        tar_file = re.sub('[^0-9a-zA-Z]+', '_', self.sip_meta.objid)
-        compress(
-            dir_to_tar=self.workspace,
-            tar_filename="%s.tar" % (tar_file),
+        sign_mets(self.config.sign_key, self.temp_path)
+
+        if self.tar_file is None:
+            self.tar_file = os.path.join(
+                os.getcwd(),
+                "%s.tar" % re.sub('[^0-9a-zA-Z]+', '_', self.sip_meta.objid))
+
+        if not os.path.exists(os.path.dirname(self.tar_file)):
+            os.makedirs(os.path.dirname(self.tar_file))
+
+        returncode = compress(
+            dir_to_tar=self.source_path,
+            tar_filename=self.tar_file,
             exclude=self.sip_meta.exclude_files(self.config))
-        print("The SIP is signed and packaged to "
-              "%s.tar" % (os.path.join(self.workspace, tar_file)))
-        print("SIP signed and packaged.")
+        if returncode != 0:
+            raise ValueError("TAR packaging error. Return code was: "
+                             "%s" % str(returncode))
+
+    def _append_tar(self):
+        """
+        """
+        if os.path.normpath(self.temp_path) == os.path.normpath(
+                self.source_path):
+            return
+        print("Append METS and signature to TAR file.")
+        command = ["tar", "-rvvf", fsencode_path(self.tar_file), "mets.xml",
+                   "signature.sig"]
+        proc = subprocess.Popen(
+            command, cwd=self.temp_path,
+            stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT, close_fds=True
+        )
+
+        proc.communicate()
+        if proc.returncode != 0:
+            raise ValueError("TAR packaging error. Return code was: "
+                             "%s" % str(returncode))
 
     def create_sip(self):
         """Create SIP in a TAR file
         """
         print("Cleaning possible old temporary files...")
-        clean_temp_files(self.workspace)
+        clean_temp_files(self.temp_path)
         print("Packaging process started. Different steps create separate "
               "provenance metadata about the process in the SIP.")
         self._create_technical_metadata()
@@ -185,34 +219,45 @@ class SipCompiler(object):
         print("Compiling...")
         self._compile_metadata()
         self._compile_package()
-        print("SIP creation finished.")
+        self._append_tar()
+        print("Compilation finished. The SIP is signed and packaged to: "
+              "%s" % self.tar_file)
 
 
-def compile_sip(workspace, conf_file=None):
+def compile_sip(source_path, tar_file, temp_path, conf_file=None):
     """SIP Compiler
-    :workspace: Workspace path
+    :source_path: Source path of files to be packaged
+    :tar_file: Target TAR file for the SIP
+    :temp_path: Path of temporary files
     :conf_file: Configuration file path
     """
     if conf_file is None:
         conf_file = get_default_config_path()
+    if temp_path is None:
+        temp_path = get_default_temp_path()
+
+    if not os.path.exists(temp_path):
+        os.makedirs(temp_path)
 
     config = Config()
     config.configure(conf_file)
 
-    sip_meta = select(workspace, config)
-    compiler = SipCompiler(workspace=workspace,
+    sip_meta = select(source_path, config)
+    compiler = SipCompiler(source_path=source_path,
+                           tar_file=tar_file,
+                           temp_path=temp_path,
                            config=config,
                            sip_meta=sip_meta)
     compiler.create_sip()
 
 
-def clean_temp_files(workspace, file_endings=None, file_names=None):
+def clean_temp_files(temp_path, file_endings=None, file_names=None):
     """
-    Clean workspace from temporary files which match to given file endings
+    Clean directory from temporary files which match to given file endings
     or file names. If no endings nor names are given, default endings/names
-    are used. This will clean the whole workspace from temporary files.
+    are used. This will clean the whole directory from temporary files.
 
-    :workspace: Workspace path
+    :temp_path: Directory containing temporary files
     :file_endings: Files matching tho the given endings will be removed.
     :file_names: Files matching to given names will be removed.
     """
@@ -236,7 +281,7 @@ def clean_temp_files(workspace, file_endings=None, file_names=None):
     if file_names is None:
         file_names = ()
 
-    for root, _, files in os.walk(workspace, topdown=False):
+    for root, _, files in os.walk(temp_path, topdown=False):
         for name in files:
             if name.endswith(file_endings) or name in file_names:
                 os.remove(os.path.join(root, name))

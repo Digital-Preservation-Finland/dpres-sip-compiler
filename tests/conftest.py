@@ -1,7 +1,6 @@
 """Common fuctions and fixtures for tests.
 """
 import os
-from shutil import copytree
 from click.testing import CliRunner
 import pytest
 from dpres_sip_compiler.config import Config
@@ -13,19 +12,18 @@ def prepare_workspace():
     """
     Prepare temporary workspace.
     """
-    def _prepare(tmp_path, workspace="workspace2"):
+    def _prepare(tmp_path, source="source2"):
         """
         Prepare temporary workspace.
         :tmp_path: Temporary test path
-        :workspace: Workspace case from test data
-        :returns: Workspace with path and configuration
+        :source: Source objects from test data
+        :returns: Source path, TAR file path, temporary path and configuration
         """
-        destination = os.path.join(str(tmp_path), workspace)
-        copytree(os.path.join("tests/data/musicarchive", workspace),
-                 destination)
+        source_path = os.path.join("tests/data/musicarchive", source)
         config = Config()
         config.configure("tests/data/musicarchive/config.conf")
-        return (destination, config)
+        tar_file = os.path.join(str(tmp_path), "sip.tar")
+        return (source_path, tar_file, str(tmp_path), config)
 
     return _prepare
 

@@ -49,37 +49,38 @@ class SipMetadataMusicArchive(SipMetadata):
     Music Archive specific PREMIS Metadata handler for a SIP to be compiled.
     """
 
-    def populate(self, workspace, config):
+    def populate(self, source_path, config):
         """
         Populate a CSV file to PREMIS dicts.
-        The CSV file must be in the root directory of workspace as it is
+        The CSV file must be in the root directory of source path as it is
         not actual digital object in the content.
 
-        :workspace: Data workspace
+        :source_path: Source data path
         :config: Basic configuration
         """
 
         try:
             filename = glob.glob(
                 os.path.join(
-                    workspace, "*{}".format(config.csv_ending)))[0]
+                    source_path, "*{}".format(config.csv_ending)))[0]
         except KeyError:
             raise IOError("CSV metadata file was not found!")
 
         for csv_row in read_csv_file(filename):
-            self.add_premis_metadata(csv_row, workspace, config)
+            self.add_premis_metadata(csv_row, source_path, config)
 
-    def add_premis_metadata(self, csv_row, workspace, config):
+    def add_premis_metadata(self, csv_row, source_path, config):
         """Add premis metadata from single row of CSV metadata / dictionary
 
         :csv_row: CSV row as dict
+        :source_path: Source data path
         :returns: None
 
         """
         p_object = PremisObjectMusicArchive(csv_row)
         if p_object.message_digest_algorithm.lower() == \
                 config.used_checksum.lower():
-            p_object.find_path(workspace)
+            p_object.find_path(source_path)
             self.add_object(p_object)
         p_event = PremisEventMusicArchive(csv_row)
         self.add_event(p_event)
@@ -139,17 +140,17 @@ class PremisObjectMusicArchive(PremisObject):
         super(PremisObjectMusicArchive, self).__init__()
         self._csv_object = {key: csv_row[key] for key in self.CSV_KEYS}
 
-    def find_path(self, workspace):
+    def find_path(self, source_path):
         """
         Find file path to object.
-        :workspace: Workspace path.
+        :source_path: Source data path.
         :raises: IOError if digital object file was not found.
         """
         found = False
-        for root, _, files in os.walk(workspace):
+        for root, _, files in os.walk(source_path):
             if self._csv_object["objekti-nimi"] in files:
                 self.filepath = os.path.relpath(os.path.join(
-                    root, self._csv_object["objekti-nimi"]), workspace)
+                    root, self._csv_object["objekti-nimi"]), source_path)
                 found = True
                 break
 

@@ -1,8 +1,10 @@
 """
 Command line interface
 """
+import os
 import click
-from dpres_sip_compiler.config import get_default_config_path
+from dpres_sip_compiler.config import (get_default_config_path,
+                                       get_default_temp_path)
 from dpres_sip_compiler.compiler import compile_sip, clean_temp_files
 
 
@@ -14,33 +16,45 @@ def cli():
 @cli.command(
     name="compile",
 )
-@click.argument('workspace', type=click.Path(exists=True))
+@click.argument('source-path', type=click.Path(exists=True, file_okay=False,
+                                               dir_okay=True))
 @click.option(
-    "--config", type=click.Path(exists=True), metavar="<PATH>",
+    "--tar-file", type=click.Path(exists=False), metavar="<FILE>",
+    help="Target tar file for the SIP. Defaults to: "
+         "%s/<trimmed-objid>.tar" % os.getcwd(), default=None)
+@click.option(
+    "--temp-path", type=click.Path(dir_okay=True, writable=True),
+    metavar="<DIR>",
+    help="Path of temporary files. Defaults to e.g.: "
+         "%s/<timestamp>" % os.getcwd(),
+    default=get_default_temp_path())
+@click.option(
+    "--config", type=click.Path(exists=True, file_okay=True,
+                                dir_okay=False),
+    metavar="<FILE>",
     help="Path of the configuration file. Defaults to: "
          "%s" % get_default_config_path(),
     default=get_default_config_path())
-def compile_command(config, workspace):
+def compile_command(source_path, tar_file, temp_path, config):
     """
     Compile Submission Information Package.
 
-    WORKSPACE: Workspace path.
+    SOURCE-PATH: Source path of the files to be packaged.
     """
-    compile_sip(workspace, config)
+    compile_sip(source_path, tar_file, temp_path, config)
 
 
 @cli.command(
     name="clean",
-    help="Clean workspace"
 )
-@click.argument('workspace', type=click.Path(exists=True))
-def clean_command(workspace):
+@click.argument('temp-path', type=click.Path(exists=True))
+def clean_command(temp_path):
     """
-    Clean workspace from temporary files.
+    Clean directory from temporary files.
 
-    WORKSPACE: Workspace path.
+    DIRECTORY: Directory containing temporary files.
     """
-    clean_temp_files(workspace)
+    clean_temp_files(temp_path)
 
 
 if __name__ == "__main__":

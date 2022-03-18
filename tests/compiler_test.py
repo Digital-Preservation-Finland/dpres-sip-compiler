@@ -19,17 +19,17 @@ NAMESPACES = {
 }
 
 
-def _get_provenance(workspace):
+def _get_provenance(temp_path):
     """
     Find 'message digest calculation' event and 'Testaaja, Teppo' agent
-    from workspace.
+    from temporary files.
 
-    :workspace: Workspace path
+    :temp_path: Path for temporary files
     :returns: Event and agent XML trees
     """
     event_paths = []
     agent_paths = []
-    for root, _, files in os.walk(workspace, topdown=False):
+    for root, _, files in os.walk(temp_path, topdown=False):
         for name in files:
             if name.endswith("PREMIS%3AEVENT-amd.xml"):
                 event_paths.append(os.path.join(root, name))
@@ -64,13 +64,13 @@ def test_technical(tmpdir, prepare_workspace):
     file. Also, existence of AudioMD is tested, because the test content
     includes an audio file. 
     """
-    (workspace, config) = prepare_workspace(tmpdir)
-    sip_meta = select(workspace, config)
-    compiler = SipCompiler(workspace, config, sip_meta)
+    (source_path, _, temp_path, config) = prepare_workspace(tmpdir)
+    sip_meta = select(source_path, config)
+    compiler = SipCompiler(source_path, None, temp_path, config, sip_meta)
     compiler._create_technical_metadata()
     audio_path = None
     premis_path = None
-    for root, _, files in os.walk(workspace, topdown=False):
+    for root, _, files in os.walk(temp_path, topdown=False):
         for name in files:
             if name.endswith("PREMIS%3AOBJECT-amd.xml"):
                 premis_path = os.path.join(root, name)
@@ -104,12 +104,12 @@ def test_provenance(tmpdir, prepare_workspace):
     It is tested that the content of an event and an agent added to METS
     meet the info found in the given CSV file. 
     """
-    (workspace, config) = prepare_workspace(tmpdir)
-    sip_meta = select(workspace, config)
-    compiler = SipCompiler(workspace, config, sip_meta)
+    (source_path, _, temp_path, config) = prepare_workspace(tmpdir)
+    sip_meta = select(source_path, config)
+    compiler = SipCompiler(source_path, None, temp_path, config, sip_meta)
     compiler._create_technical_metadata()
     compiler._create_provenance_metadata()
-    (event_xml, agent_xml) = _get_provenance(workspace)
+    (event_xml, agent_xml) = _get_provenance(temp_path)
     assert event_xml.xpath(
         ".//premis:eventType", namespaces=NAMESPACES)[0].text == \
         "message digest calculation"
@@ -155,12 +155,12 @@ def test_descriptive(tmpdir, prepare_workspace):
     """
     Test that correct number of descriptive metadata sections exists.
     """
-    (workspace, config) = prepare_workspace(tmpdir, "workspace1")
-    sip_meta = select(workspace, config)
-    compiler = SipCompiler(workspace, config, sip_meta)
+    (source_path, _, temp_path, config) = prepare_workspace(tmpdir, "source1")
+    sip_meta = select(source_path, config)
+    compiler = SipCompiler(source_path, None, temp_path, config, sip_meta)
     compiler._import_descriptive_metadata()
     count = 0
-    for root, _, files in os.walk(workspace, topdown=False):
+    for root, _, files in os.walk(temp_path, topdown=False):
         for name in files:
             if name.endswith("dmdsec.xml"):
                 count = count + 1
@@ -176,14 +176,14 @@ def test_compile_metadata(tmpdir, prepare_workspace):
         are correct.
     (3) Mets root attributes (contract id and objid) are correct.
     """
-    (workspace, config) = prepare_workspace(tmpdir)
-    sip_meta = select(workspace, config)
-    compiler = SipCompiler(workspace, config, sip_meta)
+    (source_path, _, temp_path, config) = prepare_workspace(tmpdir)
+    sip_meta = select(source_path, config)
+    compiler = SipCompiler(source_path, None, temp_path, config, sip_meta)
     compiler._create_technical_metadata()
     compiler._compile_metadata()
 
-    mets_xml = lxml.etree.parse(os.path.join(workspace, "mets.xml"))
-    assert os.path.isfile(os.path.join(workspace, "mets.xml"))
+    mets_xml = lxml.etree.parse(os.path.join(temp_path, "mets.xml"))
+    assert os.path.isfile(os.path.join(temp_path, "mets.xml"))
     assert mets_xml.xpath("/mets:mets/mets:metsHdr/mets:agent/mets:name",
                           namespaces=NAMESPACES)[0].text == "Archive X"
     assert mets_xml.xpath("/mets:mets/mets:metsHdr/mets:agent/@TYPE",
@@ -206,17 +206,16 @@ def test_compile_package(tmpdir, prepare_workspace):
     (2) signature.sig exists.
     (3) tar file with correct name exists.
     """
-    (workspace, config) = prepare_workspace(tmpdir)
-    sip_meta = select(workspace, config)
-    compiler = SipCompiler(workspace, config, sip_meta)
+    (source_path, tar_file, temp_path, config) = prepare_workspace(tmpdir)
+    sip_meta = select(source_path, config)
+    compiler = SipCompiler(source_path, tar_file, temp_path, config, sip_meta)
     compiler._create_technical_metadata()
     compiler._compile_metadata()
     compiler._compile_package()
-    mets_xml = lxml.etree.parse(os.path.join(workspace, "mets.xml"))
-    assert os.path.isfile(os.path.join(workspace, "mets.xml"))
-    assert os.path.isfile(os.path.join(workspace, "signature.sig"))
-    assert os.path.isfile(os.path.join(workspace,
-                                       "Package_2022_02_07_123.tar"))
+    mets_xml = lxml.etree.parse(os.path.join(temp_path, "mets.xml"))
+    assert os.path.isfile(os.path.join(temp_path, "mets.xml"))
+    assert os.path.isfile(os.path.join(temp_path, "signature.sig"))
+    assert os.path.isfile(os.path.join(tar_file))
 
 
 def test_compile_sip(tmpdir, prepare_workspace):
@@ -229,13 +228,14 @@ def test_compile_sip(tmpdir, prepare_workspace):
     (3) tar file with correct name exists.
     (4) Number of different metadata sections in METS is correct.
     """
-    (workspace, _) = prepare_workspace(tmpdir, "workspace1")
-    compile_sip(workspace, "tests/data/musicarchive/config.conf")
-    mets_xml = lxml.etree.parse(os.path.join(workspace, "mets.xml"))
-    assert os.path.isfile(os.path.join(workspace, "mets.xml"))
-    assert os.path.isfile(os.path.join(workspace, "signature.sig"))
-    assert os.path.isfile(os.path.join(workspace,
-                                       "Package_2022_02_07_123.tar"))
+    (source_path, tar_file, temp_path, _) = prepare_workspace(
+        tmpdir, "source1")
+    compile_sip(source_path, tar_file, temp_path,
+                "tests/data/musicarchive/config.conf")
+    mets_xml = lxml.etree.parse(os.path.join(temp_path, "mets.xml"))
+    assert os.path.isfile(os.path.join(temp_path, "mets.xml"))
+    assert os.path.isfile(os.path.join(temp_path, "signature.sig"))
+    assert os.path.isfile(os.path.join(tar_file))
     assert len(mets_xml.xpath(".//mets:dmdSec",
                               namespaces=NAMESPACES)) == 2
     assert len(mets_xml.xpath(".//mets:techMD//premis:object",
@@ -257,27 +257,27 @@ def test_default_config(tmpdir, prepare_workspace):
     Test that organization name from a config file located in
     default location is found in METS.
     """
-    (workspace, _) = prepare_workspace(tmpdir, "workspace1")
+    (source_path, tar_file, temp_path, _) = prepare_workspace(
+        tmpdir, "source1")
     conf_path = get_default_config_path()
     conf_dir = os.path.dirname(conf_path)
     if not os.path.exists(conf_dir):
         os.makedirs(conf_dir)
     shutil.copy("tests/data/musicarchive/config.conf", conf_path)
-    compile_sip(workspace)
-    mets_xml = lxml.etree.parse(os.path.join(workspace, "mets.xml"))
-    assert os.path.isfile(os.path.join(workspace, "mets.xml"))
-    assert os.path.isfile(os.path.join(workspace, "signature.sig"))
-    assert os.path.isfile(os.path.join(workspace,
-                                       "Package_2022_02_07_123.tar"))
+    compile_sip(source_path, tar_file, temp_path)
+    mets_xml = lxml.etree.parse(os.path.join(temp_path, "mets.xml"))
+    assert os.path.isfile(os.path.join(temp_path, "mets.xml"))
+    assert os.path.isfile(os.path.join(temp_path, "signature.sig"))
+    assert os.path.isfile(os.path.join(tar_file))
     assert mets_xml.xpath("/mets:mets/mets:metsHdr/mets:agent/mets:name",
                           namespaces=NAMESPACES)[0].text == "Archive X"
 
 
-def _count_temp_files(workspace):
-    """Count temporary files in workspace.
+def _count_temp_files(temp_path):
+    """Count temporary files in temp_path.
     """
     count = 0
-    for root, _, files in os.walk(workspace, topdown=False):
+    for root, _, files in os.walk(temp_path, topdown=False):
         for name in files:
             if not name.endswith(("___metadata.xml", "___metadata.csv",
                                   "testfile1.wav")):
@@ -290,17 +290,19 @@ def test_automated_cleanup(tmpdir, prepare_workspace):
     Test that calling the steps multiple times remove the temporary files
     resulted from the previous call.
     """
-    (workspace, config) = prepare_workspace(tmpdir)
-    sip_meta = select(workspace, config)
-    compiler = SipCompiler(workspace, config, sip_meta)
+    (source_path, tar_file, temp_path, config) = prepare_workspace(tmpdir)
+    sip_meta = select(source_path, config)
+    compiler = SipCompiler(source_path, tar_file, temp_path, config, sip_meta)
     compiler.create_sip()
-    count = _count_temp_files(workspace)
+    count = _count_temp_files(temp_path)
     compiler.create_sip()
-    assert _count_temp_files(workspace) == count
+    assert _count_temp_files(temp_path) == count
 
-    compile_sip(workspace, "tests/data/musicarchive/config.conf")
-    compile_sip(workspace, "tests/data/musicarchive/config.conf")
-    assert _count_temp_files(workspace) == count
+    compile_sip(source_path, tar_file, temp_path,
+                "tests/data/musicarchive/config.conf")
+    compile_sip(source_path, tar_file, temp_path,
+                "tests/data/musicarchive/config.conf")
+    assert _count_temp_files(temp_path) == count
 
 
 @pytest.mark.parametrize("temp_files, file_endings, file_names", [
@@ -340,18 +342,17 @@ def test_clean_temp_files(tmpdir, temp_files, file_endings, file_names):
         assert not os.path.exists(temp_path)
 
 
-def test_clean_workspace(tmpdir, prepare_workspace):
+def test_clean_temp_files(tmpdir, prepare_workspace):
     """
-    Test workspace cleaning. First create temporary files by calling
+    Test cleaning of temporary files. First create temporary files by calling
     different metadata creation steps. Eventually remove those.
-    Check that only source files exist.
     """
-    (workspace, config) = prepare_workspace(tmpdir)
-    sip_meta = select(workspace, config)
-    compiler = SipCompiler(workspace, config, sip_meta)
+    (source_path, _, temp_path, config) = prepare_workspace(tmpdir)
+    sip_meta = select(source_path, config)
+    compiler = SipCompiler(source_path, None, temp_path, config, sip_meta)
     compiler._create_technical_metadata()
     compiler._create_provenance_metadata()
     compiler._import_descriptive_metadata()
     compiler._compile_metadata()
-    clean_temp_files(workspace)
-    assert _count_temp_files(workspace) == 0
+    clean_temp_files(temp_path)
+    assert _count_temp_files(temp_path) == 0

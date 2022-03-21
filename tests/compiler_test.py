@@ -232,7 +232,7 @@ def test_compile_package(tmpdir, prepare_workspace):
     assert os.path.isfile(os.path.join(temp_path, "signature.sig"))
 
 
-def test_compile_sip(tmpdir, prepare_workspace, untar_sip):
+def test_compile_sip(tmpdir, prepare_workspace, pick_files_tar):
     """
     Test SIP compilation.
 
@@ -247,13 +247,12 @@ def test_compile_sip(tmpdir, prepare_workspace, untar_sip):
     compile_sip(source_path, tar_file, temp_path,
                 "tests/data/musicarchive/config.conf")
     assert os.path.isfile(tar_file)
-    assert not os.path.isfile(os.path.join(temp_path, "mets.xml"))
-    assert not os.path.isfile(os.path.join(temp_path, "signature.sig"))
 
-    untar_sip(tar_file, temp_path)
+    tar_list = pick_files_tar(tar_file, temp_path, ["./mets.xml"])
+    assert "./mets.xml" in tar_list
+    assert "./signature.sig" in tar_list
+
     mets_xml = lxml.etree.parse(os.path.join(temp_path, "mets.xml"))
-    assert os.path.isfile(os.path.join(temp_path, "mets.xml"))
-    assert os.path.isfile(os.path.join(temp_path, "signature.sig"))
     assert len(mets_xml.xpath(".//mets:dmdSec",
                               namespaces=NAMESPACES)) == 2
     assert len(mets_xml.xpath(".//mets:techMD//premis:object",
@@ -270,7 +269,7 @@ def test_compile_sip(tmpdir, prepare_workspace, untar_sip):
                               namespaces=NAMESPACES)) == 1
 
 
-def test_default_config(tmpdir, prepare_workspace, untar_sip):
+def test_default_config(tmpdir, prepare_workspace, pick_files_tar):
     """
     Test that organization name from a config file located in
     default location is found in METS.
@@ -283,20 +282,17 @@ def test_default_config(tmpdir, prepare_workspace, untar_sip):
         os.makedirs(conf_dir)
     shutil.copy("tests/data/musicarchive/config.conf", conf_path)
     compile_sip(source_path, tar_file, temp_path)
-    assert os.path.isfile(tar_file)
-    assert not os.path.isfile(os.path.join(temp_path, "mets.xml"))
-    assert not os.path.isfile(os.path.join(temp_path, "signature.sig"))
 
-    untar_sip(tar_file, temp_path)
+    tar_list = pick_files_tar(tar_file, temp_path, ["./mets.xml"])
+    assert "./mets.xml" in tar_list
+    assert "./signature.sig" in tar_list
+
     mets_xml = lxml.etree.parse(os.path.join(temp_path, "mets.xml"))
-    assert os.path.isfile(os.path.join(temp_path, "mets.xml"))
-    assert os.path.isfile(os.path.join(temp_path, "signature.sig"))
-    assert os.path.isfile(tar_file)
     assert mets_xml.xpath("/mets:mets/mets:metsHdr/mets:agent/mets:name",
                           namespaces=NAMESPACES)[0].text == "Archive X"
 
 
-def test_default_paths(tmpdir, prepare_workspace, untar_sip):
+def test_default_paths(tmpdir, prepare_workspace, pick_files_tar):
     """
     Test cunctionality with default temporary and output paths.
     The current working path in the test is the created temporary directory.
@@ -319,17 +315,11 @@ def test_default_paths(tmpdir, prepare_workspace, untar_sip):
     found_dirs.remove("tests")
     assert not found_dirs
 
-    untar_sip(os.path.join(cwd_run, "Package_2022_02_07_123.tar"),
-              temp_path)
-    assert os.path.isfile(os.path.join(temp_path, "mets.xml"))
-    assert os.path.isfile(os.path.join(temp_path, "signature.sig"))
-    assert os.path.isfile(os.path.join(temp_path, "audio", "testfile1.wav"))
-
-
-def _dummy_clean():
-    """
-    """
-    pass
+    tar_list = pick_files_tar(
+        os.path.join(cwd_run, "Package_2022_02_07_123.tar"))
+    assert "./mets.xml" in tar_list
+    assert "./signature.sig" in tar_list
+    assert "./audio/testfile1.wav" in tar_list
 
 
 def test_temp_path_name(tmpdir, prepare_workspace, monkeypatch):

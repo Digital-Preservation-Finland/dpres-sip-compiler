@@ -194,8 +194,8 @@ class SipCompiler(object):
                 self.source_path):
             return
         print("Append METS and signature to TAR file.")
-        command = ["tar", "-rvvf", fsencode_path(self.tar_file), "mets.xml",
-                   "signature.sig"]
+        command = ["tar", "-rvvf", fsencode_path(self.tar_file), "./mets.xml",
+                   "./signature.sig"]
         proc = subprocess.Popen(
             command, cwd=self.temp_path,
             stdin=subprocess.PIPE, stdout=subprocess.PIPE,

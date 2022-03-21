@@ -9,20 +9,27 @@ from dpres_sip_compiler.cmd import cli
 
 
 @pytest.fixture(scope="function")
-def untar_sip():
+def pick_files_tar():
     """
-    Untar a a SIP TAR file.
+    List all files included in a TAR file and extract the given files.
     """
-    def _untar(tar_file, directory):
+    def _pick_files_tar(tar_file, target=None, extract_list=None):
         """
-        Untar a SIP TAR file.
-        :tar_file: File to untar.
-        :directory: Output directory.
+        List all files included in a TAR file and extract the given files.
+        :tar_file: TAR file.
+        :target: Target directory to extract files.
+        :extract_list: List of files to extract.
         """
         with tarfile.open(tar_file) as tar:
-            tar.extractall(directory)
+            if extract_list is not None:
+                tar.extractall(
+                    path=target,
+                    members=[member for member in tar.getmembers()
+                             if member.name in extract_list])
+            return tar.getnames()
+        return []
 
-    return _untar
+    return _pick_files_tar
 
 
 @pytest.fixture(scope="function")

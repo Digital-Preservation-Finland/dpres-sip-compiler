@@ -7,7 +7,7 @@ from dpres_sip_compiler.selector import select
 from dpres_sip_compiler.compiler import SipCompiler
 
 
-def test_compile(tmpdir, run_cli, prepare_workspace, untar_sip):
+def test_compile(tmpdir, run_cli, prepare_workspace, pick_files_tar):
     """Test compile command.
     """
     (source_path, tar_file, temp_path, _) = prepare_workspace(tmpdir)
@@ -15,17 +15,13 @@ def test_compile(tmpdir, run_cli, prepare_workspace, untar_sip):
         ["compile", "--config", "tests/data/musicarchive/config.conf",
          "--tar-file", tar_file, "--temp-path", temp_path, source_path])
     assert result.exit_code == 0
-    assert os.path.isfile(tar_file)
-    assert not os.path.isfile(os.path.join(temp_path, "mets.xml"))
-    assert not os.path.isfile(os.path.join(temp_path, "signature.sig"))
 
-    untar_sip(tar_file, temp_path)
-    assert os.path.isfile(os.path.join(temp_path, "mets.xml"))
-    assert os.path.isfile(os.path.join(temp_path, "signature.sig"))
-    assert os.path.isfile(os.path.join(temp_path, "audio", "testfile1.wav"))
+    tar_list = pick_files_tar(tar_file)
+    assert "./mets.xml" in tar_list
+    assert "./signature.sig" in tar_list
 
 
-def test_default_config(tmpdir, run_cli, prepare_workspace, untar_sip):
+def test_default_config(tmpdir, run_cli, prepare_workspace, pick_files_tar):
     """Test default configuration path
     """
     (source_path, tar_file, temp_path, _) = prepare_workspace(
@@ -38,13 +34,10 @@ def test_default_config(tmpdir, run_cli, prepare_workspace, untar_sip):
     result = run_cli(["compile", "--tar-file", tar_file, "--temp-path",
                       temp_path, source_path])
     assert result.exit_code == 0
-    assert os.path.isfile(tar_file)
-    assert not os.path.isfile(os.path.join(temp_path, "mets.xml"))
-    assert not os.path.isfile(os.path.join(temp_path, "signature.sig"))
 
-    untar_sip(tar_file, temp_path)
-    assert os.path.isfile(os.path.join(temp_path, "mets.xml"))
-    assert os.path.isfile(os.path.join(temp_path, "signature.sig"))
+    tar_list = pick_files_tar(tar_file)
+    assert "./mets.xml" in tar_list
+    assert "./signature.sig" in tar_list
 
 
 def test_clean(tmpdir, run_cli, prepare_workspace):

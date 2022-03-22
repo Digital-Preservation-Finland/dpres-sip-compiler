@@ -3,6 +3,7 @@
 import os
 import glob
 from io import open as io_open
+import datetime
 import re
 import csv
 import six
@@ -12,11 +13,12 @@ from dpres_sip_compiler.base_adaptor import (
 
 def spaceless(string):
     """
-    Change whitespaces to undercores.
+    Strip string and change whitespaces to undercores.
+    Consecutive whitespaces are changed to a single underscore.
     :string: String to be changed.
     :returns: Spaceless string
     """
-    return re.sub(r"\s+", '_', string)
+    return re.sub(r"\s+", '_', string.strip())
 
 
 def read_csv_file(filename):
@@ -232,7 +234,9 @@ class PremisEventMusicArchive(PremisEvent):
     @property
     def event_datetime(self):
         """Event timestamp from a CSV file"""
-        return self._csv_event["event-aika"].replace(" ", "T")
+        date = datetime.datetime.strptime(
+            self._csv_event["event-aika"], "%Y-%m-%d %H:%M:%S")
+        return date.strftime("%Y-%m-%dT%H:%M:%S")
 
     @property
     def event_outcome(self):

@@ -181,7 +181,7 @@ class SipCompiler(object):
 
         returncode = compress(
             dir_to_tar=self.source_path,
-            tar_filename=self.tar_file,
+            tar_filename=os.path.abspath(self.tar_file),
             exclude=self.sip_meta.exclude_files(self.config))
         if returncode != 0:
             raise ValueError("TAR packaging error. Return code was: "

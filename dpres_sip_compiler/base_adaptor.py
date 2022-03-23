@@ -185,7 +185,7 @@ class PremisObject(object):
                     "original_name",
                     "message_digest_algorithm",
                     "message_digest"]:
-            if not key in self._metadata:
+            if key not in self._metadata:
                 self._metadata[key] = None
 
     def __getattr__(self, attr):
@@ -249,7 +249,7 @@ class PremisEvent(object):
                     "event_datetime",
                     "event_detail",
                     "event_outcome_detail"]:
-            if not key in self._metadata:
+            if key not in self._metadata:
                 self._metadata[key] = None
 
     def __getattr__(self, attr):
@@ -290,7 +290,7 @@ class PremisAgent(object):
                     "agent_identifier_value",
                     "agent_name",
                     "agent_type"]:
-            if not key in self._metadata:
+            if key not in self._metadata:
                 self._metadata[key] = None
 
     def __getattr__(self, attr):

@@ -32,6 +32,7 @@ class SipCompiler(object):
     """Compiler to create SIPs
     """
 
+    # pylint: disable=too-many-arguments
     def __init__(self, source_path, temp_path, config, sip_meta,
                  tar_file=None):
         """Initialize compiler.
@@ -192,8 +193,10 @@ class SipCompiler(object):
             raise ValueError("TAR packaging error. Return code was: "
                              "%s" % str(returncode))
 
+    # Popen does not support with in Python2
+    # pylint: disable=consider-using-with
     def _append_tar(self):
-        """
+        """Append METS and signature to TAR file.
         """
         if os.path.normpath(self.temp_path) == os.path.normpath(
                 self.source_path):

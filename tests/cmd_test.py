@@ -3,7 +3,8 @@
 import os
 import shutil
 from dpres_sip_compiler.config import get_default_config_path
-from dpres_sip_compiler.selector import select
+from dpres_sip_compiler.adaptor_list import ADAPTOR_DICT
+from dpres_sip_compiler.base_adaptor import build_sip_metadata
 from dpres_sip_compiler.compiler import SipCompiler
 
 
@@ -46,7 +47,7 @@ def test_clean(tmpdir, run_cli, prepare_workspace):
     Check that only source files exist.
     """
     (source_path, _, temp_path, config) = prepare_workspace(tmpdir)
-    sip_meta = select(source_path, config)
+    sip_meta = build_sip_metadata(ADAPTOR_DICT, source_path, config)
     compiler = SipCompiler(source_path=source_path, temp_path=temp_path,
                            config=config, sip_meta=sip_meta)
     compiler._create_technical_metadata()

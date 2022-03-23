@@ -6,8 +6,9 @@ import contextlib
 import re
 import lxml.etree
 import pytest
-from dpres_sip_compiler.selector import select
 import dpres_sip_compiler.compiler
+from dpres_sip_compiler.adaptor_list import ADAPTOR_DICT
+from dpres_sip_compiler.base_adaptor import build_sip_metadata
 from dpres_sip_compiler.compiler import (SipCompiler, compile_sip,
                                          clean_temp_files)
 from dpres_sip_compiler.config import get_default_config_path
@@ -78,7 +79,7 @@ def test_technical(tmpdir, prepare_workspace):
     includes an audio file.
     """
     (source_path, _, temp_path, config) = prepare_workspace(tmpdir)
-    sip_meta = select(source_path, config)
+    sip_meta = build_sip_metadata(ADAPTOR_DICT, source_path, config)
     compiler = SipCompiler(source_path=source_path, temp_path=temp_path,
                            config=config, sip_meta=sip_meta)
     compiler._create_technical_metadata()
@@ -119,7 +120,7 @@ def test_provenance(tmpdir, prepare_workspace):
     meet the info found in the given CSV file.
     """
     (source_path, _, temp_path, config) = prepare_workspace(tmpdir)
-    sip_meta = select(source_path, config)
+    sip_meta = build_sip_metadata(ADAPTOR_DICT, source_path, config)
     compiler = SipCompiler(source_path=source_path, temp_path=temp_path,
                            config=config, sip_meta=sip_meta)
     compiler._create_technical_metadata()
@@ -171,7 +172,7 @@ def test_descriptive(tmpdir, prepare_workspace):
     Test that correct number of descriptive metadata sections exists.
     """
     (source_path, _, temp_path, config) = prepare_workspace(tmpdir, "source1")
-    sip_meta = select(source_path, config)
+    sip_meta = build_sip_metadata(ADAPTOR_DICT, source_path, config)
     compiler = SipCompiler(source_path=source_path, temp_path=temp_path,
                            config=config, sip_meta=sip_meta)
     compiler._import_descriptive_metadata()
@@ -193,7 +194,7 @@ def test_compile_metadata(tmpdir, prepare_workspace):
     (3) Mets root attributes (contract id and objid) are correct.
     """
     (source_path, _, temp_path, config) = prepare_workspace(tmpdir)
-    sip_meta = select(source_path, config)
+    sip_meta = build_sip_metadata(ADAPTOR_DICT, source_path, config)
     compiler = SipCompiler(source_path=source_path, temp_path=temp_path,
                            config=config, sip_meta=sip_meta)
     compiler._create_technical_metadata()
@@ -220,7 +221,7 @@ def test_compile_package(tmpdir, prepare_workspace):
     Test package and METS creation.
     """
     (source_path, tar_file, temp_path, config) = prepare_workspace(tmpdir)
-    sip_meta = select(source_path, config)
+    sip_meta = build_sip_metadata(ADAPTOR_DICT, source_path, config)
     compiler = SipCompiler(source_path=source_path, temp_path=temp_path,
                            config=config, sip_meta=sip_meta,
                            tar_file=tar_file)
@@ -370,7 +371,7 @@ def test_automated_cleanup(tmpdir, prepare_workspace):
     resulted from the previous call.
     """
     (source_path, tar_file, temp_path, config) = prepare_workspace(tmpdir)
-    sip_meta = select(source_path, config)
+    sip_meta = build_sip_metadata(ADAPTOR_DICT, source_path, config)
     compiler = SipCompiler(source_path=source_path, tar_file=tar_file,
                            temp_path=temp_path, config=config,
                            sip_meta=sip_meta)
@@ -429,7 +430,7 @@ def test_clean_temp_steps(tmpdir, prepare_workspace):
     different metadata creation steps. Eventually remove those.
     """
     (source_path, _, temp_path, config) = prepare_workspace(tmpdir)
-    sip_meta = select(source_path, config)
+    sip_meta = build_sip_metadata(ADAPTOR_DICT, source_path, config)
     compiler = SipCompiler(source_path=source_path, temp_path=temp_path,
                            config=config, sip_meta=sip_meta)
     compiler._create_technical_metadata()

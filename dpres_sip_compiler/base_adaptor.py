@@ -55,6 +55,11 @@ class SipMetadata(object):
         self.premis_agents = {}     # PREMIS Agents
         self.premis_linkings = {}   # Linkings inside PREMIS
 
+    def populate(self, source_path, config):
+        """Create metadata objects based on source path.
+        """
+        pass
+
     # pylint: disable=unused-argument
     def descriptive_files(self, desc_path, config):
         """

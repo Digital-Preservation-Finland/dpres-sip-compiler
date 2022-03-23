@@ -104,7 +104,7 @@ def test_add_detail_info():
     source_dict = {
         "event-id": "event-id-123",
         "event": "message digest calculation",
-        "event-aika": "2022-02-01T14:00:00",
+        "event-aika": "2022-02-01 14:00:00",
         "event-tulos": "success",
         "tiiviste": "abc",
         "tiiviste-tyyppi": "MD5",

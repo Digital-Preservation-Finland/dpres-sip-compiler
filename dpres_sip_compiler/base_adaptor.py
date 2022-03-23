@@ -174,12 +174,30 @@ class PremisObject(object):
     Can be overwritten with metadata type specific adaptors.
     """
 
-    # pylint: disable=no-self-use
-
-    def __init__(self):
+    def __init__(self, metadata):
         """Initialize object.
+        :metadata: Metadata dict for object.
         """
         self.filepath = None  # File path to object
+        self._metadata = metadata
+        for key in ["object_identifier_type",
+                    "object_identifier_value",
+                    "original_name",
+                    "message_digest_algorithm",
+                    "message_digest"]:
+            if not key in self._metadata:
+                self._metadata[key] = None
+
+    def __getattr__(self, attr):
+        """
+        Set metadata items as properties.
+        :attr: Attribute name
+        :returns: Value for given attribute or None
+        """
+        if attr in self._metadata:
+            return self._metadata[attr]
+
+        return None
 
     @property
     def identifier(self):
@@ -187,36 +205,6 @@ class PremisObject(object):
         PREMIS objectIdentifierValue by default.
         """
         return self.object_identifier_value
-
-    @property
-    def object_identifier_type(self):
-        """Value corresponding to PREMIS objectIdentifierType.
-        """
-        return None
-
-    @property
-    def object_identifier_value(self):
-        """Value corresponding to PREMIS objectIdentifierValue.
-        """
-        return None
-
-    @property
-    def original_name(self):
-        """Original name.
-        """
-        return None
-
-    @property
-    def message_digest_algorithm(self):
-        """Checksum algorithm.
-        """
-        return None
-
-    @property
-    def message_digest(self):
-        """Checksum.
-        """
-        return None
 
     @property
     def format_name(self):
@@ -238,13 +226,42 @@ class PremisObject(object):
             return ""
         return None
 
+    def remove_metadata(self, metadata_key):
+        """Remove key from metadata.
+        """
+        self._metadata.pop(metadata_key, None)
+
 
 class PremisEvent(object):
     """Class for a PREMIS Event.
     Can be overwritten with metadata type specific adaptors.
     """
 
-    # pylint: disable=no-self-use
+    def __init__(self, metadata):
+        """Initialize event.
+        :metadata: Metadata dict for event.
+        """
+        self._metadata = metadata
+        for key in ["event_identifier_type",
+                    "event_identifier_value",
+                    "event_type",
+                    "event_outcome",
+                    "event_datetime",
+                    "event_detail",
+                    "event_outcome_detail"]:
+            if not key in self._metadata:
+                self._metadata[key] = None
+
+    def __getattr__(self, attr):
+        """
+        Set metadata items as properties.
+        :attr: Attribute name
+        :returns: Value for given attribute or None
+        """
+        if attr in self._metadata:
+            return self._metadata[attr]
+
+        return None
 
     @property
     def identifier(self):
@@ -253,55 +270,39 @@ class PremisEvent(object):
         """
         return self.event_identifier_value
 
-    @property
-    def event_identifier_type(self):
-        """Value corresponding to PREMIS eventIdentifierType.
+    def remove_metadata(self, metadata_key):
+        """Remove key from metadata.
         """
-        return None
-
-    @property
-    def event_identifier_value(self):
-        """Value corresponding to PREMIS eventIdentifierValue.
-        """
-        return None
-
-    @property
-    def event_type(self):
-        """Event type.
-        """
-        return None
-
-    @property
-    def event_datetime(self):
-        """Event datetime.
-        """
-        return None
-
-    @property
-    def event_detail(self):
-        """Event detail.
-        """
-        return None
-
-    @property
-    def event_outcome(self):
-        """Event outcome.
-        """
-        return None
-
-    @property
-    def event_outcome_detail(self):
-        """Event outcome detail.
-        """
-        return None
+        self._metadata.pop(metadata_key, None)
 
 
 class PremisAgent(object):
-    """Class for a PREMIS Event.
+    """Class for a PREMIS Agent.
     Can be overwritten with metadata type specific adaptors.
     """
 
-    # pylint: disable=no-self-use
+    def __init__(self, metadata):
+        """Initialize agent.
+        :metadata: Metadata dict for agent.
+        """
+        self._metadata = metadata
+        for key in ["agent_identifier_type",
+                    "agent_identifier_value",
+                    "agent_name",
+                    "agent_type"]:
+            if not key in self._metadata:
+                self._metadata[key] = None
+
+    def __getattr__(self, attr):
+        """
+        Set metadata items as properties.
+        :attr: Attribute name
+        :returns: Value for given attribute or None
+        """
+        if attr in self._metadata:
+            return self._metadata[attr]
+
+        return None
 
     @property
     def identifier(self):
@@ -310,29 +311,10 @@ class PremisAgent(object):
         """
         return self.agent_identifier_value
 
-    @property
-    def agent_identifier_type(self):
-        """Value corresponding to PREMIS agentIdentifierType.
+    def remove_metadata(self, metadata_key):
+        """Remove key from metadata.
         """
-        return None
-
-    @property
-    def agent_identifier_value(self):
-        """Value corresponding to PREMIS agentIdentifierValue.
-        """
-        return None
-
-    @property
-    def agent_name(self):
-        """Agent name.
-        """
-        return None
-
-    @property
-    def agent_type(self):
-        """Agent type.
-        """
-        return None
+        self._metadata.pop(metadata_key, None)
 
 
 class PremisLinking(object):

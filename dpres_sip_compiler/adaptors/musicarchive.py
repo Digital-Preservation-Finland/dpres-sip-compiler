@@ -134,14 +134,19 @@ class PremisObjectMusicArchive(PremisObject):
     """
     Music Archive specific PREMIS Object handler.
     """
-    CSV_KEYS = ["objekti-uuid", "objekti-nimi", "tiiviste-tyyppi", "tiiviste"]
 
     def __init__(self, csv_row):
         """Initialize.
         :csv_row: One row from a CSV file.
         """
-        super(PremisObjectMusicArchive, self).__init__()
-        self._csv_object = {key: csv_row[key] for key in self.CSV_KEYS}
+        metadata = {
+            "object_identifier_type": "UUID",
+            "object_identifier_value": csv_row["objekti-uuid"],
+            "original_name": csv_row["objekti-nimi"],
+            "message_digest_algorithm": csv_row["tiiviste-tyyppi"],
+            "message_digest": csv_row["tiiviste"]
+        }
+        super(PremisObjectMusicArchive, self).__init__(metadata)
 
     def find_path(self, source_path):
         """
@@ -151,47 +156,21 @@ class PremisObjectMusicArchive(PremisObject):
         """
         found = False
         for root, _, files in os.walk(source_path):
-            if self._csv_object["objekti-nimi"] in files:
+            if self.original_name in files:
                 self.filepath = os.path.relpath(os.path.join(
-                    root, self._csv_object["objekti-nimi"]), source_path)
+                    root, self.original_name), source_path)
                 found = True
                 break
 
         if not found:
             raise IOError("Digital object %s was not found!"
-                          "" % (self._csv_object["objekti-nimi"]))
-
-    @property
-    def object_identifier_type(self):
-        """All objectIdentifierTypes are UUIDs"""
-        return "UUID"
-
-    @property
-    def object_identifier_value(self):
-        """Object ID value from a CSV file"""
-        return self._csv_object["objekti-uuid"]
-
-    @property
-    def original_name(self):
-        """Object orginal name from a CSV file"""
-        return self._csv_object["objekti-nimi"]
-
-    @property
-    def message_digest_algorithm(self):
-        """Message digest algorithm from a CSV file"""
-        return self._csv_object["tiiviste-tyyppi"]
-
-    @property
-    def message_digest(self):
-        """Message digest from a CSV file"""
-        return self._csv_object["tiiviste"]
+                          "" % (self.original_name))
 
 
 class PremisEventMusicArchive(PremisEvent):
     """
     Music Archive specific PREMIS Event handler.
     """
-    CSV_KEYS = ["event-id", "event", "event-aika", "event-tulos"]
     DETAIL_KEYS = ["tiiviste", "tiiviste-tyyppi", "pon-korvattu-nimi",
                    "objekti-nimi", "sip-tunniste"]
 
@@ -199,9 +178,19 @@ class PremisEventMusicArchive(PremisEvent):
         """Initialize.
         :csv_row: One row from a CSV file.
         """
-        super(PremisEventMusicArchive, self).__init__()
-        self._csv_event = {key: csv_row[key] for key in self.CSV_KEYS}
         self._detail_info = []
+        metadata = {
+            "event_identifier_type": "local",
+            "event_identifier_value": csv_row["event-id"],
+            "event_type": csv_row["event"],
+            "event_outcome": csv_row["event-tulos"],
+            "event_datetime": datetime.datetime.strptime(
+                csv_row["event-aika"], "%Y-%m-%d %H:%M:%S"
+                ).strftime("%Y-%m-%dT%H:%M:%S")
+        }
+        super(PremisEventMusicArchive, self).__init__(metadata)
+        self.remove_metadata("event_detail")
+        self.remove_metadata("event_outcome_detail")
 
     def add_detail_info(self, csv_row):
         """
@@ -215,33 +204,6 @@ class PremisEventMusicArchive(PremisEvent):
         detail = {key: csv_row[key] for key in self.DETAIL_KEYS}
         if detail not in self._detail_info:
             self._detail_info.append(detail)
-
-    @property
-    def event_identifier_type(self):
-        """All event IDs are local"""
-        return "local"
-
-    @property
-    def event_identifier_value(self):
-        """Event ID value from a CSV file"""
-        return self._csv_event["event-id"]
-
-    @property
-    def event_type(self):
-        """Event type from a CSV file"""
-        return self._csv_event["event"]
-
-    @property
-    def event_datetime(self):
-        """Event timestamp from a CSV file"""
-        date = datetime.datetime.strptime(
-            self._csv_event["event-aika"], "%Y-%m-%d %H:%M:%S")
-        return date.strftime("%Y-%m-%dT%H:%M:%S")
-
-    @property
-    def event_outcome(self):
-        """Event outcome from a CSV file"""
-        return self._csv_event["event-tulos"]
 
     @property
     def event_detail(self):
@@ -294,33 +256,17 @@ class PremisAgentMusicArchive(PremisAgent):
     Music Archive specific PREMIS Agent handler.
     """
 
-    CSV_KEYS = ["agent-id", "agent-nimi", "agent-tyyppi"]
-
     def __init__(self, csv_row):
         """Initialize.
         :csv_row: One row from a CSV file.
         """
-        self._csv_agent = {key: csv_row[key] for key in self.CSV_KEYS}
-
-    @property
-    def agent_identifier_type(self):
-        """All agent IDs are local"""
-        return "local"
-
-    @property
-    def agent_identifier_value(self):
-        """Agent ID value from a CSV file"""
-        return self._csv_agent["agent-id"]
-
-    @property
-    def agent_name(self):
-        """Agent name from a CSV file"""
-        return self._csv_agent["agent-nimi"]
-
-    @property
-    def agent_type(self):
-        """Agent type from a CSV file"""
-        return self._csv_agent["agent-tyyppi"]
+        metadata = {
+            "agent_identifier_type": "local",
+            "agent_identifier_value": csv_row["agent-id"],
+            "agent_name": csv_row["agent-nimi"],
+            "agent_type": csv_row["agent-tyyppi"],
+        }
+        super(PremisAgentMusicArchive, self).__init__(metadata)
 
 
 class PremisLinkingMusicArchive(PremisLinking):

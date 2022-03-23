@@ -261,7 +261,7 @@ def test_compile_sip(tmpdir, prepare_workspace, pick_files_tar):
     assert len(mets_xml.xpath(".//mets:techMD//audiomd:AUDIOMD",
                               namespaces=NAMESPACES)) == 1
     assert len(mets_xml.xpath(".//mets:digiprovMD//premis:event",
-                              namespaces=NAMESPACES)) == 22
+                              namespaces=NAMESPACES)) == 13
     assert len(mets_xml.xpath(".//mets:digiprovMD//premis:agent",
                               namespaces=NAMESPACES)) == 13
     assert len(mets_xml.xpath(".//mets:file",

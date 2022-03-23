@@ -7,6 +7,7 @@ from __future__ import print_function
 import os
 import subprocess
 import re
+import datetime
 from siptools.scripts.import_object import import_object
 from siptools.scripts.create_mix import create_mix
 from siptools.scripts.create_videomd import create_videomd
@@ -52,6 +53,7 @@ class SipCompiler(object):
         """
         print("Creating technical metadata for %d file(s)."
               "" % (len(self.sip_meta.premis_objects)))
+        event_datetime = datetime.datetime.now().isoformat()
         for obj in self.sip_meta.objects:
             file_format = (obj.format_name, obj.format_version)
             if obj.format_name is None:
@@ -64,7 +66,9 @@ class SipCompiler(object):
                           identifier=(obj.object_identifier_type,
                                       obj.object_identifier_value),
                           checksum=(obj.message_digest_algorithm,
-                                    obj.message_digest))
+                                    obj.message_digest),
+                          event_datetime=event_datetime,
+                          event_target=".")
             streams = read_json_streams(obj.filepath, self.temp_path)
             if any(stream["stream_type"] == "image"
                    for stream in streams.values()):

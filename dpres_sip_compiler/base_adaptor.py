@@ -8,8 +8,11 @@ Adaptors can overwrite the required methods and properties as needed.
 def build_sip_metadata(adaptor_dict, source_path, config):
     """
     Build metadata object based on given class.
+    :adaptor_dict: Dict of adaptor names and corresponding SIP metadata
+                   classes.
     :source_path: Source data path
     :config: Basic configuration
+    :returns: SIP metadata object
     """
     if config.adaptor not in adaptor_dict:
         raise NotImplementedError(

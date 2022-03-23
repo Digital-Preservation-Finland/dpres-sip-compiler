@@ -20,9 +20,10 @@ from siptools.scripts.compile_mets import compile_mets
 from siptools.scripts.sign_mets import sign_mets
 from siptools.scripts.compress import compress
 from siptools.utils import read_json_streams, fsencode_path
+from dpres_sip_compiler.base_adaptor import build_sip_metadata
+from dpres_sip_compiler.adaptor_list import ADAPTOR_DICT
 from dpres_sip_compiler.config import (Config, get_default_config_path,
                                        get_default_temp_path)
-from dpres_sip_compiler.selector import select
 
 
 # pylint: disable=too-few-public-methods
@@ -52,9 +53,9 @@ class SipCompiler(object):
         print("Creating technical metadata for %d file(s)."
               "" % (len(self.sip_meta.premis_objects)))
         for obj in self.sip_meta.objects:
-            file_format = ()
-            if obj.filepath.endswith(".csv"):
-                file_format = ("text/csv", "")
+            file_format = (obj.format_name, obj.format_version)
+            if obj.format_name is None:
+                file_format = ()
             import_object(filepaths=[obj.filepath],
                           workspace=self.temp_path,
                           base_path=self.source_path,
@@ -249,7 +250,7 @@ def compile_sip(source_path, tar_file=None, temp_path=None, conf_file=None):
     config = Config()
     config.configure(conf_file)
 
-    sip_meta = select(source_path, config)
+    sip_meta = build_sip_metadata(ADAPTOR_DICT, source_path, config)
     compiler = SipCompiler(source_path=source_path,
                            tar_file=tar_file,
                            temp_path=temp_path,

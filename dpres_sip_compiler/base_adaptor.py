@@ -5,6 +5,22 @@ Adaptors can overwrite the required methods and properties as needed.
 """
 
 
+def build_sip_metadata(adaptor_dict, source_path, config):
+    """
+    Build metadata object based on given class.
+    :source_path: Source data path
+    :config: Basic configuration
+    """
+    if config.adaptor not in adaptor_dict:
+        raise NotImplementedError(
+            "Unsupported configuration! Maybe the adaptor name is incorrect "
+            "in configuration file?")
+
+    sip_meta = adaptor_dict[config.adaptor]()
+    sip_meta.populate(source_path, config)
+    return sip_meta
+
+
 def add_premis(premis_elem, premis_dict):
     """
     Add PREMIS metadata object to a dict.
@@ -192,6 +208,26 @@ class PremisObject(object):
     def message_digest(self):
         """Checksum.
         """
+        return None
+
+    @property
+    def format_name(self):
+        """File format name
+        """
+        # We have to give help with CSV files.
+        # Automatic identifying recognizes CSV files as text files.
+        if self.filepath.endswith(".csv"):
+            return "text/csv"
+        return None
+
+    @property
+    def format_version(self):
+        """File format version
+        """
+        # We have to give help with CSV files.
+        # Automatic identifying recognizes CSV files as text files.
+        if self.filepath.endswith(".csv"):
+            return ""
         return None
 
 

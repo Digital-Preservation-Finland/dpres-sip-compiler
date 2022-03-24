@@ -169,7 +169,7 @@ def test_provenance(tmpdir, prepare_workspace):
 
 def test_descriptive(tmpdir, prepare_workspace):
     """
-    Test that correct number of descriptive metadata sections exists.
+    Test that correct number of descriptive metadata sections exist.
     """
     (source_path, _, temp_path, config) = prepare_workspace(tmpdir, "source1")
     sip_meta = build_sip_metadata(ADAPTOR_DICT, source_path, config)

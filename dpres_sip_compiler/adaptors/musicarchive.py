@@ -127,7 +127,7 @@ class SipMetadataMusicArchive(SipMetadata):
         """
         return ("*%s" % config.meta_ending,
                 "*%s" % config.csv_ending,
-                ".[^/]*")
+                ".[^/]*", "*/.[^/]*")  # Exclude all hidden files/directories
 
 
 class PremisObjectMusicArchive(PremisObject):

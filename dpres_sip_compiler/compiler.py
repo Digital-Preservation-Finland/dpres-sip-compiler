@@ -179,8 +179,9 @@ class SipCompiler(object):
 
         if self.tar_file is None:
             self.tar_file = os.path.join(
-                os.getcwd(),
-                "%s.tar" % re.sub('[^0-9a-zA-Z]+', '_', self.sip_meta.objid))
+                os.getcwd(), "%s.tar" % re.sub('[^0-9a-zA-Z\-]+',
+                                               '_',
+                                               self.sip_meta.objid))
 
         if not os.path.exists(os.path.dirname(self.tar_file)):
             os.makedirs(os.path.dirname(self.tar_file))
@@ -265,7 +266,6 @@ def compile_sip(source_path, tar_file=None, temp_path=None, conf_file=None):
                            sip_meta=sip_meta)
     compiler.create_sip(temp_path_created)
 
-
 def clean_temp_files(temp_path, file_endings=None, file_names=None,
                      delete_path=False):
     """
@@ -293,6 +293,7 @@ def clean_temp_files(temp_path, file_endings=None, file_names=None,
             "create-mix-md-references.jsonl",
             "premis-event-md-references.jsonl",
             "import-description-md-references.jsonl",
+            "import-object-datetime-amd.json",
             "filesec.xml", "structmap.xml", "mets.xml", "signature.sig")
     if file_endings is None:
         file_endings = ()

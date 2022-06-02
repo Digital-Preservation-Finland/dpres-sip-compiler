@@ -83,9 +83,9 @@ Adaptor Specific Details
 For details about adaptor specific configuration and content preparation,
 select the adaptor below:
 
-   * `Music Archive <./doc/musicarchive.rst>`_
+   * `Music Archive Finland <./doc/musicarchive.rst>`_
 
-The tool currently supports only packaging of Music Archive data,
+The tool currently supports only packaging of data of Music Archive Finland,
 with content preparation rules which have been agreed in advance.
 
 Usage

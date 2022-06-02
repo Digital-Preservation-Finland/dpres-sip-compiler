@@ -4,21 +4,10 @@ import os
 import glob
 from io import open as io_open
 import datetime
-import re
 import csv
 import six
 from dpres_sip_compiler.base_adaptor import (
     SipMetadata, PremisObject, PremisEvent, PremisAgent, PremisLinking)
-
-
-def spaceless(string):
-    """
-    Strip string and change whitespaces to undercores.
-    Consecutive whitespaces are changed to a single underscore.
-    :string: String to be changed.
-    :returns: Spaceless string
-    """
-    return re.sub(r"\s+", '_', string.strip())
 
 
 def read_csv_file(filename):
@@ -68,6 +57,8 @@ class SipMetadataMusicArchive(SipMetadata):
         except KeyError:
             raise IOError("CSV metadata file was not found!")
 
+        self.objid = os.path.split(filename)[1].replace(config.csv_ending, "")
+
         for csv_row in read_csv_file(filename):
             self.add_premis_metadata(csv_row, source_path, config)
 
@@ -93,10 +84,6 @@ class SipMetadataMusicArchive(SipMetadata):
                          object_id=csv_row["objekti-uuid"],
                          agent_id=csv_row["agent-id"],
                          agent_role=csv_row["agent-rooli"])
-        if p_event.event_type == "information package creation" \
-                and self.objid is None \
-                and csv_row["sip-tunniste"] is not None:
-            self.objid = spaceless(csv_row["sip-tunniste"])
 
     def descriptive_files(self, desc_path, config):
         """
@@ -107,7 +94,8 @@ class SipMetadataMusicArchive(SipMetadata):
         :returns: Descriptive metadata file
         """
         for filepath in os.listdir(desc_path):
-            if filepath.endswith(config.meta_ending):
+            if filepath.endswith(config.meta_ending) and \
+                    not filepath.startswith("."):
                 yield os.path.join(desc_path, filepath)
 
     def desc_root_remove(self, config):
@@ -245,7 +233,7 @@ class PremisEventMusicArchive(PremisEvent):
         if self.event_type == "information package creation":
             # There's only one element in details
             return "Submission information package created as: " \
-                   "%s" % spaceless(self._detail_info[0]["sip-tunniste"])
+                   "%s" % self._detail_info[0]["sip-tunniste"]
 
         raise NotImplementedError(
             "Not implemented event type '%s'." % (self.event_type))

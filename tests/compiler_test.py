@@ -317,7 +317,7 @@ def test_default_paths(tmpdir, prepare_workspace, pick_files_tar):
     assert not found_dirs
 
     tar_list = pick_files_tar(
-        os.path.join(cwd_run, "Package_2022_02_07_123.tar"))
+        os.path.join(cwd_run, "Package_2022-02-07_123.tar"))
     assert "./mets.xml" in tar_list
     assert "./signature.sig" in tar_list
     assert "./audio/testfile1.wav" in tar_list

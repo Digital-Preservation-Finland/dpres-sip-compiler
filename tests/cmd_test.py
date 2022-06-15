@@ -61,6 +61,5 @@ def test_clean(tmpdir, run_cli, prepare_workspace):
         for name in files:
             if not name.endswith(("___metadata.xml", "___metadata.csv",
                                   "testfile1.wav")):
-                print(name)
                 count = count + 1
     assert count == 0

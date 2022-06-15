@@ -172,7 +172,7 @@ class PremisEventMusicArchive(PremisEvent):
             csv_row["event-aika-alku"], "%Y-%m-%d %H:%M:%S"
             ).strftime("%Y-%m-%dT%H:%M:%S")
         end_time = None
-        if csv_row["event-aika-loppu"] != "0000-00-00 00:00:00":
+        if csv_row["event-aika-loppu"] != "null":
             end_time = datetime.datetime.strptime(
                 csv_row["event-aika-loppu"], "%Y-%m-%d %H:%M:%S"
                 ).strftime("%Y-%m-%dT%H:%M:%S")

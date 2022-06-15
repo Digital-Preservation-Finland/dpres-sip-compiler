@@ -294,7 +294,6 @@ def clean_temp_files(temp_path, file_endings=None, file_names=None,
             "create-mix-md-references.jsonl",
             "premis-event-md-references.jsonl",
             "import-description-md-references.jsonl",
-            "import-object-datetime-amd.json",
             "filesec.xml", "structmap.xml", "mets.xml", "signature.sig")
     if file_endings is None:
         file_endings = ()

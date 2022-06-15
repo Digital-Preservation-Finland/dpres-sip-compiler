@@ -179,7 +179,7 @@ class SipCompiler(object):
 
         if self.tar_file is None:
             self.tar_file = os.path.join(
-                os.getcwd(), "%s.tar" % re.sub('[^0-9a-zA-Z\-]+',
+                os.getcwd(), "%s.tar" % re.sub('[^0-9a-zA-Z-]+',
                                                '_',
                                                self.sip_meta.objid))
 

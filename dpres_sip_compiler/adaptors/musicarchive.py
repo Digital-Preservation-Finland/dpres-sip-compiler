@@ -171,13 +171,15 @@ class PremisEventMusicArchive(PremisEvent):
         start_time = datetime.datetime.strptime(
             csv_row["event-aika-alku"], "%Y-%m-%d %H:%M:%S"
             ).strftime("%Y-%m-%dT%H:%M:%S")
-        end_time = datetime.datetime.strptime(
-            csv_row["event-aika-loppu"], "%Y-%m-%d %H:%M:%S"
-            ).strftime("%Y-%m-%dT%H:%M:%S")
+        end_time = None
+        if csv_row["event-aika-loppu"] != "0000-00-00 00:00:00":
+            end_time = datetime.datetime.strptime(
+                csv_row["event-aika-loppu"], "%Y-%m-%d %H:%M:%S"
+                ).strftime("%Y-%m-%dT%H:%M:%S")
 
-        event_datetime = "%s/%s" % (start_time, end_time)
-        if end_time == "0000-00-00T00:00:00":
-            event_datetime = start_time
+        event_datetime = start_time
+        if end_time is not None:
+            event_datetime = "%s/%s" % (start_time, end_time)
 
         metadata = {
             "event_identifier_type": "local",
@@ -230,9 +232,12 @@ class PremisEventMusicArchive(PremisEvent):
                   "following checksums:" \
                   "" % self._detail_info[0]["tiiviste-tyyppi"]
             for info in self._detail_info:
-                out = "%s\n%s: %s (datetime: %s)" \
+                checksum_time = datetime.datetime.strptime(
+                    info["tiiviste-aika"], "%Y-%m-%d %H:%M:%S"
+                    ).strftime("%Y-%m-%dT%H:%M:%S")
+                out = "%s\n%s: %s (timestamp: %s)" \
                       "" % (out, info["objekti-nimi"],
-                            info["tiiviste"], info["tiiviste-aika"])
+                            info["tiiviste"], checksum_time)
             return out
 
         if self.event_type == "filename change":

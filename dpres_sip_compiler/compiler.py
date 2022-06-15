@@ -266,6 +266,7 @@ def compile_sip(source_path, tar_file=None, temp_path=None, conf_file=None):
                            sip_meta=sip_meta)
     compiler.create_sip(temp_path_created)
 
+
 def clean_temp_files(temp_path, file_endings=None, file_names=None,
                      delete_path=False):
     """

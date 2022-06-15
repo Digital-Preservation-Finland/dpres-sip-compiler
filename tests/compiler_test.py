@@ -131,7 +131,7 @@ def test_provenance(tmpdir, prepare_workspace):
         "message digest calculation"
     assert event_xml.xpath(
         ".//premis:eventDateTime", namespaces=NAMESPACES)[0].text == \
-        "2022-02-02T00:00:00"
+        "2022-02-02T00:00:00/2022-02-02T00:00:02"
     assert event_xml.xpath(".//premis:eventOutcome",
                            namespaces=NAMESPACES)[0].text == "success"
     assert event_xml.xpath(
@@ -141,7 +141,7 @@ def test_provenance(tmpdir, prepare_workspace):
         ".//premis:eventOutcomeDetailNote",
         namespaces=NAMESPACES)[0].text == \
         "Checksum calculated with algorithm MD5 resulted the following " \
-        "checksums:\ntestfile1.wav: abc123"
+        "checksums:\ntestfile1.wav: abc123 (timestamp: 2021-03-20T00:00:00)"
     assert event_xml.xpath(".//premis:linkingObjectIdentifierType",
                            namespaces=NAMESPACES)[0].text == "UUID"
     assert event_xml.xpath(

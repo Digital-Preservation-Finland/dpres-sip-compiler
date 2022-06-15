@@ -76,10 +76,12 @@ def test_event_properties():
     source_dict = {
         "event-id": "event-id-123",
         "event": "message digest calculation",
-        "event-aika": "2022-02-01 14:00:00",
+        "event-aika-alku": "2022-02-01 14:00:00",
+        "event-aika-loppu": "2022-02-01 14:00:15",
         "event-tulos": "success",
         "tiiviste": "abc",
         "tiiviste-tyyppi": "MD5",
+        "tiiviste-aika": "2022-02-01 14:00:05",
         "pon-korvattu-nimi": None,
         "objekti-nimi": "filename",
         "sip-tunniste": "sip-123"
@@ -90,12 +92,12 @@ def test_event_properties():
     assert event.event_identifier_type == "local"
     assert event.event_identifier_value == "event-id-123"
     assert event.event_type == "message digest calculation"
-    assert event.event_datetime == "2022-02-01T14:00:00"
+    assert event.event_datetime == "2022-02-01T14:00:00/2022-02-01T14:00:15"
     assert event.event_outcome == "success"
     assert event.event_detail == "Checksum calculation for digital objects."
     assert event.event_outcome_detail == \
         "Checksum calculated with algorithm MD5 resulted the following " \
-        "checksums:\nfilename: abc"
+        "checksums:\nfilename: abc (timestamp: 2022-02-01T14:00:05)"
 
 
 def test_add_detail_info():
@@ -104,10 +106,12 @@ def test_add_detail_info():
     source_dict = {
         "event-id": "event-id-123",
         "event": "message digest calculation",
-        "event-aika": "2022-02-01 14:00:00",
+        "event-aika-alku": "2022-02-01 14:00:00",
+        "event-aika-loppu": "2022-02-01 14:00:15",
         "event-tulos": "success",
         "tiiviste": "abc",
         "tiiviste-tyyppi": "MD5",
+        "tiiviste-aika": "2022-02-01 14:00:05",
         "pon-korvattu-nimi": None,
         "objekti-nimi": "filename1",
         "sip-tunniste": "sip-123"
@@ -120,7 +124,9 @@ def test_add_detail_info():
     event.add_detail_info(copy_dict)
     event.add_detail_info(source_dict)
     detail = "Checksum calculated with algorithm MD5 resulted the " \
-             "following checksums:\nfilename1: abc\nfilename2: def"
+             "following checksums:\nfilename1: abc (timestamp: " \
+             "2022-02-01T14:00:05)\nfilename2: def (timestamp: " \
+             "2022-02-01T14:00:05)"
     assert event.event_outcome_detail == detail
     assert len(event._detail_info) == 2
 

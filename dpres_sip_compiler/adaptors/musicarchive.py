@@ -159,22 +159,32 @@ class PremisEventMusicArchive(PremisEvent):
     """
     Music Archive specific PREMIS Event handler.
     """
-    DETAIL_KEYS = ["tiiviste", "tiiviste-tyyppi", "pon-korvattu-nimi",
-                   "objekti-nimi", "sip-tunniste"]
+    DETAIL_KEYS = ["tiiviste", "tiiviste-tyyppi", "tiiviste-aika",
+                   "pon-korvattu-nimi", "objekti-nimi", "sip-tunniste"]
 
     def __init__(self, csv_row):
         """Initialize.
         :csv_row: One row from a CSV file.
         """
         self._detail_info = []
+
+        start_time = datetime.datetime.strptime(
+            csv_row["event-aika-alku"], "%Y-%m-%d %H:%M:%S"
+            ).strftime("%Y-%m-%dT%H:%M:%S")
+        end_time = datetime.datetime.strptime(
+            csv_row["event-aika-loppu"], "%Y-%m-%d %H:%M:%S"
+            ).strftime("%Y-%m-%dT%H:%M:%S")
+
+        event_datetime = "%s/%s" % (start_time, end_time)
+        if end_time == "0000-00-00T00:00:00":
+            event_datetime = start_time
+
         metadata = {
             "event_identifier_type": "local",
             "event_identifier_value": csv_row["event-id"],
             "event_type": csv_row["event"],
             "event_outcome": csv_row["event-tulos"],
-            "event_datetime": datetime.datetime.strptime(
-                csv_row["event-aika"], "%Y-%m-%d %H:%M:%S"
-                ).strftime("%Y-%m-%dT%H:%M:%S")
+            "event_datetime": event_datetime
         }
         super(PremisEventMusicArchive, self).__init__(metadata)
         self.remove_metadata("event_detail")
@@ -220,8 +230,9 @@ class PremisEventMusicArchive(PremisEvent):
                   "following checksums:" \
                   "" % self._detail_info[0]["tiiviste-tyyppi"]
             for info in self._detail_info:
-                out = "%s\n%s: %s" % (out, info["objekti-nimi"],
-                                      info["tiiviste"])
+                out = "%s\n%s: %s (datetime: %s)" \
+                      "" % (out, info["objekti-nimi"],
+                            info["tiiviste"], info["tiiviste-aika"])
             return out
 
         if self.event_type == "filename change":

@@ -1,5 +1,6 @@
 """Test Music Archive adaptor.
 """
+import pytest
 from dpres_sip_compiler.adaptors.musicarchive import (
     SipMetadataMusicArchive,
     PremisObjectMusicArchive,
@@ -98,6 +99,30 @@ def test_event_properties():
     assert event.event_outcome_detail == \
         "Checksum calculated with algorithm MD5 resulted the following " \
         "checksums:\nfilename: abc (timestamp: 2022-02-01T14:00:05)"
+
+
+@pytest.mark.parametrize("end_timestamp",
+                         ["NULL",
+                          "2022-02-01 14:00:00"])
+def test_event_noend(end_timestamp):
+    """Test a case where event timestamp in CSV is not periodic.
+    """
+    source_dict = {
+        "event-id": "event-id-123",
+        "event": "test event",
+        "event-aika-alku": "2022-02-01 14:00:00",
+        "event-aika-loppu": end_timestamp,
+        "event-tulos": "success",
+        "tiiviste": None,
+        "tiiviste-tyyppi": None,
+        "tiiviste-aika": None,
+        "pon-korvattu-nimi": None,
+        "objekti-nimi": "filename",
+        "sip-tunniste": "sip-123"
+    }
+    event = PremisEventMusicArchive(source_dict)
+    event.add_detail_info(source_dict)
+    assert event.event_datetime == "2022-02-01T14:00:00"
 
 
 def test_add_detail_info():

@@ -1,6 +1,11 @@
 Release notes
 =============
 
+Version 0.3
+-----------
+
+   * Fix handling of non-periodic event timestamps.
+
 Version 0.2
 -----------
 

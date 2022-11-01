@@ -1,5 +1,6 @@
 """Test CLI.
 """
+import json
 import os
 import shutil
 from dpres_sip_compiler.config import get_default_config_path
@@ -63,3 +64,15 @@ def test_clean(tmpdir, run_cli, prepare_workspace):
                                   "testfile1.wav")):
                 count = count + 1
     assert count == 0
+
+
+def test_validate(run_cli):
+    """Test validate command."""
+    results = run_cli(["validate", "tests/data/musicarchive"])
+    assert results.exit_code == 0
+    results_count = 0
+    # Last result is just an empty line
+    for result in results.output.split('\n')[:-1]:
+        assert 'well-formed' in json.loads(result)
+        results_count += 1
+    assert results_count == 11

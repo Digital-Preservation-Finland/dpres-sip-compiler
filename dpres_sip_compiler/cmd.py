@@ -1,11 +1,13 @@
 """
 Command line interface
 """
+import json
 import os
 import click
 from dpres_sip_compiler.config import (get_default_config_path,
                                        get_default_temp_path)
 from dpres_sip_compiler.compiler import compile_sip, clean_temp_files
+from dpres_sip_compiler.validate import scrape_files
 
 
 @click.group()
@@ -58,6 +60,22 @@ def clean_command(temp_path, delete_path):
     DIRECTORY: Directory containing temporary files.
     """
     clean_temp_files(temp_path, delete_path=delete_path)
+
+
+@cli.command(
+    name="validate",
+)
+@click.argument('path', type=click.Path(exists=True))
+def validate(path):
+    """
+    Recursively scrape file metadata and check well-formedness in the
+    given path.
+
+    PATH: Path to the files to be validated.
+    """
+    for file_info in scrape_files(path):
+        err = bool(file_info['well-formed'])
+        click.echo(json.dumps(file_info), err=err)
 
 
 if __name__ == "__main__":

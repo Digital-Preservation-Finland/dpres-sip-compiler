@@ -74,7 +74,8 @@ def validate(path):
     PATH: Path to the files to be validated.
     """
     for file_info in scrape_files(path):
-        err = bool(file_info['well-formed'])
+        # Direct invalid file metadata to stderr
+        err = file_info['well-formed'] == True
         click.echo(json.dumps(file_info), err=err)
 
 

@@ -67,12 +67,20 @@ def test_clean(tmpdir, run_cli, prepare_workspace):
 
 
 def test_validate(run_cli):
-    """Test validate command."""
-    results = run_cli(["validate", "tests/data/musicarchive/source1/audio"])
+    """Test validate command. Supported files are directed to stdout,
+    while unsupported files are directed to stderr.
+    """
+    results = run_cli(["validate", "tests/data/musicarchive"])
     assert results.exit_code == 0
-    results_count = 0
+    supported_files_count = 0
+    unsupported_files_count = 0
     # Last result is just an empty line
-    for result in results.output.split('\n')[:-1]:
-        assert 'well-formed' in json.loads(result)
-        results_count += 1
-    assert results_count == 4
+    for result in results.stdout.split('\n')[:-1]:
+        assert json.loads(result)['well-formed']
+        supported_files_count += 1
+    # Last result is just an empty line
+    for result in results.stderr.split('\n')[:-1]:
+        assert not json.loads(result)['well-formed']
+        unsupported_files_count += 1
+    assert supported_files_count == 8
+    assert unsupported_files_count == 3

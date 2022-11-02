@@ -68,22 +68,27 @@ def test_clean(tmpdir, run_cli, prepare_workspace):
 
 def test_validate(run_cli, tmpdir):
     """Test validate command."""
+    valid_output = os.path.join(str(tmpdir), 'valid.jsonl')
+    invalid_output = os.path.join(str(tmpdir), 'invalid.jsonl')
+
     results = run_cli(
         ["validate", "tests/data/musicarchive",
-         "--valid-output", os.path.join(tmpdir, 'valid.jsonl'),
-         "--invalid-output", os.path.join(tmpdir, 'invalid.jsonl')])
+         "--valid-output", valid_output,
+         "--invalid-output", invalid_output])
     assert results.exit_code == 0
+
     supported_files_count = 0
     unsupported_files_count = 0
-    with open(os.path.join(tmpdir, 'valid.jsonl'),
-              encoding='utf-8') as infile:
+
+    with open(valid_output, encoding='utf-8') as infile:
         for line in infile:
             assert json.loads(line)['well-formed']
             supported_files_count += 1
-    with open(os.path.join(tmpdir, 'invalid.jsonl'),
-              encoding='utf-8') as infile:
+
+    with open(invalid_output, encoding='utf-8') as infile:
         for line in infile:
             assert not json.loads(line)['well-formed']
             unsupported_files_count += 1
+
     assert supported_files_count == 8
     assert unsupported_files_count == 3

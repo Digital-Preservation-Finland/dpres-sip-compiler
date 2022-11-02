@@ -62,7 +62,7 @@ def run_cli():
         Execute Click command with given arguments.
         :returns: Command result
         """
-        runner = CliRunner(mix_stderr=False)
+        runner = CliRunner()
         result = runner.invoke(
             cli, args, catch_exceptions=False
         )

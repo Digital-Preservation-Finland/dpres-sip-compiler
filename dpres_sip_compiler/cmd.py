@@ -7,7 +7,7 @@ import click
 from dpres_sip_compiler.config import (get_default_config_path,
                                        get_default_temp_path)
 from dpres_sip_compiler.compiler import compile_sip, clean_temp_files
-from dpres_sip_compiler.validate import scrape_files
+from dpres_sip_compiler.validate import count_files, scrape_files
 
 
 @click.group()
@@ -66,17 +66,38 @@ def clean_command(temp_path, delete_path):
     name="validate",
 )
 @click.argument('path', type=click.Path(exists=True))
-def validate(path):
+@click.option(
+    "--valid-output", type=click.Path(exists=False), metavar="<FILE>",
+    help=("Target file to write result metadata for valid and supported "
+          "files. Defaults to: ./validate_files_valid.jsonl"),
+    default="./validate_files_valid.jsonl")
+@click.option(
+    "--invalid-output", type=click.Path(exists=False), metavar="<FILE>",
+    help=("Target file to write result metadata for invalid or unsupported "
+          "files. Defaults to: ./validate_files_invalid.jsonl"),
+    default="./validate_files_invalid.jsonl")
+@click.option('--stdout', is_flag=True,
+              help='Print result metadata also to stdout')
+def validate(path, valid_output, invalid_output, stdout):
     """
     Recursively scrape file metadata and check well-formedness in the
-    given path.
+    given path. The scraped metadata is saved in output files as jsonl
+    in the current directory.
 
-    PATH: Path to the files to be validated.
+    PATH: Path to the files to be scraped and validated.
     """
-    for file_info in scrape_files(path):
-        # Direct invalid file metadata to stderr
-        err = file_info['well-formed'] is False
-        click.echo(json.dumps(file_info), err=err)
+    length = count_files(path)
+    click.echo('Found %s files.' % length)
+    with click.progressbar(scrape_files(path),
+                           label="Scraping files",
+                           length=length) as files:
+        for file_info in files:
+            if stdout:
+                click.echo(json.dumps(file_info, indent=4))
+            out = valid_output if file_info['well-formed'] else invalid_output
+            with open(out, 'at', encoding='utf-8') as outfile:
+                json.dump(file_info, outfile)
+                outfile.write('\n')
 
 
 if __name__ == "__main__":

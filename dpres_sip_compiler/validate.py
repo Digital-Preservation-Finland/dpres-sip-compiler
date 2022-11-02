@@ -4,6 +4,19 @@ from file_scraper.scraper import Scraper
 from file_scraper.utils import ensure_text
 
 
+def count_files(path):
+    """Recursively counts all files in given path.
+
+    :path: The path which is recursively processed
+    :returns: The total amount of files
+    """
+    total = 0
+    for _, _, files in os.walk(path):
+        total += len(files)
+
+    return total
+
+
 def scrape_files(path):
     """Loops all files recursively in given path, scrapes the metadata
     and checks the well-formedness and grading. The function yields the

@@ -1,5 +1,5 @@
 """Tests the validate module."""
-from dpres_sip_compiler.validate import scrape_files
+from dpres_sip_compiler.validate import count_files, scrape_files
 
 
 def test_scrape_files():
@@ -10,3 +10,8 @@ def test_scrape_files():
         assert file_dict['MIME type']
         assert file_dict['version']
         assert file_dict['tool_info']
+
+
+def test_count_files():
+    """Tests the count_files function."""
+    assert count_files('tests/data/musicarchive') == 11

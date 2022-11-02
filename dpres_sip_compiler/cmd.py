@@ -95,7 +95,7 @@ def validate(path, valid_output, invalid_output, stdout):
             if stdout:
                 click.echo(json.dumps(file_info, indent=4))
             out = valid_output if file_info['well-formed'] else invalid_output
-            with open(out, 'at', encoding='utf-8') as outfile:
+            with open(out, 'at') as outfile:
                 json.dump(file_info, outfile)
                 outfile.write('\n')
 

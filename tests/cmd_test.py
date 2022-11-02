@@ -80,12 +80,12 @@ def test_validate(run_cli, tmpdir):
     supported_files_count = 0
     unsupported_files_count = 0
 
-    with open(valid_output, encoding='utf-8') as infile:
+    with open(valid_output) as infile:
         for line in infile:
             assert json.loads(line)['well-formed']
             supported_files_count += 1
 
-    with open(invalid_output, encoding='utf-8') as infile:
+    with open(invalid_output) as infile:
         for line in infile:
             assert not json.loads(line)['well-formed']
             unsupported_files_count += 1

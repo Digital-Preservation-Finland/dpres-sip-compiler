@@ -88,16 +88,27 @@ def validate(path, valid_output, invalid_output, stdout):
     """
     length = count_files(path)
     click.echo('Found %s files.' % length)
+    valid_files_count = 0
+    invalid_files_count = 0
     with click.progressbar(scrape_files(path),
                            label="Scraping files",
                            length=length) as files:
         for file_info in files:
             if stdout:
                 click.echo(json.dumps(file_info, indent=4))
-            out = valid_output if file_info['well-formed'] else invalid_output
-            with open(out, 'at') as outfile:
+            if file_info['well-formed']:
+                output = valid_output
+                valid_files_count += 1
+            else:
+                output = invalid_output
+                invalid_files_count += 1
+            with open(output, 'at') as outfile:
                 json.dump(file_info, outfile)
                 outfile.write('\n')
+    click.echo('Validation finished!')
+    click.echo(
+        '%s files were valid. %s files were invalid or '
+        'unsupported.' % (valid_files_count, invalid_files_count))
 
 
 if __name__ == "__main__":

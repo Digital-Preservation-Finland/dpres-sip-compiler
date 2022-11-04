@@ -1,6 +1,12 @@
 Release notes
 =============
 
+Version 0.4
+-----------
+
+   * Adds a validate command that recursively identifies, validates,
+     and scrapes metadata from files in given path.
+
 Version 0.3
 -----------
 

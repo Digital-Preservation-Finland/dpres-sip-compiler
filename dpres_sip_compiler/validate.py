@@ -1,4 +1,5 @@
 """Recursively scrape files in given path."""
+import datetime
 import os
 from file_scraper.scraper import Scraper
 from file_scraper.utils import ensure_text
@@ -34,6 +35,8 @@ def scrape_files(path):
 
             results = {
                 "path": ensure_text(scraper.filename),
+                "filename": ensure_text(os.path.basename(scraper.filename)),
+                "timestamp": datetime.datetime.now().isoformat(),
                 "MIME type": ensure_text(scraper.mimetype),
                 "version": ensure_text(scraper.version),
                 "metadata": scraper.streams,

@@ -10,6 +10,8 @@ def test_scrape_files():
         assert file_dict['MIME type']
         assert file_dict['version']
         assert file_dict['tool_info']
+        assert file_dict['filename']
+        assert file_dict['timestamp']
 
 
 def test_count_files():

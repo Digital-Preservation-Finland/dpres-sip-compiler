@@ -3,6 +3,7 @@
 import json
 import os
 import shutil
+import pytest
 from dpres_sip_compiler.config import get_default_config_path
 from dpres_sip_compiler.adaptor_list import ADAPTOR_DICT
 from dpres_sip_compiler.base_adaptor import build_sip_metadata
@@ -66,15 +67,25 @@ def test_clean(tmpdir, run_cli, prepare_workspace):
     assert count == 0
 
 
-def test_validate(run_cli, tmpdir):
+@pytest.mark.parametrize(('summary'), [
+    (False),
+    (True)
+])
+def test_validate(run_cli, tmpdir, summary):
     """Test validate command."""
     valid_output = os.path.join(str(tmpdir), 'valid.jsonl')
     invalid_output = os.path.join(str(tmpdir), 'invalid.jsonl')
 
-    results = run_cli(
-        ["validate", "tests/data/musicarchive",
-         "--valid-output", valid_output,
-         "--invalid-output", invalid_output])
+    params = [
+        "validate",
+        "tests/data/musicarchive",
+        "--valid-output", valid_output,
+        "--invalid-output", invalid_output
+    ]
+    if summary:
+        params.append("--summary")
+
+    results = run_cli(params)
     assert results.exit_code == 0
 
     supported_files_count = 0
@@ -92,3 +103,8 @@ def test_validate(run_cli, tmpdir):
 
     assert supported_files_count == 8
     assert unsupported_files_count == 3
+
+    assert os.path.isfile(
+        os.path.join(str(tmpdir), 'valid_summary.jsonl')) == summary
+    assert os.path.isfile(
+        os.path.join(str(tmpdir), 'invalid_summary.jsonl')) == summary

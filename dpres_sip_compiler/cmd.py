@@ -76,9 +76,11 @@ def clean_command(temp_path, delete_path):
     help=("Target file to write result metadata for invalid or unsupported "
           "files. Defaults to: ./validate_files_invalid.jsonl"),
     default="./validate_files_invalid.jsonl")
+@click.option('--summary/--no-summary', default=False,
+              help='Write summary information to separate target files')
 @click.option('--stdout', is_flag=True,
               help='Print result metadata also to stdout')
-def validate(path, valid_output, invalid_output, stdout):
+def validate(path, valid_output, invalid_output, summary, stdout):
     """
     Recursively scrape file metadata and check well-formedness in the
     given path. The scraped metadata is saved in output files as jsonl
@@ -94,9 +96,10 @@ def validate(path, valid_output, invalid_output, stdout):
                            label="Scraping files",
                            length=length) as files:
         for file_info in files:
+            valid = file_info['well-formed']
             if stdout:
                 click.echo(json.dumps(file_info, indent=4))
-            if file_info['well-formed']:
+            if valid:
                 output = valid_output
                 valid_files_count += 1
             else:
@@ -105,6 +108,22 @@ def validate(path, valid_output, invalid_output, stdout):
             with open(output, 'at') as outfile:
                 json.dump(file_info, outfile)
                 outfile.write('\n')
+            if summary:
+                # Create summary information and write to own output
+                summary_info = {
+                    'path': file_info['path'],
+                    'filename': file_info['filename'],
+                    'timestamp': file_info['timestamp'],
+                    'MIME type': file_info['MIME type'],
+                    'version': file_info['version'],
+                    'grade': file_info['grade'],
+                    'well-formed': file_info['well-formed']
+                }
+                sum_output = '{0}_summary{1}'.format(*os.path.splitext(output))
+                with open(sum_output, 'at') as outfile:
+                    json.dump(summary_info, outfile)
+                    outfile.write('\n')
+
     click.echo('Validation finished!')
     click.echo(
         '%s files were valid. %s files were invalid or '

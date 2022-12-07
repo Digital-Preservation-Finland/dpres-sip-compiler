@@ -98,10 +98,9 @@ def validate(path, valid_output, invalid_output, summary, stdout):
                            label="Scraping files",
                            length=length) as files:
         for file_info in files:
-            valid = file_info['well-formed']
             if stdout:
                 click.echo(json.dumps(file_info, indent=4))
-            if valid:
+            if file_info['well-formed']:
                 output = valid_output
                 valid_files_count += 1
             else:

@@ -65,7 +65,7 @@ def clean_command(temp_path, delete_path):
 @cli.command(
     name="validate",
 )
-@click.argument('path', type=click.Path(exists=True))
+@click.argument("path", type=click.Path(exists=True))
 @click.option(
     "--valid-output", type=click.Path(exists=False), metavar="<FILE>",
     help=("Target file to write result metadata for valid and supported "
@@ -76,10 +76,12 @@ def clean_command(temp_path, delete_path):
     help=("Target file to write result metadata for invalid or unsupported "
           "files. Defaults to: ./validate_files_invalid.jsonl"),
     default="./validate_files_invalid.jsonl")
-@click.option('--summary/--no-summary', default=False,
-              help='Write summary information to separate target files')
-@click.option('--stdout', is_flag=True,
-              help='Print result metadata also to stdout')
+@click.option(
+    "--summary/--no-summary", default=False,
+    help=("Write summary information to separate target files named "
+          "<valid-output>_summary.jsonl and <invalid-output>_summary.jsonl"))
+@click.option("--stdout", is_flag=True,
+              help="Print result metadata also to stdout")
 def validate(path, valid_output, invalid_output, summary, stdout):
     """
     Recursively scrape file metadata and check well-formedness in the

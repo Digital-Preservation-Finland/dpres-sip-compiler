@@ -1,6 +1,13 @@
 Release notes
 =============
 
+Version 0.5
+-----------
+
+   * Adds the keys "filename" and "timestamp" to the validate command output.
+   * Adds a summary option to the validate command. When used, writes summary
+     information of the validation to separate output files.
+
 Version 0.4
 -----------
 

@@ -82,7 +82,7 @@ def test_alt_identifier(tmpdir):
     config = Config()
     config.configure("tests/data/musicarchive/config.conf")
     sip_meta.populate("tests/data/musicarchive/source2", config)
-    sip_meta.post_tasks(tmpdir)
+    sip_meta.post_tasks(str(tmpdir))
     mets_xml = lxml.etree.parse(mets_file).getroot()
     premis_ids = mets_xml.xpath(
         ".//premis:objectIdentifier",

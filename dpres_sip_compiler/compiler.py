@@ -171,6 +171,11 @@ class SipCompiler(object):
                      clean=True)
         print("METS file created.")
 
+    def _post_adaptor_tasks(self):
+        """Additional tasks to workspace.
+        """
+        self.sip_meta.post_tasks(self.temp_path)
+
     def _compile_package(self):
         """Sign SIP and create TAR file
         """
@@ -230,6 +235,9 @@ class SipCompiler(object):
         self._import_descriptive_metadata()
         print("Compiling...")
         self._compile_metadata()
+        print("Running additional tasks...")
+        self._post_adaptor_tasks()
+        print("Compiling...")
         self._compile_package()
         self._append_tar()
         print("Cleaning temporary files.")

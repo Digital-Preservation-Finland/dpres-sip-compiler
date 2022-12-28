@@ -94,6 +94,14 @@ class SipMetadata(object):
         """
         return ()
 
+    def post_tasks(self, workspace):
+        """
+        Post tasks to workspace not supported by dpres-siptools.
+
+        :workspace: Workspace path
+        """
+        pass
+
     def add_object(self, p_object):
         """Add PREMIS Object.
         :p_object: PREMIS Object

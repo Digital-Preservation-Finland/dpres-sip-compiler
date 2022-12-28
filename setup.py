@@ -13,6 +13,12 @@ def main():
         include_package_data=True,
         install_requires=[
             "click",
+            "xml_helpers@git+https://gitlab.ci.csc.fi/dpres/"
+            "xml-helpers.git@develop#egg=xml_helpers",
+            "premis@git+https://gitlab.ci.csc.fi/dpres/"
+            "premis.git@develop#egg=premis",
+            "file_scraper@git+https://gitlab.ci.csc.fi/dpres/"
+            "file-scraper.git@develop#egg=file_scraper",
             "siptools@git+https://gitlab.ci.csc.fi/dpres/"
             "dpres-siptools.git@develop#egg=siptools"
         ],

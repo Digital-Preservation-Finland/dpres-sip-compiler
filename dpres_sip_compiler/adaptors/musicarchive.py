@@ -6,6 +6,8 @@ from io import open as io_open
 import datetime
 import csv
 import six
+import premis
+from xml_helpers import utils as xml_utils
 from dpres_sip_compiler.base_adaptor import (
     SipMetadata, PremisObject, PremisEvent, PremisAgent, PremisLinking)
 
@@ -68,7 +70,6 @@ class SipMetadataMusicArchive(SipMetadata):
         :csv_row: CSV row as dict
         :source_path: Source data path
         :returns: None
-
         """
         p_object = PremisObjectMusicArchive(csv_row)
         if p_object.message_digest_algorithm.lower() == \
@@ -117,6 +118,28 @@ class SipMetadataMusicArchive(SipMetadata):
                 "*%s" % config.csv_ending,
                 ".[^/]*", "*/.[^/]*")  # Exclude all hidden files/directories
 
+    def post_tasks(self, workspace):
+        """
+        Add additional PREMIS object identifiers to METS.
+
+        :workspace: Workspace path
+        """
+        mets_file = os.path.join(workspace, "mets.xml")
+        mets = xml_utils.readfile(mets_file)
+        for xml_object in premis.iter_objects(mets):
+            if premis.parse_object_type(xml_object) != "premis:file":
+                continue
+
+            (_, id_value) = premis.parse_identifier_type_value(xml_object)
+            id_value = id_value.strip()
+            p_object = self.premis_objects[id_value]
+            xml_id = premis.identifier(p_object.alt_identifier_type,
+                                       p_object.alt_identifier_value)
+            xml_object.insert(1, xml_id)
+
+        with open(mets_file, 'wb+') as outfile:
+            outfile.write(xml_utils.serialize(mets.getroot()))
+
 
 class PremisObjectMusicArchive(PremisObject):
     """
@@ -132,7 +155,9 @@ class PremisObjectMusicArchive(PremisObject):
             "object_identifier_value": csv_row["objekti-uuid"],
             "original_name": csv_row["objekti-nimi"],
             "message_digest_algorithm": csv_row["tiiviste-tyyppi"],
-            "message_digest": csv_row["tiiviste"]
+            "message_digest": csv_row["tiiviste"],
+            "alt_identifier_type": "local",
+            "alt_identifier_value": csv_row["objekti-id"]
         }
         super(PremisObjectMusicArchive, self).__init__(metadata)
 

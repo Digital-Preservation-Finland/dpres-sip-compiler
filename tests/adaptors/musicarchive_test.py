@@ -1,6 +1,8 @@
 """Test Music Archive adaptor.
 """
+import os
 import pytest
+import lxml
 from dpres_sip_compiler.adaptors.musicarchive import (
     SipMetadataMusicArchive,
     PremisObjectMusicArchive,
@@ -46,11 +48,61 @@ def test_find_path():
         "objekti-uuid": "object-id-123",
         "objekti-nimi": "testfile1.wav",
         "tiiviste-tyyppi": "MD5",
-        "tiiviste": "abc"
+        "tiiviste": "abc",
+        "objekti-id": "alt-123"
     }
     obj = PremisObjectMusicArchive(source_dict)
     obj.find_path("tests/data/musicarchive/source1")
     assert obj.filepath == "audio/testfile1.wav"
+
+
+def test_alt_identifier(tmpdir):
+    """
+    Test appending an alternative PREMIS object identifier to METS
+    """
+    xml_original = \
+        """
+        <mets:mets xmlns:mets="http://www.loc.gov/METS/"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns:premis="info:lc/xmlns/premis-v2">
+        <mets:amdSec><mets:techMD><mets:mdWrap><mets:xmlData>
+        <premis:object xsi:type="premis:file">
+          <premis:objectIdentifier>
+            <premis:objectIdentifierType>UUID</premis:objectIdentifierType>
+            <premis:objectIdentifierValue>882d63db-c9b6-4f44-83ba-901b300821cc
+            </premis:objectIdentifierValue>
+          </premis:objectIdentifier>
+        <premis:objectCharacteristics /></premis:object>
+        </mets:xmlData></mets:mdWrap></mets:techMD></mets:amdSec>
+        </mets:mets>"""
+    mets_file = os.path.join(str(tmpdir), "mets.xml")
+    with open(mets_file, 'wt') as outfile:
+        outfile.write(xml_original)
+    sip_meta = SipMetadataMusicArchive()
+    config = Config()
+    config.configure("tests/data/musicarchive/config.conf")
+    sip_meta.populate("tests/data/musicarchive/source2", config)
+    sip_meta.post_tasks(tmpdir)
+    mets_xml = lxml.etree.parse(mets_file).getroot()
+    premis_ids = mets_xml.xpath(
+        ".//premis:objectIdentifier",
+        namespaces={'premis': 'info:lc/xmlns/premis-v2'})
+    assert premis_ids[0].xpath(
+        "./premis:objectIdentifierType",
+        namespaces={'premis': 'info:lc/xmlns/premis-v2'}
+        )[0].text.strip() == "UUID"
+    assert premis_ids[0].xpath(
+        "./premis:objectIdentifierValue",
+        namespaces={'premis': 'info:lc/xmlns/premis-v2'}
+        )[0].text.strip() == "882d63db-c9b6-4f44-83ba-901b300821cc"
+    assert premis_ids[1].xpath(
+        "./premis:objectIdentifierType",
+        namespaces={'premis': 'info:lc/xmlns/premis-v2'}
+        )[0].text.strip() == "local"
+    assert premis_ids[1].xpath(
+        "./premis:objectIdentifierValue",
+        namespaces={'premis': 'info:lc/xmlns/premis-v2'}
+        )[0].text.strip() == "123"
 
 
 def test_object_properties():
@@ -60,7 +112,8 @@ def test_object_properties():
         "objekti-uuid": "object-id-123",
         "objekti-nimi": "filename",
         "tiiviste-tyyppi": "MD5",
-        "tiiviste": "abc"
+        "tiiviste": "abc",
+        "objekti-id": "alt-123"
     }
     obj = PremisObjectMusicArchive(source_dict)
     assert obj.identifier == "object-id-123"
@@ -69,6 +122,8 @@ def test_object_properties():
     assert obj.original_name == "filename"
     assert obj.message_digest_algorithm == "MD5"
     assert obj.message_digest == "abc"
+    assert obj.alt_identifier_type == "local"
+    assert obj.alt_identifier_value == "alt-123"
 
 
 def test_event_properties():

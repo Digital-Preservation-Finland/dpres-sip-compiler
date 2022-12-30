@@ -130,6 +130,12 @@ class SipMetadataMusicArchive(SipMetadata):
             if premis.parse_object_type(xml_object) != "premis:file":
                 continue
 
+            # Check if there already are multiple IDs in the object
+            if len(xml_object.xpath(
+                    "./premis:objectIdentifier",
+                    namespaces={'premis': 'info:lc/xmlns/premis-v2'})) > 1:
+                continue
+
             (_, id_value) = premis.parse_identifier_type_value(xml_object)
             id_value = id_value.strip()
             p_object = self.premis_objects[id_value]

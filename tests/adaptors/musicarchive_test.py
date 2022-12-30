@@ -103,6 +103,16 @@ def test_alt_identifier(tmpdir):
         "./premis:objectIdentifierValue",
         namespaces={'premis': 'info:lc/xmlns/premis-v2'}
         )[0].text.strip() == "123"
+    assert len(mets_xml.xpath(
+        ".//premis:objectIdentifier",
+        namespaces={'premis': 'info:lc/xmlns/premis-v2'})) == 2
+
+    # Test that alt ID can not be added twice
+    sip_meta.post_tasks(str(tmpdir))
+    mets_xml = lxml.etree.parse(mets_file).getroot()
+    assert len(mets_xml.xpath(
+        ".//premis:objectIdentifier",
+        namespaces={'premis': 'info:lc/xmlns/premis-v2'})) == 2
 
 
 def test_object_properties():

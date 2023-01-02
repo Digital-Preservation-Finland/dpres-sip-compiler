@@ -1,6 +1,11 @@
 Release notes
 =============
 
+Version 0.6
+-----------
+
+   * Add additional identifier to metadata for files in Music Archive adaptor.
+
 Version 0.5
 -----------
 

@@ -120,12 +120,28 @@ class SipMetadataMusicArchive(SipMetadata):
 
     def post_tasks(self, workspace):
         """
-        Add additional PREMIS object identifiers to METS.
+        Post tasks to workspace not supported by dpres-siptools.
+
+        Open and write METS file here, because in this adaptor the possible
+        future tasks are assumend to be related to METS.
 
         :workspace: Workspace path
         """
         mets_file = os.path.join(workspace, "mets.xml")
         mets = xml_utils.readfile(mets_file)
+
+        # Post tasks for the METS file
+        mets = self._append_alternative_ids(mets)
+
+        with open(mets_file, 'wb+') as outfile:
+            outfile.write(xml_utils.serialize(mets.getroot()))
+
+    def _append_alternative_ids(self, mets):
+        """
+        Add additional PREMIS object identifiers to METS.
+
+        :mets: METS XML root
+        """
         for xml_object in premis.iter_objects(mets):
             if premis.parse_object_type(xml_object) != "premis:file":
                 continue
@@ -143,8 +159,7 @@ class SipMetadataMusicArchive(SipMetadata):
                                        p_object.alt_identifier_value)
             xml_object.insert(1, xml_id)
 
-        with open(mets_file, 'wb+') as outfile:
-            outfile.write(xml_utils.serialize(mets.getroot()))
+        return mets
 
 
 class PremisObjectMusicArchive(PremisObject):

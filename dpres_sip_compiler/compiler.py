@@ -34,7 +34,7 @@ class SipCompiler(object):
 
     # pylint: disable=too-many-arguments
     def __init__(self, source_path, temp_path, config, sip_meta,
-                 tar_file=None):
+                 tar_file=None, validation=True):
         """Initialize compiler.
 
         :source_path Source path of the files to be packaged
@@ -42,12 +42,14 @@ class SipCompiler(object):
         :config: Basic configuration
         :sip_meta: PREMIS metadata objects for the SIP to be compiled.
         :tar_file: Target TAR file for the SIP
+        :validation: True to validate files during packaging, False otherwise
         """
         self.source_path = source_path
         self.temp_path = temp_path
         self.config = config
         self.sip_meta = sip_meta
         self.tar_file = tar_file
+        self.validation = validation
 
     def _create_technical_metadata(self):
         """Create technical metadata
@@ -69,7 +71,8 @@ class SipCompiler(object):
                           checksum=(obj.message_digest_algorithm,
                                     obj.message_digest),
                           event_datetime=event_datetime,
-                          event_target=".")
+                          event_target=".",
+                          skip_wellformed_check=not self.validation)
             streams = read_json_streams(obj.filepath, self.temp_path)
             if any(stream["stream_type"] == "image"
                    for stream in streams.values()):
@@ -246,12 +249,14 @@ class SipCompiler(object):
               "%s" % self.tar_file)
 
 
-def compile_sip(source_path, tar_file=None, temp_path=None, conf_file=None):
+def compile_sip(source_path, tar_file=None, temp_path=None, conf_file=None,
+                validation=True):
     """SIP Compiler
     :source_path: Source path of files to be packaged
     :tar_file: Target TAR file for the SIP
     :temp_path: Path of temporary files
     :conf_file: Configuration file path
+    :validation: True to validate files during packaging, False otherwise
     """
     if conf_file is None:
         conf_file = get_default_config_path()
@@ -271,7 +276,8 @@ def compile_sip(source_path, tar_file=None, temp_path=None, conf_file=None):
                            tar_file=tar_file,
                            temp_path=temp_path,
                            config=config,
-                           sip_meta=sip_meta)
+                           sip_meta=sip_meta,
+                           validation=validation)
     compiler.create_sip(temp_path_created)
 
 

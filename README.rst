@@ -90,8 +90,8 @@ select the adaptor below:
 The tool currently supports only packaging of data of Music Archive Finland,
 with content preparation rules which have been agreed in advance.
 
-Usage
------
+Usage: Compile content
+----------------------
 
 Compile a given content by using the following command::
 
@@ -105,10 +105,15 @@ The following options can be used:
      path will be a timestamp path in current working directory.
    * ``--config <FILE>`` - Configuration file. If not given, the default config location
      is used.
+   * ``--validation`` or ``--no-validation`` - Define whether validation is used
+     during compilation. Validation is used by default.
 
 The software creates a TAR file, which can be submitted to the Digital Preservation
 Service. The path to temporary files is deleted if it was created during the process
 and no files remain in it after cleaning.
+
+Usage: Clean temporary files
+----------------------------
 
 The software raises an exception and stops packaging immediately, if a problem
 occurs. In such case, there may be some temporary files left in the path for
@@ -123,6 +128,38 @@ The following options can be used:
    * ``--delete-path`` If used and the path is empty, it will be deleted.
 
 This also removes possible ``mets.xml`` and ``signature.sig``.
+
+Usage: Validate files separately
+--------------------------------
+
+Validation of the files can be used separately with the following command::
+
+    sip-compiler validate <path-to-content>
+
+The following options can be used:
+
+   * ``--valid-output <FILE>`` - Target file to write result metadata for
+     valid and supported files. Defaults to ``./validate_files_valid.jsonl``.
+   * ``--invalid-output <FILE>`` - Target file to write result metadata for
+     invalid or unsupported files. Defaults to
+     ``./validate_files_invalid.jsonl``.
+   * ``--summary`` or ``--no-summary`` - Write or do not write summary
+     information to separate target files named
+     ``<valid-output>_summary.jsonl`` and ``<invalid-output>_summary.jsonl``.
+     By default, no summary is written.
+   * ``--config <FILE>`` - Configuration file. If not given, the default
+     config location is used.
+   * ``--stdout`` - Print result metadata also to stdout.
+
+If a target file already exists, the results will be appended to the end of
+the file. This makes it possible to combine validation results of several
+sets of files. It is also possible to use the same target file for valid and
+invalid results. In such case, also the summary file is same for valid and
+invalid results.
+
+If the used adaptor defined in the configuration is set to skip some files in
+compilation (for example hidden files), then these are also skipped in
+validation without any notice in the target files.
 
 Copyright
 ---------

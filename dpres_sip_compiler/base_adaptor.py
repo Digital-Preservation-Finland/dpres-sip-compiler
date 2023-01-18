@@ -14,14 +14,24 @@ def build_sip_metadata(adaptor_dict, source_path, config):
     :config: Basic configuration
     :returns: SIP metadata object
     """
+    sip_meta = sip_metadata_class(adaptor_dict, config)()
+    sip_meta.populate(source_path, config)
+    return sip_meta
+
+
+def sip_metadata_class(adaptor_dict, config):
+    """
+    Find metadata class for SIP based on configured adaptor.
+    :adaptor_dict: Dict of adaptor names and corresponding SIP metadata
+                   classes.
+    :config: Basic configuration
+    """
     if config.adaptor not in adaptor_dict:
         raise NotImplementedError(
             "Unsupported configuration! Maybe the adaptor name is incorrect "
             "in configuration file?")
 
-    sip_meta = adaptor_dict[config.adaptor]()
-    sip_meta.populate(source_path, config)
-    return sip_meta
+    return adaptor_dict[config.adaptor]
 
 
 def add_premis(premis_elem, premis_dict):
@@ -83,8 +93,8 @@ class SipMetadata(object):
         """
         return False
 
-    # pylint: disable=unused-argument
-    def exclude_files(self, config):
+    @staticmethod
+    def exclude_files(config):
         """
         Exclude files from Submission Information Package.
         Implemented in adaptors.

@@ -25,6 +25,7 @@ def get_default_temp_path():
         datetime.datetime.now().strftime("%Y-%m-%dT%H-%M-%S"))
 
 
+# pylint: disable=too-few-public-methods
 class Config(object):
     """Basic configuration.
     """

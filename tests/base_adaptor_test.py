@@ -90,7 +90,7 @@ def test_objects():
     assert sip_meta.premis_objects[2]
 
     count = 0
-    for obj in sip_meta.objects:
+    for _ in sip_meta.objects:
         count = count + 1
     assert count == 2
 
@@ -109,7 +109,7 @@ def test_events():
     assert sip_meta.premis_events[2]
 
     count = 0
-    for obj in sip_meta.events:
+    for _ in sip_meta.events:
         count = count + 1
     assert count == 2
 
@@ -128,7 +128,7 @@ def test_agents():
     assert sip_meta.premis_agents[2]
 
     count = 0
-    for obj in sip_meta.agents:
+    for _ in sip_meta.agents:
         count = count + 1
     assert count == 2
 
@@ -147,7 +147,7 @@ def test_linkings():
     assert sip_meta.premis_linkings[2]
 
     count = 0
-    for obj in sip_meta.linkings:
+    for _ in sip_meta.linkings:
         count = count + 1
     assert count == 2
 

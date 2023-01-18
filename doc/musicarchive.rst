@@ -24,3 +24,11 @@ structured administrative metadata must be given as as single
 CSV structure has been agreed in advance. These files are utilized in
 packaging, but these will not be included in the package as separate digital
 objects.
+
+Skipped Content
+---------------
+
+Specially named metadata XML and CSV files described in previous chapter,
+and also hidden files and directories, will not be included as separate
+digital objects in the package in compilation. These files are also
+skipped in validation without producing any note in the validation results.

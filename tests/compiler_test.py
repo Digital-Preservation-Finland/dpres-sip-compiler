@@ -82,7 +82,7 @@ def test_technical(tmpdir, prepare_workspace):
     sip_meta = build_sip_metadata(ADAPTOR_DICT, source_path, config)
     compiler = SipCompiler(source_path=source_path, temp_path=temp_path,
                            config=config, sip_meta=sip_meta)
-    compiler._create_technical_metadata()
+    compiler._create_technical_metadata()  # pylint: disable=protected-access
     audio_path = None
     premis_path = None
     for root, _, files in os.walk(temp_path, topdown=False):
@@ -123,8 +123,8 @@ def test_provenance(tmpdir, prepare_workspace):
     sip_meta = build_sip_metadata(ADAPTOR_DICT, source_path, config)
     compiler = SipCompiler(source_path=source_path, temp_path=temp_path,
                            config=config, sip_meta=sip_meta)
-    compiler._create_technical_metadata()
-    compiler._create_provenance_metadata()
+    compiler._create_technical_metadata()  # pylint: disable=protected-access
+    compiler._create_provenance_metadata()  # pylint: disable=protected-access
     (event_xml, agent_xml) = _get_provenance(temp_path)
     assert event_xml.xpath(
         ".//premis:eventType", namespaces=NAMESPACES)[0].text == \
@@ -175,9 +175,10 @@ def test_descriptive(tmpdir, prepare_workspace):
     sip_meta = build_sip_metadata(ADAPTOR_DICT, source_path, config)
     compiler = SipCompiler(source_path=source_path, temp_path=temp_path,
                            config=config, sip_meta=sip_meta)
+    # pylint: disable=protected-access
     compiler._import_descriptive_metadata()
     count = 0
-    for root, _, files in os.walk(temp_path, topdown=False):
+    for _, _, files in os.walk(temp_path, topdown=False):
         for name in files:
             if name.endswith("dmdsec.xml"):
                 count = count + 1
@@ -197,8 +198,8 @@ def test_compile_metadata(tmpdir, prepare_workspace):
     sip_meta = build_sip_metadata(ADAPTOR_DICT, source_path, config)
     compiler = SipCompiler(source_path=source_path, temp_path=temp_path,
                            config=config, sip_meta=sip_meta)
-    compiler._create_technical_metadata()
-    compiler._compile_metadata()
+    compiler._create_technical_metadata()  # pylint: disable=protected-access
+    compiler._compile_metadata()  # pylint: disable=protected-access
 
     mets_xml = lxml.etree.parse(os.path.join(temp_path, "mets.xml"))
     assert os.path.isfile(os.path.join(temp_path, "mets.xml"))
@@ -225,9 +226,9 @@ def test_compile_package(tmpdir, prepare_workspace):
     compiler = SipCompiler(source_path=source_path, temp_path=temp_path,
                            config=config, sip_meta=sip_meta,
                            tar_file=tar_file)
-    compiler._create_technical_metadata()
-    compiler._compile_metadata()
-    compiler._compile_package()
+    compiler._create_technical_metadata()  # pylint: disable=protected-access
+    compiler._compile_metadata()  # pylint: disable=protected-access
+    compiler._compile_package()  # pylint: disable=protected-access
     assert os.path.isfile(tar_file)
     assert os.path.isfile(os.path.join(temp_path, "mets.xml"))
     assert os.path.isfile(os.path.join(temp_path, "signature.sig"))
@@ -326,6 +327,7 @@ def test_default_paths(tmpdir, prepare_workspace, pick_files_tar):
 def test_temp_path_name(tmpdir, prepare_workspace, monkeypatch):
     """Test the name of the directory of temporary files.
     """
+    # pylint: disable=unused-argument
     def _dummy_clean(temp_path, file_endings=None, file_names=None,
                      delete_path=False):
         """Monkeypatch temporary file cleaning with no cleaning.
@@ -357,7 +359,7 @@ def _count_temp_files(temp_path):
     """Count temporary files in temp_path.
     """
     count = 0
-    for root, _, files in os.walk(temp_path, topdown=False):
+    for _, _, files in os.walk(temp_path, topdown=False):
         for name in files:
             if not name.endswith(("___metadata.xml", "___metadata.csv",
                                   "testfile1.wav")):
@@ -433,6 +435,7 @@ def test_clean_temp_steps(tmpdir, prepare_workspace):
     sip_meta = build_sip_metadata(ADAPTOR_DICT, source_path, config)
     compiler = SipCompiler(source_path=source_path, temp_path=temp_path,
                            config=config, sip_meta=sip_meta)
+    # pylint: disable=protected-access
     compiler._create_technical_metadata()
     compiler._create_provenance_metadata()
     compiler._import_descriptive_metadata()

@@ -1,6 +1,7 @@
 """Test Music Archive adaptor.
 """
 import os
+import shutil
 import pytest
 import lxml
 from dpres_sip_compiler.adaptors.musicarchive import (
@@ -11,6 +12,7 @@ from dpres_sip_compiler.adaptors.musicarchive import (
     PremisLinkingMusicArchive
 )
 from dpres_sip_compiler.config import Config
+from dpres_sip_compiler.compiler import compile_sip
 
 
 def test_populate():
@@ -218,7 +220,7 @@ def test_add_detail_info():
              "2022-02-01T14:00:05)\nfilename2: def (timestamp: " \
              "2022-02-01T14:00:05)"
     assert event.event_outcome_detail == detail
-    assert len(event._detail_info) == 2
+    assert len(event._detail_info) == 2  # pylint: disable=protected-access
 
 
 def test_agent_properties():
@@ -248,3 +250,32 @@ def test_skip_object():
     linking = PremisLinkingMusicArchive(source_row)
     linking.add_object_link(1)
     assert linking.object_links == []
+
+
+def test_skip_hidden(tmpdir, pick_files_tar):
+    """
+    Test that we do not pick hidden files in SIP compilation
+    in Music Archive adaptor.
+    """
+    config = Config()
+    config.configure("tests/data/musicarchive/config.conf")
+
+    source_path = os.path.join(str(tmpdir), "source1")
+    shutil.copytree("tests/data/musicarchive/source1", source_path)
+
+    hidden = os.path.join(source_path, ".hidden_file")
+    open(hidden, "w").close()
+    assert os.path.isfile(hidden)
+
+    tar_file = os.path.join(str(tmpdir), "sip.tar")
+    compile_sip(source_path, tar_file, str(tmpdir),
+                "tests/data/musicarchive/config.conf")
+
+    if os.path.isfile(hidden):
+        os.remove(hidden)
+
+    assert os.path.isfile(tar_file)
+    tar_list = pick_files_tar(tar_file, None, None)
+    assert not "./.hidden_file" in tar_list
+    assert "./mets.xml" in tar_list
+    assert "./signature.sig" in tar_list

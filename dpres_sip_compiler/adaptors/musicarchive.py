@@ -107,7 +107,8 @@ class SipMetadataMusicArchive(SipMetadata):
         """
         return config.desc_root_remove.lower() == "true"
 
-    def exclude_files(self, config):
+    @staticmethod
+    def exclude_files(config):
         """
         Exclude files from Submission Information Package.
 
@@ -116,7 +117,7 @@ class SipMetadataMusicArchive(SipMetadata):
         """
         return ("*%s" % config.meta_ending,
                 "*%s" % config.csv_ending,
-                ".[^/]*", "*/.[^/]*")  # Exclude all hidden files/directories
+                ".[!/]*", "*/.[!/]*")  # Exclude all hidden files/directories
 
     def post_tasks(self, workspace):
         """

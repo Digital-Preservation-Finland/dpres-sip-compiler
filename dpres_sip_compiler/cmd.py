@@ -8,6 +8,7 @@ from dpres_sip_compiler.config import (get_default_config_path,
                                        get_default_temp_path)
 from dpres_sip_compiler.compiler import compile_sip, clean_temp_files
 from dpres_sip_compiler.validate import count_files, scrape_files
+from dpres_sip_compiler.config import Config
 
 
 @click.group()
@@ -37,13 +38,16 @@ def cli():
     help="Path of the configuration file. Defaults to: "
          "%s" % get_default_config_path(),
     default=get_default_config_path())
-def compile_command(source_path, tar_file, temp_path, config):
+@click.option("--validation/--no-validation", default=True,
+              help="Validation / No validation of the files during "
+                   "compilation. Defaults to validation with compilation.")
+def compile_command(source_path, tar_file, temp_path, config, validation):
     """
     Compile Submission Information Package.
 
     SOURCE-PATH: Source path of the files to be packaged.
     """
-    compile_sip(source_path, tar_file, temp_path, config)
+    compile_sip(source_path, tar_file, temp_path, config, validation)
 
 
 @cli.command(
@@ -62,6 +66,7 @@ def clean_command(temp_path, delete_path):
     clean_temp_files(temp_path, delete_path=delete_path)
 
 
+# pylint: disable=too-many-arguments, too-many-locals
 @cli.command(
     name="validate",
 )
@@ -80,9 +85,16 @@ def clean_command(temp_path, delete_path):
     "--summary/--no-summary", default=False,
     help=("Write summary information to separate target files named "
           "<valid-output>_summary.jsonl and <invalid-output>_summary.jsonl"))
+@click.option(
+    "--config", "conf_file", type=click.Path(exists=True, file_okay=True,
+                                             dir_okay=False),
+    metavar="<FILE>",
+    help="Path of the configuration file. Defaults to: "
+         "%s" % get_default_config_path(),
+    default=get_default_config_path())
 @click.option("--stdout", is_flag=True,
               help="Print result metadata also to stdout")
-def validate(path, valid_output, invalid_output, summary, stdout):
+def validate(path, valid_output, invalid_output, summary, conf_file, stdout):
     """
     Recursively scrape file metadata and check well-formedness in the
     given path. The scraped metadata is saved in output files as jsonl
@@ -90,11 +102,13 @@ def validate(path, valid_output, invalid_output, summary, stdout):
 
     PATH: Path to the files to be scraped and validated.
     """
-    length = count_files(path)
+    config = Config()
+    config.configure(conf_file)
+    length = count_files(path, config)
     click.echo('Found %s files.' % length)
     valid_files_count = 0
     invalid_files_count = 0
-    with click.progressbar(scrape_files(path),
+    with click.progressbar(scrape_files(path, config),
                            label="Scraping files",
                            length=length) as files:
         for file_info in files:

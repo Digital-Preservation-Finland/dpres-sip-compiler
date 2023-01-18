@@ -52,14 +52,14 @@ def test_clean(tmpdir, run_cli, prepare_workspace):
     sip_meta = build_sip_metadata(ADAPTOR_DICT, source_path, config)
     compiler = SipCompiler(source_path=source_path, temp_path=temp_path,
                            config=config, sip_meta=sip_meta)
-    compiler._create_technical_metadata()
-    compiler._create_provenance_metadata()
-    compiler._import_descriptive_metadata()
-    compiler._compile_metadata()
+    compiler._create_technical_metadata()  # pylint: disable=protected-access
+    compiler._create_provenance_metadata()  # pylint: disable=protected-access
+    compiler._import_descriptive_metadata()  # pylint: disable=protected-access
+    compiler._compile_metadata()  # pylint: disable=protected-access
     result = run_cli(["clean", temp_path])
     assert result.exit_code == 0
     count = 0
-    for root, _, files in os.walk(temp_path, topdown=False):
+    for _, _, files in os.walk(temp_path, topdown=False):
         for name in files:
             if not name.endswith(("___metadata.xml", "___metadata.csv",
                                   "testfile1.wav")):
@@ -80,7 +80,8 @@ def test_validate(run_cli, tmpdir, summary):
         "validate",
         "tests/data/musicarchive",
         "--valid-output", valid_output,
-        "--invalid-output", invalid_output
+        "--invalid-output", invalid_output,
+        "--config", "tests/data/musicarchive/config.conf"
     ]
     if summary:
         params.append("--summary")
@@ -101,8 +102,9 @@ def test_validate(run_cli, tmpdir, summary):
             assert not json.loads(line)['well-formed']
             unsupported_files_count += 1
 
-    assert supported_files_count == 8
-    assert unsupported_files_count == 3
+    # In the used configuration, we skip files named as *___metadata.{csv,xml}
+    assert supported_files_count == 6
+    assert unsupported_files_count == 1
 
     assert os.path.isfile(
         os.path.join(str(tmpdir), 'valid_summary.jsonl')) == summary

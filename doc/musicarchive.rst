@@ -28,7 +28,7 @@ objects.
 Skipped Content
 ---------------
 
-Specially named metadata XML and CSV files described in previous chapter,
-and also hidden files and directories, will not be included as separate
-digital objects in the package in compilation. These files are also
-skipped in validation without producing any note in the validation results.
+Metadata XML and CSV files described in the previous chapter, hidden files,
+and hidden directories will not be included as separate digital objects in the
+package during compilation. These files are also silently skipped during
+validation without producing any notes in the validation results.

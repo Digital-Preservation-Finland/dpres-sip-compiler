@@ -1,5 +1,7 @@
 """Test CLI.
 """
+# pylint: disable=protected-access
+
 import json
 import os
 import shutil
@@ -52,10 +54,10 @@ def test_clean(tmpdir, run_cli, prepare_workspace):
     sip_meta = build_sip_metadata(ADAPTOR_DICT, source_path, config)
     compiler = SipCompiler(source_path=source_path, temp_path=temp_path,
                            config=config, sip_meta=sip_meta)
-    compiler._create_technical_metadata()  # pylint: disable=protected-access
-    compiler._create_provenance_metadata()  # pylint: disable=protected-access
-    compiler._import_descriptive_metadata()  # pylint: disable=protected-access
-    compiler._compile_metadata()  # pylint: disable=protected-access
+    compiler._create_technical_metadata()
+    compiler._create_provenance_metadata()
+    compiler._import_descriptive_metadata()
+    compiler._compile_metadata()
     result = run_cli(["clean", temp_path])
     assert result.exit_code == 0
     count = 0

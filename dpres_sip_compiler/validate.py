@@ -8,17 +8,19 @@ from dpres_sip_compiler.base_adaptor import sip_metadata_class
 from dpres_sip_compiler.adaptor_list import ADAPTOR_DICT
 
 
-def iterate_files(path, config):
+def iterate_files(source_path, config):
     """
     Iterate files recursively with skipping the files that matches to pattern
     defined in adaptor.
-    :path: Source data path
+    :source_path: Source data path
     :config: Basic configuration
     :returns: An iterator of list of files
     """
     excl_patterns = sip_metadata_class(
         ADAPTOR_DICT, config).exclude_files(config)
-    for root, _, files in os.walk(path):
+    if os.path.isfile(source_path):
+        yield source_path
+    for root, _, files in os.walk(source_path):
         for filename in files:
             exclude = False
             path = os.path.join(root, filename)

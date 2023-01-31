@@ -1,8 +1,8 @@
 Release notes
 =============
 
-Version 0.7
------------
+Version 0.7-0.8
+---------------
 
    * Make validation optional in packaging.
    * Fix handling of hidden files in Music Archive adaptor during validation.

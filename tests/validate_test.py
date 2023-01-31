@@ -7,7 +7,7 @@ from dpres_sip_compiler.config import Config
 
 def test_iterate_files(tmpdir):
     """
-    Test that file exclution feature works in file iteration.
+    Test that file exclusion feature works in file iteration.
     """
     config = Config()
     config.configure("tests/data/musicarchive/config.conf")
@@ -24,9 +24,6 @@ def test_iterate_files(tmpdir):
         count += 1
     for _ in os.walk(tmp_path):
         count_real += 1
-
-    if os.path.isfile(hidden):
-        os.remove(hidden)
 
     assert count == 0
     assert count_real == 1

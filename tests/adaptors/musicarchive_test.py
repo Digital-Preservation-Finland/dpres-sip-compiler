@@ -271,9 +271,6 @@ def test_skip_hidden(tmpdir, pick_files_tar):
     compile_sip(source_path, tar_file, str(tmpdir),
                 "tests/data/musicarchive/config.conf")
 
-    if os.path.isfile(hidden):
-        os.remove(hidden)
-
     assert os.path.isfile(tar_file)
     tar_list = pick_files_tar(tar_file, None, None)
     assert not "./.hidden_file" in tar_list

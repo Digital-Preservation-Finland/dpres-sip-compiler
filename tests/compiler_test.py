@@ -56,7 +56,9 @@ def _get_provenance(temp_path):
         event_xml = lxml.etree.parse(path)
         if event_xml.xpath(
                 ".//premis:eventType", namespaces=NAMESPACES)[0].text == \
-                "message digest calculation":
+                "message digest calculation" and "abc123" in \
+                event_xml.xpath(".//premis:eventOutcomeDetailNote",
+                                namespaces=NAMESPACES)[0].text:
             break
     agent_xml = None
     for path in agent_paths:

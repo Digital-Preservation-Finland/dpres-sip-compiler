@@ -28,6 +28,26 @@ def test_populate():
     assert len(sip_meta.premis_linkings) == 7
 
 
+def test_populate_deprecatedsum():
+    """
+    Test that PREMIS object is not created for old checksum, but the event is.
+    """
+    sip_meta = SipMetadataMusicArchive()
+    config = Config()
+    config.configure("tests/data/musicarchive/config.conf")
+    sip_meta.populate("tests/data/musicarchive/source2", config)
+
+    assert sip_meta.premis_objects[
+        '882d63db-c9b6-4f44-83ba-901b300821cc'].digest_valid
+    assert "deprecatedsum" in sip_meta.premis_events['3'].event_outcome_detail
+    assert "abc123" in sip_meta.premis_events['4'].event_outcome_detail
+
+    assert len(sip_meta.premis_objects) == 1
+    assert len(sip_meta.premis_events) == 3
+    assert len(sip_meta.premis_agents) == 1
+    assert len(sip_meta.premis_linkings) == 3
+
+
 def test_descriptive_files():
     """Check that descriptive metadata files are found.
     """

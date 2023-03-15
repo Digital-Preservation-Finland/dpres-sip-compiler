@@ -73,7 +73,7 @@ class SipMetadataMusicArchive(SipMetadata):
         """
         p_object = PremisObjectMusicArchive(csv_row)
         if p_object.message_digest_algorithm.lower() == \
-                config.used_checksum.lower():
+                config.used_checksum.lower() and p_object.digest_valid:
             p_object.find_path(source_path)
             self.add_object(p_object)
         p_event = PremisEventMusicArchive(csv_row)
@@ -172,6 +172,11 @@ class PremisObjectMusicArchive(PremisObject):
         """Initialize.
         :csv_row: One row from a CSV file.
         """
+
+        # We may have CSV files without the digest status information.
+        # In such case, the message digest is always valid.
+        self.digest_valid = \
+            True if csv_row.get("tiiviste-status", "1") == "1" else False
         metadata = {
             "object_identifier_type": "UUID",
             "object_identifier_value": csv_row["objekti-uuid"],

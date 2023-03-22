@@ -1,6 +1,11 @@
 Release notes
 =============
 
+Version 0.9
+-----------
+
+   * Add handling of checksum status (current, deprecated) in Music Archive adaptor.
+
 Version 0.7-0.8
 ---------------
 

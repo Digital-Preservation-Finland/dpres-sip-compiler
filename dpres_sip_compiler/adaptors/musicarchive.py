@@ -212,7 +212,8 @@ class PremisEventMusicArchive(PremisEvent):
     Music Archive specific PREMIS Event handler.
     """
     DETAIL_KEYS = ["tiiviste", "tiiviste-tyyppi", "tiiviste-aika",
-                   "pon-korvattu-nimi", "objekti-nimi", "sip-tunniste"]
+                   "pon-korvattu-nimi", "objekti-nimi", "sip-tunniste",
+                   "event-selite"]
 
     def __init__(self, csv_row):
         """Initialize.
@@ -270,12 +271,21 @@ class PremisEventMusicArchive(PremisEvent):
         if self.event_type == "information package creation":
             return "Creation of submission information package."
 
+        if self.event_type == "modification":
+            return "Modification of digital object."
+
+        if self.event_type == "metadata modification":
+            return "Modification of metadata."
+
         raise NotImplementedError(
             "Not implemented event type '%s'." % (self.event_type))
 
     @property
     def event_outcome_detail(self):
         """Event outcome detail"""
+        if self._detail_info[0]["event-selite"].lower() != "null":
+            return self._detail_info[0]["event-selite"]
+
         if self.event_outcome != "success":
             return "Event failed."
 
@@ -303,6 +313,12 @@ class PremisEventMusicArchive(PremisEvent):
             # There's only one element in details
             return "Submission information package created as: " \
                    "%s" % self._detail_info[0]["sip-tunniste"]
+
+        if self.event_type in ["modification"]:
+            return "Digital object has been modified."
+
+        if self.event_type in ["metadata modification"]:
+            return "Metadata has been modified."
 
         raise NotImplementedError(
             "Not implemented event type '%s'." % (self.event_type))

@@ -166,6 +166,7 @@ def test_event_properties():
         "event": "message digest calculation",
         "event-aika-alku": "2022-02-01 14:00:00",
         "event-aika-loppu": "2022-02-01 14:00:15",
+        "event-selite": "null",
         "event-tulos": "success",
         "tiiviste": "abc",
         "tiiviste-tyyppi": "MD5",
@@ -199,6 +200,7 @@ def test_event_noend(end_timestamp):
         "event": "test event",
         "event-aika-alku": "2022-02-01 14:00:00",
         "event-aika-loppu": end_timestamp,
+        "event-selite": "null",
         "event-tulos": "success",
         "tiiviste": None,
         "tiiviste-tyyppi": None,
@@ -220,6 +222,7 @@ def test_add_detail_info():
         "event": "message digest calculation",
         "event-aika-alku": "2022-02-01 14:00:00",
         "event-aika-loppu": "2022-02-01 14:00:15",
+        "event-selite": "null",
         "event-tulos": "success",
         "tiiviste": "abc",
         "tiiviste-tyyppi": "MD5",
@@ -241,6 +244,11 @@ def test_add_detail_info():
              "2022-02-01T14:00:05)"
     assert event.event_outcome_detail == detail
     assert len(event._detail_info) == 2  # pylint: disable=protected-access
+
+    source_dict["event-selite"] = "Overridden detail."
+    event = PremisEventMusicArchive(source_dict)
+    event.add_detail_info(source_dict)
+    assert event.event_outcome_detail == "Overridden detail."
 
 
 def test_agent_properties():

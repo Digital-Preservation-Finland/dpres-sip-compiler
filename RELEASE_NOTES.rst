@@ -1,6 +1,12 @@
 Release notes
 =============
 
+Version 0.11
+------------
+
+   * For Music Archive adaptor, add support for modification events and
+     for given event detail.
+
 Version 0.10
 ------------
 

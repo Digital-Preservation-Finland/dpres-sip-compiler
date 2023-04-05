@@ -283,17 +283,18 @@ class PremisEventMusicArchive(PremisEvent):
     @property
     def event_outcome_detail(self):
         """Event outcome detail"""
+        out = ""
         if self._detail_info[0]["event-selite"].lower() != "null":
-            return self._detail_info[0]["event-selite"]
+            out = "%s\n\n" % self._detail_info[0]["event-selite"]
 
         if self.event_outcome != "success":
-            return "Event failed."
+            return "%sEvent failed." % out
 
         if self.event_type == "message digest calculation":
             # The same algorithm exists in all elements of details
-            out = "Checksum calculated with algorithm %s resulted the " \
-                  "following checksums:" \
-                  "" % self._detail_info[0]["tiiviste-tyyppi"]
+            out = "%sChecksum calculated with algorithm %s " \
+                  "resulted the following checksums:" \
+                  "" % (out, self._detail_info[0]["tiiviste-tyyppi"])
             for info in self._detail_info:
                 checksum_time = datetime.datetime.strptime(
                     info["tiiviste-aika"], "%Y-%m-%d %H:%M:%S"
@@ -305,20 +306,22 @@ class PremisEventMusicArchive(PremisEvent):
 
         if self.event_type == "filename change":
             # There's only one element in details
-            return "Filename changed.\nOld filename: %s\nNew filename: %s\n" \
-                   "" % (self._detail_info[0]["pon-korvattu-nimi"],
+            return "%sFilename changed.\nOld filename: %s\n" \
+                   "New filename: %s\n" \
+                   "" % (out,
+                         self._detail_info[0]["pon-korvattu-nimi"],
                          self._detail_info[0]["objekti-nimi"])
 
         if self.event_type == "information package creation":
             # There's only one element in details
-            return "Submission information package created as: " \
-                   "%s" % self._detail_info[0]["sip-tunniste"]
+            return "%sSubmission information package created as: " \
+                   "%s" % (out, self._detail_info[0]["sip-tunniste"])
 
         if self.event_type in ["modification"]:
-            return "Digital object has been modified."
+            return "%sObject has been modified." % out
 
         if self.event_type in ["metadata modification"]:
-            return "Metadata has been modified."
+            return "%sMetadata has been modified." % out
 
         raise NotImplementedError(
             "Not implemented event type '%s'." % (self.event_type))

@@ -245,10 +245,13 @@ def test_add_detail_info():
     assert event.event_outcome_detail == detail
     assert len(event._detail_info) == 2  # pylint: disable=protected-access
 
-    source_dict["event-selite"] = "Overridden detail."
+    source_dict["event-selite"] = "Given detail."
     event = PremisEventMusicArchive(source_dict)
     event.add_detail_info(source_dict)
-    assert event.event_outcome_detail == "Overridden detail."
+    detail = "Checksum calculated with algorithm MD5 resulted the " \
+             "following checksums:\nfilename1: abc (timestamp: " \
+             "2022-02-01T14:00:05)"
+    assert event.event_outcome_detail == "Given detail.\n\n%s" % detail
 
 
 def test_agent_properties():

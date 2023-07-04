@@ -35,8 +35,9 @@ and install this software with the following commands::
 If this is the case, you may skip the following installation guide. If there is
 no Pre-Ingest Tool environment present, the following process is needed.
 
-Packages openssl-devel, swig and gcc are required in your system to install
-M2Crypto, which is used for signing the packages with digital signature.
+Packages python3-devel, openssl-devel, swig and gcc are required in your system
+to install M2Crypto, which is used for signing the packages with digital
+signature.
 
 Create a virtual environment::
 

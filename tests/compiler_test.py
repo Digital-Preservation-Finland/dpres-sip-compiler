@@ -157,13 +157,13 @@ def test_provenance(tmpdir, prepare_workspace):
     assert event_xml.xpath(".//premis:linkingAgentIdentifierType",
                            namespaces=NAMESPACES)[0].text == "local"
     assert event_xml.xpath(".//premis:linkingAgentIdentifierValue",
-                           namespaces=NAMESPACES)[0].text == "1"
+                           namespaces=NAMESPACES)[0].text == "agent-1"
     assert event_xml.xpath(".//premis:linkingAgentRole",
                            namespaces=NAMESPACES)[0].text == "implementer"
     assert agent_xml.xpath(".//premis:agentIdentifierType",
                            namespaces=NAMESPACES)[0].text == "local"
     assert agent_xml.xpath(".//premis:agentIdentifierValue",
-                           namespaces=NAMESPACES)[0].text == "1"
+                           namespaces=NAMESPACES)[0].text == "agent-1"
     assert agent_xml.xpath(
         ".//premis:agentName", namespaces=NAMESPACES)[0].text == \
         "Testaaja, Teppo"
@@ -267,7 +267,7 @@ def test_compile_sip(tmpdir, prepare_workspace, pick_files_tar):
     assert len(mets_xml.xpath(".//mets:digiprovMD//premis:event",
                               namespaces=NAMESPACES)) == 12
     assert len(mets_xml.xpath(".//mets:digiprovMD//premis:agent",
-                              namespaces=NAMESPACES)) == 14
+                              namespaces=NAMESPACES)) == 15
     assert len(mets_xml.xpath(".//mets:file",
                               namespaces=NAMESPACES)) == 4
     assert len(mets_xml.xpath(".//mets:structMap",

@@ -83,7 +83,7 @@ class SipMetadataMusicArchive(SipMetadata):
         self.add_agent(PremisAgentMusicArchive(csv_row))
         self.add_linking(p_linking=PremisLinkingMusicArchive(csv_row),
                          object_id=csv_row["objekti-uuid"],
-                         agent_id=csv_row["agent-id"],
+                         agent_id="agent-"+csv_row["agent-id"],
                          agent_role=csv_row["agent-rooli"])
 
     def descriptive_files(self, desc_path, config):
@@ -338,7 +338,7 @@ class PremisAgentMusicArchive(PremisAgent):
         """
         metadata = {
             "agent_identifier_type": "local",
-            "agent_identifier_value": csv_row["agent-id"],
+            "agent_identifier_value": "agent-" + csv_row["agent-id"],
             "agent_name": csv_row["agent-nimi"],
             "agent_type": csv_row["agent-tyyppi"],
         }

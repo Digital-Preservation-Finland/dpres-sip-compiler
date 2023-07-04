@@ -258,7 +258,7 @@ def test_agent_properties():
     """Test that agent properties result values from given dict.
     """
     source_dict = {
-        "agent-id": "agent-id-123",
+        "agent-id": "id-123",
         "agent-nimi": "Test agent",
         "agent-tyyppi": "tester",
     }

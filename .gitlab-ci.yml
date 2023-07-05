@@ -1,8 +1,5 @@
 ---
 
-variables:
-  CI_PYTHON_2_VENV: "yes"
-
 include:
   - project: 'dpres/gitlab-ci-pipeline'
     ref: master

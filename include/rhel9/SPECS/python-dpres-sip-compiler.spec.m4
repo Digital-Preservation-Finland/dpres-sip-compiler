@@ -42,7 +42,7 @@ Requires:  %{py3_dist addml}
 Requires:  %{py3_dist audiomd}
 Requires:  %{py3_dist videomd}
 Requires:  %{py3_dist ffmpeg-python}
-Requires:  %{py3_dist dpres-siptools}
+Requires:  %{py3_dist siptools}
 Requires:  python3-file-scraper-full
 %description -n python3-dpres-sip-compiler %_description
 

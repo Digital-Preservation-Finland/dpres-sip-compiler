@@ -1,6 +1,11 @@
 Release notes
 =============
 
+Version 0.12
+------------
+
+   * Add a prefix to Music Archive's agent-IDs.
+
 Version 0.11
 ------------
 

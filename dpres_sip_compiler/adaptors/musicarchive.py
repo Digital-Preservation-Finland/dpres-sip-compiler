@@ -5,7 +5,6 @@ import glob
 from io import open as io_open
 import datetime
 import csv
-import six
 import premis
 from xml_helpers import utils as xml_utils
 from dpres_sip_compiler.base_adaptor import (
@@ -27,8 +26,6 @@ def read_csv_file(filename):
 
         :filename: File to open
         """
-        if six.PY2:
-            return io_open(filename, "rb")
         return io_open(filename, "rt", encoding="utf-8")
 
     with _open_file(filename) as infile:

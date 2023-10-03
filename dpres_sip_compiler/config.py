@@ -3,7 +3,6 @@
 import datetime
 import os
 import configparser
-import six
 import click
 
 
@@ -55,4 +54,4 @@ class Config(object):
 
             return self._conf["script"][attr]
         except Exception as exception:
-            raise AttributeError(six.text_type(exception))
+            raise AttributeError(str(exception))

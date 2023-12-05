@@ -2,7 +2,6 @@
 Compile SIP based on a given metadata source.
 Adaptors for different types of sources may be added.
 """
-from __future__ import print_function
 
 import os
 import subprocess
@@ -28,7 +27,7 @@ from dpres_sip_compiler.config import (Config, get_default_config_path,
 
 
 # pylint: disable=too-few-public-methods
-class SipCompiler(object):
+class SipCompiler:
     """Compiler to create SIPs
     """
 
@@ -153,7 +152,7 @@ class SipCompiler(object):
                 dmd_agent=(os.path.basename(__file__), "software"))
             found = True
         if not found:
-            raise IOError("Descriptive metadata file was not found!")
+            raise OSError("Descriptive metadata file was not found!")
         print("Descriptive metadata imported from %d file(s)." % (count))
 
     def _compile_metadata(self):

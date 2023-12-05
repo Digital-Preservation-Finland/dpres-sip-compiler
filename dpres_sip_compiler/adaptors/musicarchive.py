@@ -30,8 +30,7 @@ def read_csv_file(filename):
 
     with _open_file(filename) as infile:
         csvreader = csv.DictReader(infile, delimiter=',', quotechar='"')
-        for row in csvreader:
-            yield row
+        yield from csvreader
 
 
 class SipMetadataMusicArchive(SipMetadata):
@@ -52,9 +51,9 @@ class SipMetadataMusicArchive(SipMetadata):
         try:
             filename = glob.glob(
                 os.path.join(
-                    source_path, "*{}".format(config.csv_ending)))[0]
+                    source_path, f"*{config.csv_ending}"))[0]
         except KeyError:
-            raise IOError("CSV metadata file was not found!")
+            raise OSError("CSV metadata file was not found!")
 
         self.objid = os.path.split(filename)[1].replace(config.csv_ending, "")
 
@@ -183,7 +182,7 @@ class PremisObjectMusicArchive(PremisObject):
             "alt_identifier_type": "local",
             "alt_identifier_value": csv_row["objekti-id"]
         }
-        super(PremisObjectMusicArchive, self).__init__(metadata)
+        super().__init__(metadata)
 
     def find_path(self, source_path):
         """
@@ -200,7 +199,7 @@ class PremisObjectMusicArchive(PremisObject):
                 break
 
         if not found:
-            raise IOError("Digital object %s was not found!"
+            raise OSError("Digital object %s was not found!"
                           "" % (self.original_name))
 
 
@@ -230,7 +229,7 @@ class PremisEventMusicArchive(PremisEvent):
 
         event_datetime = start_time
         if end_time is not None:
-            event_datetime = "%s/%s" % (start_time, end_time)
+            event_datetime = "{}/{}".format(start_time, end_time)
 
         metadata = {
             "event_identifier_type": "local",
@@ -239,7 +238,7 @@ class PremisEventMusicArchive(PremisEvent):
             "event_outcome": csv_row["event-tulos"],
             "event_datetime": event_datetime
         }
-        super(PremisEventMusicArchive, self).__init__(metadata)
+        super().__init__(metadata)
         self.remove_metadata("event_detail")
         self.remove_metadata("event_outcome_detail")
 
@@ -339,7 +338,7 @@ class PremisAgentMusicArchive(PremisAgent):
             "agent_name": csv_row["agent-nimi"],
             "agent_type": csv_row["agent-tyyppi"],
         }
-        super(PremisAgentMusicArchive, self).__init__(metadata)
+        super().__init__(metadata)
 
 
 class PremisLinkingMusicArchive(PremisLinking):
@@ -351,7 +350,7 @@ class PremisLinkingMusicArchive(PremisLinking):
         """Initialize.
         :csv_row: One row from a CSV file.
         """
-        super(PremisLinkingMusicArchive, self).__init__()
+        super().__init__()
         self._event_type = csv_row["event"]
         self.identifier = csv_row["event-id"]
 
@@ -363,4 +362,4 @@ class PremisLinkingMusicArchive(PremisLinking):
         """
         if self._event_type == "information package creation":
             return
-        super(PremisLinkingMusicArchive, self).add_object_link(identifier)
+        super().add_object_link(identifier)

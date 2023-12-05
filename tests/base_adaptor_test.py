@@ -24,7 +24,7 @@ class PremisObjectTest(PremisObject):
     def __init__(self, identifier):
         """Set given identifier.
         """
-        super(PremisObjectTest, self).__init__({})
+        super().__init__({})
         self._identifier = identifier
 
     @property
@@ -40,7 +40,7 @@ class PremisEventTest(PremisEvent):
     def __init__(self, identifier):
         """Set given identifier.
         """
-        super(PremisEventTest, self).__init__({})
+        super().__init__({})
         self._identifier = identifier
 
     @property
@@ -56,7 +56,7 @@ class PremisAgentTest(PremisAgent):
     def __init__(self, identifier):
         """Set given identifier.
         """
-        super(PremisAgentTest, self).__init__({})
+        super().__init__({})
         self._identifier = identifier
 
     @property
@@ -72,7 +72,7 @@ class PremisLinkingTest(PremisLinking):
     def __init__(self, identifier):
         """Set given identifier as identifier.
         """
-        super(PremisLinkingTest, self).__init__()
+        super().__init__()
         self.identifier = identifier
 
 

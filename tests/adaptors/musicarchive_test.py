@@ -58,9 +58,9 @@ def test_descriptive_files():
     for desc in sip_meta.descriptive_files(
             "tests/data/musicarchive/source1", config):
         desc_files.append(desc)
-    assert set(desc_files) == set([
+    assert set(desc_files) == {
         "tests/data/musicarchive/source1/test1___metadata.xml",
-        "tests/data/musicarchive/source1/test2___metadata.xml"])
+        "tests/data/musicarchive/source1/test2___metadata.xml"}
 
 
 def test_find_path():
@@ -98,7 +98,7 @@ def test_alt_identifier(tmpdir):
         </mets:xmlData></mets:mdWrap></mets:techMD></mets:amdSec>
         </mets:mets>"""
     mets_file = os.path.join(str(tmpdir), "mets.xml")
-    with open(mets_file, 'wt') as outfile:
+    with open(mets_file, 'w') as outfile:
         outfile.write(xml_original)
     sip_meta = SipMetadataMusicArchive()
     config = Config()

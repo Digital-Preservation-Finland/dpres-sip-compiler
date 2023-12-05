@@ -47,7 +47,7 @@ def add_premis(premis_elem, premis_dict):
     premis_dict[premis_elem.identifier] = premis_elem
 
 
-class SipMetadata(object):
+class SipMetadata:
     """
     Metadata handler for a SIP to be compiled.
     Can be overwritten with metadata type specific adaptors.
@@ -159,35 +159,31 @@ class SipMetadata(object):
         """Iterate PREMIS Objects.
         :returns: PREMIS Object
         """
-        for premis_object in self.premis_objects.values():
-            yield premis_object
+        yield from self.premis_objects.values()
 
     @property
     def events(self):
         """Iterate PREMIS Events.
         :returns: PREMIS Event
         """
-        for premis_event in self.premis_events.values():
-            yield premis_event
+        yield from self.premis_events.values()
 
     @property
     def agents(self):
         """Iterate PREMIS Agents.
         :returns: PREMIS Agent
         """
-        for premis_agent in self.premis_agents.values():
-            yield premis_agent
+        yield from self.premis_agents.values()
 
     @property
     def linkings(self):
         """Iterate PREMIS Linkings.
         :returns: PREMIS Linking
         """
-        for premis_linking in self.premis_linkings.values():
-            yield premis_linking
+        yield from self.premis_linkings.values()
 
 
-class PremisObject(object):
+class PremisObject:
     """Class for a PREMIS Object.
     Can be overwritten with metadata type specific adaptors.
     """
@@ -250,7 +246,7 @@ class PremisObject(object):
         self._metadata.pop(metadata_key, None)
 
 
-class PremisEvent(object):
+class PremisEvent:
     """Class for a PREMIS Event.
     Can be overwritten with metadata type specific adaptors.
     """
@@ -294,7 +290,7 @@ class PremisEvent(object):
         self._metadata.pop(metadata_key, None)
 
 
-class PremisAgent(object):
+class PremisAgent:
     """Class for a PREMIS Agent.
     Can be overwritten with metadata type specific adaptors.
     """
@@ -335,7 +331,7 @@ class PremisAgent(object):
         self._metadata.pop(metadata_key, None)
 
 
-class PremisLinking(object):
+class PremisLinking:
     """Class for a PREMIS Linking.
     Can be overwritten with metadata type specific adaptors.
     """

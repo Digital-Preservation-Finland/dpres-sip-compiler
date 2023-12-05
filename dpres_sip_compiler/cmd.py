@@ -120,7 +120,7 @@ def validate(path, valid_output, invalid_output, summary, conf_file, stdout):
             else:
                 output = invalid_output
                 invalid_files_count += 1
-            with open(output, 'at') as outfile:
+            with open(output, 'a') as outfile:
                 json.dump(file_info, outfile)
                 outfile.write('\n')
             if summary:
@@ -134,8 +134,8 @@ def validate(path, valid_output, invalid_output, summary, conf_file, stdout):
                     'grade': file_info['grade'],
                     'well-formed': file_info['well-formed']
                 }
-                sum_output = '{0}_summary{1}'.format(*os.path.splitext(output))
-                with open(sum_output, 'at') as outfile:
+                sum_output = '{}_summary{}'.format(*os.path.splitext(output))
+                with open(sum_output, 'a') as outfile:
                     json.dump(summary_info, outfile)
                     outfile.write('\n')
 

@@ -25,7 +25,7 @@ def get_default_temp_path():
 
 
 # pylint: disable=too-few-public-methods
-class Config(object):
+class Config:
     """Basic configuration.
     """
 

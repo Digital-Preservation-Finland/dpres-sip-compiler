@@ -172,10 +172,10 @@ def test_handle_html_files(tmpdir):
     sip_meta.post_tasks(str(tmpdir))
     mets_xml = lxml.etree.parse(mets_file).getroot()
     html_file = mets_xml.xpath(
-        ".//premis:objectCharacteristics/format/formatDesignation",
+        ".//premis:objectCharacteristics",
         namespaces={'premis': 'info:lc/xmlns/premis-v2'})
     assert html_file[0].xpath(
-        "./premis:formatName", 
+        "./premis:format/premis:formatDesignation/premis:formatName",
         namespaces={'premis': 'info:lc/xmlns/premis-v2'})[0].text.strip() == "jeejee"
 
 

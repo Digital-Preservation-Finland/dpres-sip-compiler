@@ -136,6 +136,49 @@ def test_alt_identifier(tmpdir):
         ".//premis:objectIdentifier",
         namespaces={'premis': 'info:lc/xmlns/premis-v2'})) == 2
 
+def test_handle_html_files(tmpdir):
+    """
+    Test appending an alternative PREMIS object identifier to METS
+    """
+    xml_original = \
+        """
+        <mets:mets xmlns:mets="http://www.loc.gov/METS/"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns:premis="info:lc/xmlns/premis-v2">
+        <mets:amdSec><mets:techMD><mets:mdWrap><mets:xmlData>
+        <premis:object xsi:type="premis:file">
+          <premis:objectIdentifier>
+            <premis:objectIdentifierType>UUID</premis:objectIdentifierType>
+            <premis:objectIdentifierValue>882d63db-c9b6-4f44-83ba-901b300821cc
+            </premis:objectIdentifierValue>
+          </premis:objectIdentifier>
+        <premis:objectCharacteristics>
+            <premis:format>
+                <premis:formatDesignation>
+                    <premis:formatName>text/html</premis:formatName>
+                </premis:formatDesignation>
+            </premis:format>
+        </premis:objectCharacteristics>
+        </premis:object>
+        </mets:xmlData></mets:mdWrap></mets:techMD></mets:amdSec>
+        </mets:mets>"""
+    mets_file = os.path.join(str(tmpdir), "mets.xml")
+    with open(mets_file, 'wt') as outfile:
+        outfile.write(xml_original)
+    sip_meta = SipMetadataMusicArchive()
+    config = Config()
+    config.configure("tests/data/musicarchive/config.conf")
+    sip_meta.populate("tests/data/musicarchive/source2", config)
+    sip_meta.post_tasks(str(tmpdir))
+    mets_xml = lxml.etree.parse(mets_file).getroot()
+    html_file = mets_xml.xpath(
+        ".//premis:objectCharacteristics/format/formatDesignation",
+        namespaces={'premis': 'info:lc/xmlns/premis-v2'})
+    assert html_file[0].xpath(
+        "./premis:formatName", 
+        namespaces={'premis': 'info:lc/xmlns/premis-v2'})[0].text.strip() == "jeejee"
+
+
 
 def test_object_properties():
     """Test that object properties result values from given dict.

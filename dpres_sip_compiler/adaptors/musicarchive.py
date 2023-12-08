@@ -129,9 +129,11 @@ class SipMetadataMusicArchive(SipMetadata):
 
         # Post tasks for the METS file
         mets = self._append_alternative_ids(mets)
+        mets = self._handle_html_files(mets)
 
         with open(mets_file, 'wb+') as outfile:
             outfile.write(xml_utils.serialize(mets.getroot()))
+
 
     def _append_alternative_ids(self, mets):
         """
@@ -156,6 +158,15 @@ class SipMetadataMusicArchive(SipMetadata):
                                        p_object.alt_identifier_value)
             xml_object.insert(1, xml_id)
 
+        return mets
+
+    def _handle_html_files(self, mets):
+        for xml_object in premis.iter_objects(mets):
+            if premis.parse_object_type(xml_object) != "premis:file":
+                continue
+            if premis.parse_format(xml_object)[0] == "premis:text/html":
+                print("JEE")
+            
         return mets
 
 

@@ -164,9 +164,12 @@ class SipMetadataMusicArchive(SipMetadata):
         for xml_object in premis.iter_objects(mets):
             if premis.parse_object_type(xml_object) != "premis:file":
                 continue
-            if premis.parse_format(xml_object)[0] == "premis:text/html":
-                print("JEE")
             
+            if premis.parse_format(xml_object)[0] == "text/html":
+                xml_object.xpath(
+                    ".//premis:formatName",
+                    namespaces={'premis': 'info:lc/xmlns/premis-v2'})[0].text = "JEE"
+
         return mets
 
 

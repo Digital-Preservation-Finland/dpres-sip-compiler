@@ -104,7 +104,7 @@ class SipMetadata:
         """
         return ()
 
-    def post_tasks(self, workspace):
+    def post_tasks(self, workspace, *args):
         """
         Post tasks to workspace not supported by dpres-siptools.
 

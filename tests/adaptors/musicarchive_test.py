@@ -156,6 +156,7 @@ def test_handle_html_files(tmpdir):
             <premis:format>
                 <premis:formatDesignation>
                     <premis:formatName>text/html</premis:formatName>
+                    <premis:formatVersion>1a</premis:formatVersion>
                 </premis:formatDesignation>
             </premis:format>
         </premis:objectCharacteristics>
@@ -177,6 +178,9 @@ def test_handle_html_files(tmpdir):
     assert html_file[0].xpath(
         "./premis:format/premis:formatDesignation/premis:formatName",
         namespaces={'premis': 'info:lc/xmlns/premis-v2'})[0].text.strip() == "jeejee"
+    assert len(html_file[0].xpath(
+        "./premis:format/premis:formatDesignation/premis:formatVersion",
+        namespaces={'premis': 'info:lc/xmlns/premis-v2'})[0]) == 0
 
 
 

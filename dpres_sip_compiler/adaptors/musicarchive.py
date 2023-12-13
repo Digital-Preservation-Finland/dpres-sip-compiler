@@ -6,10 +6,11 @@ from io import open as io_open
 import datetime
 import csv
 import premis
+import mets as metslib
 from xml_helpers import utils as xml_utils
 from dpres_sip_compiler.base_adaptor import (
     SipMetadata, PremisObject, PremisEvent, PremisAgent, PremisLinking)
-from dpres_sip_compiler.validate import scrape_files
+# from dpres_sip_compiler.validate import scrape_files
 
 
 def read_csv_file(filename):
@@ -116,7 +117,9 @@ class SipMetadataMusicArchive(SipMetadata):
                 "*%s" % config.csv_ending,
                 ".[!/]*", "*/.[!/]*")  # Exclude all hidden files/directories
 
-    def post_tasks(self, workspace, config):
+    # def post_tasks(self, workspace, config):
+    def post_tasks(self, workspace):
+
         """
         Post tasks to workspace not supported by dpres-siptools.
 
@@ -130,7 +133,9 @@ class SipMetadataMusicArchive(SipMetadata):
 
         # Post tasks for the METS file
         mets = self._append_alternative_ids(mets)
-        mets = self._handle_html_files(mets, config)
+        # mets = self._handle_html_files(mets, config)
+
+        mets = self._handle_html_files(mets)
 
         with open(mets_file, 'wb+') as outfile:
             outfile.write(xml_utils.serialize(mets.getroot()))
@@ -160,28 +165,41 @@ class SipMetadataMusicArchive(SipMetadata):
 
         return mets
 
-    def _handle_html_files(self, mets, config):
-        for xml_object in premis.iter_objects(mets):
-            if premis.parse_object_type(xml_object) != "premis:file":
-                continue
+    # def _handle_html_files(self, mets, config):
+    def _handle_html_files(self, mets):
 
-            (format_name, format_version) = premis.parse_format(xml_object)
+        for techmd_element in metslib.iter_techmd(mets):
+
+        # for xml_object in premis.iter_objects(mets):
+        #     if premis.parse_object_type(xml_object) != "premis:file":
+        #         continue
+
+            (format_name, format_version) = premis.parse_format(techmd_element)
             if format_name == "text/html":
-                xml_object.xpath(
+                techmd_element.xpath(
                     ".//premis:formatName",
                     namespaces={'premis': 'info:lc/xmlns/premis-v2'})[0].text = "JEE"
 
+                file_id = techmd_element.attrib["ID"]
+                
+                #selvitä path metsistä fileSec-elementistä:
+                # hae techMD-lohko
+                
+                    # hae ID
+                    # hae fileSec-lohko
+                        # hae ID:n perusteella xlink (tiedostopolku)
+
                 # validointi
-                scraper_results = scrape_files("joku_path", config)
-                if not scraper_results["well_formed"]:
+                # scraper_results = scrape_files("joku_path", config)
+                # if not scraper_results["well_formed"]:
                     # muuta mimetyyppi text/plain
                     # poista formatVersion -elementti
-                    if format_version:
-                        version_element = xml_object.xpath(
-                            ".//premis:formatVersion",
-                            namespaces={
-                                'premis': 'info:lc/xmlns/premis-v2'})[0]
-                        version_element.getparent().remove(version_element)
+                    # if format_version:
+                    #     version_element = xml_object.xpath(
+                    #         ".//premis:formatVersion",
+                    #         namespaces={
+                    #             'premis': 'info:lc/xmlns/premis-v2'})[0]
+                    #     version_element.getparent().remove(version_element)
 
         return mets
 

@@ -87,7 +87,7 @@ def test_alt_identifier(tmpdir):
         <mets:mets xmlns:mets="http://www.loc.gov/METS/"
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xmlns:premis="info:lc/xmlns/premis-v2">
-        <mets:amdSec><mets:techMD><mets:mdWrap><mets:xmlData>
+        <mets:amdSec><mets:techMD ID="tech014" CREATED="2015-04-29"><mets:mdWrap><mets:xmlData>
         <premis:object xsi:type="premis:file">
           <premis:objectIdentifier>
             <premis:objectIdentifierType>UUID</premis:objectIdentifierType>
@@ -144,8 +144,9 @@ def test_handle_html_files(tmpdir):
         """
         <mets:mets xmlns:mets="http://www.loc.gov/METS/"
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                   xmlns:premis="info:lc/xmlns/premis-v2">
-        <mets:amdSec><mets:techMD><mets:mdWrap><mets:xmlData>
+                   xmlns:premis="info:lc/xmlns/premis-v2"
+                   xmlns:xlink="http://www.w3.org/1999/xlink">
+        <mets:amdSec><mets:techMD ID="tech014" CREATED="2015-04-29"><mets:mdWrap><mets:xmlData>
         <premis:object xsi:type="premis:file">
           <premis:objectIdentifier>
             <premis:objectIdentifierType>UUID</premis:objectIdentifierType>
@@ -162,6 +163,14 @@ def test_handle_html_files(tmpdir):
         </premis:objectCharacteristics>
         </premis:object>
         </mets:xmlData></mets:mdWrap></mets:techMD></mets:amdSec>
+        <mets:fileSec>
+		<mets:fileGrp>
+			<mets:file ID="file014" ADMID="tech014 event-pdf-pdfa agent-csc agent-gs">
+				<mets:FLocat LOCTYPE="URL" xlink:type="simple" xlink:href="file://testi.html"/>
+			</mets:file>
+		</mets:fileGrp>
+    	</mets:fileSec>
+
         </mets:mets>"""
     mets_file = os.path.join(str(tmpdir), "mets.xml")
     with open(mets_file, 'wt') as outfile:

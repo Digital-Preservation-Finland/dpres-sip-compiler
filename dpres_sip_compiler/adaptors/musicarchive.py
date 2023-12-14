@@ -176,22 +176,24 @@ class SipMetadataMusicArchive(SipMetadata):
 
             (format_name, format_version) = premis.parse_format(techmd_element)
             if format_name == "text/html":
-                techmd_element.xpath(
-                    ".//premis:formatName",
-                    namespaces={'premis': 'info:lc/xmlns/premis-v2'})[0].text = "JEE"
 
-                file_id = techmd_element.attrib["ID"]
+                techmd_file_id = techmd_element.attrib["ID"]
+                flocat_list = mets.xpath('mets:FLocat', namespaces={'mets': 'http://www.loc.gov/METS/'})
+                file_elem_list = metslib.parse_files(mets)
+                for file_elem in file_elem_list:
+                    admid_id = metslib.parse_admid(file_elem)[0]
+                    if admid_id == techmd_file_id:
+                        flocat_elem = file_elem.xpath('mets:FLocat', namespaces={'mets': 'http://www.loc.gov/METS/'})[0]
+                        file_path = metslib.parse_href(flocat_elem)
                 
-                #selvitä path metsistä fileSec-elementistä:
-                # hae techMD-lohko
-                
-                    # hae ID
-                    # hae fileSec-lohko
-                        # hae ID:n perusteella xlink (tiedostopolku)
-
                 # validointi
-                # scraper_results = scrape_files("joku_path", config)
+                # scraper_results = scrape_files(file_path, config)
                 # if not scraper_results["well_formed"]:
+                #     techmd_element.xpath(
+                #         ".//premis:formatName",
+                #         namespaces={
+                #             'premis': 'info:lc/xmlns/premis-v2'})[0].text = "text/plain; alt-format=text/html"
+
                     # muuta mimetyyppi text/plain
                     # poista formatVersion -elementti
                     # if format_version:

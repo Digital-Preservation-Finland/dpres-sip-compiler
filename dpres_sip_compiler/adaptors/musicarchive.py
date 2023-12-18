@@ -10,7 +10,6 @@ import mets as metslib
 from xml_helpers import utils as xml_utils
 from dpres_sip_compiler.base_adaptor import (
     SipMetadata, PremisObject, PremisEvent, PremisAgent, PremisLinking)
-# from dpres_sip_compiler.validate import scrape_files
 
 
 def read_csv_file(filename):
@@ -118,7 +117,7 @@ class SipMetadataMusicArchive(SipMetadata):
                 ".[!/]*", "*/.[!/]*")  # Exclude all hidden files/directories
 
     # def post_tasks(self, workspace, config):
-    def post_tasks(self, workspace):
+    def post_tasks(self, workspace, config):
 
         """
         Post tasks to workspace not supported by dpres-siptools.
@@ -135,7 +134,7 @@ class SipMetadataMusicArchive(SipMetadata):
         mets = self._append_alternative_ids(mets)
         # mets = self._handle_html_files(mets, config)
 
-        mets = self._handle_html_files(mets)
+        mets = self._handle_html_files(mets, config)
 
         with open(mets_file, 'wb+') as outfile:
             outfile.write(xml_utils.serialize(mets.getroot()))
@@ -166,7 +165,8 @@ class SipMetadataMusicArchive(SipMetadata):
         return mets
 
     # def _handle_html_files(self, mets, config):
-    def _handle_html_files(self, mets):
+    def _handle_html_files(self, mets, config):
+        from dpres_sip_compiler.validate import scrape_files
 
         for techmd_element in metslib.iter_techmd(mets):
 
@@ -178,21 +178,26 @@ class SipMetadataMusicArchive(SipMetadata):
             if format_name == "text/html":
 
                 techmd_file_id = techmd_element.attrib["ID"]
-                flocat_list = mets.xpath('mets:FLocat', namespaces={'mets': 'http://www.loc.gov/METS/'})
                 file_elem_list = metslib.parse_files(mets)
                 for file_elem in file_elem_list:
                     admid_id = metslib.parse_admid(file_elem)[0]
                     if admid_id == techmd_file_id:
-                        flocat_elem = file_elem.xpath('mets:FLocat', namespaces={'mets': 'http://www.loc.gov/METS/'})[0]
-                        file_path = metslib.parse_href(flocat_elem)
-                
+                        flocat_elem = metslib.parse_flocats(file_elem)[0]
+                        href = metslib.parse_href(flocat_elem)
+                        if href.startswith('file://'):
+                            file_path = href[len('file://'):]
+                            long_path = "tests/data/musicarchive/source2/" + file_path
+
                 # validointi
-                # scraper_results = scrape_files(file_path, config)
-                # if not scraper_results["well_formed"]:
-                #     techmd_element.xpath(
-                #         ".//premis:formatName",
-                #         namespaces={
-                #             'premis': 'info:lc/xmlns/premis-v2'})[0].text = "text/plain; alt-format=text/html"
+                        scraper_results = scrape_files(long_path, config)
+                        for results in scraper_results:
+                            print(results)
+                            if not results["well_formed"]:
+
+                                techmd_element.xpath(
+                                    ".//premis:formatName",
+                                    namespaces={
+                                        'premis': 'info:lc/xmlns/premis-v2'})[0].text = "text/plain; alt-format=text/html"
 
                     # muuta mimetyyppi text/plain
                     # poista formatVersion -elementti

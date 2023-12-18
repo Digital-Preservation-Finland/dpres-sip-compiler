@@ -15,6 +15,7 @@ from dpres_sip_compiler.config import Config
 from dpres_sip_compiler.compiler import compile_sip
 
 
+
 def test_populate():
     """Test that CSV is populated.
     """
@@ -169,6 +170,12 @@ def test_handle_html_files(tmpdir):
 				<mets:FLocat LOCTYPE="URL" xlink:type="simple" xlink:href="file://testi.html"/>
 			</mets:file>
 		</mets:fileGrp>
+        		<mets:fileGrp>
+			<mets:file ID="file015" ADMID="tech015 event-pdf-pdfa agent-csc agent-gs">
+				<mets:FLocat LOCTYPE="URL" xlink:type="simple" xlink:href="file://data/invalid_html.html"/>
+			</mets:file>
+		</mets:fileGrp>
+
     	</mets:fileSec>
 
         </mets:mets>"""
@@ -179,14 +186,14 @@ def test_handle_html_files(tmpdir):
     config = Config()
     config.configure("tests/data/musicarchive/config.conf")
     sip_meta.populate("tests/data/musicarchive/source2", config)
-    sip_meta.post_tasks(str(tmpdir))
+    sip_meta.post_tasks(str(tmpdir), config)
     mets_xml = lxml.etree.parse(mets_file).getroot()
     html_file = mets_xml.xpath(
         ".//premis:objectCharacteristics",
         namespaces={'premis': 'info:lc/xmlns/premis-v2'})
     assert html_file[0].xpath(
         "./premis:format/premis:formatDesignation/premis:formatName",
-        namespaces={'premis': 'info:lc/xmlns/premis-v2'})[0].text.strip() == "jeejee"
+        namespaces={'premis': 'info:lc/xmlns/premis-v2'})[0].text.strip() == "text/plain; alt-format=text/html"
     assert len(html_file[0].xpath(
         "./premis:format/premis:formatDesignation/premis:formatVersion",
         namespaces={'premis': 'info:lc/xmlns/premis-v2'})[0]) == 0

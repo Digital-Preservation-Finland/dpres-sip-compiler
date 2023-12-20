@@ -167,12 +167,14 @@ def test_handle_html_files(tmpdir):
         <mets:fileSec>
 		<mets:fileGrp>
 			<mets:file ID="file014" ADMID="tech014 event-pdf-pdfa agent-csc agent-gs">
-				<mets:FLocat LOCTYPE="URL" xlink:type="simple" xlink:href="file://testi.html"/>
+				<mets:FLocat LOCTYPE="URL" xlink:type="simple"
+                xlink:href="file://tests/data/musicarchive/source2/testi.html"/>
 			</mets:file>
 		</mets:fileGrp>
         		<mets:fileGrp>
 			<mets:file ID="file015" ADMID="tech015 event-pdf-pdfa agent-csc agent-gs">
-				<mets:FLocat LOCTYPE="URL" xlink:type="simple" xlink:href="file://data/invalid_html.html"/>
+				<mets:FLocat LOCTYPE="URL" xlink:type="simple"
+                xlink:href="file://tests/data/musicarchive/source2/data/invalid_html.html"/>
 			</mets:file>
 		</mets:fileGrp>
 
@@ -194,9 +196,9 @@ def test_handle_html_files(tmpdir):
     assert html_file[0].xpath(
         "./premis:format/premis:formatDesignation/premis:formatName",
         namespaces={'premis': 'info:lc/xmlns/premis-v2'})[0].text.strip() == "text/plain; alt-format=text/html"
-    assert len(html_file[0].xpath(
+    assert not html_file[0].xpath(
         "./premis:format/premis:formatDesignation/premis:formatVersion",
-        namespaces={'premis': 'info:lc/xmlns/premis-v2'})[0]) == 0
+        namespaces={'premis': 'info:lc/xmlns/premis-v2'})
 
 
 

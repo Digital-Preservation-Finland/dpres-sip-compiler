@@ -164,21 +164,14 @@ class SipMetadataMusicArchive(SipMetadata):
 
         return mets
 
-    # def _handle_html_files(self, mets, config):
     def _handle_html_files(self, mets, config):
         from dpres_sip_compiler.validate import scrape_files
 
+        file_elem_list = metslib.parse_files(mets)
         for techmd_element in metslib.iter_techmd(mets):
-
-        # for xml_object in premis.iter_objects(mets):
-        #     if premis.parse_object_type(xml_object) != "premis:file":
-        #         continue
-
             (format_name, format_version) = premis.parse_format(techmd_element)
             if format_name == "text/html":
-
                 techmd_file_id = techmd_element.attrib["ID"]
-                file_elem_list = metslib.parse_files(mets)
                 for file_elem in file_elem_list:
                     admid_id = metslib.parse_admid(file_elem)[0]
                     if admid_id == techmd_file_id:
@@ -186,27 +179,25 @@ class SipMetadataMusicArchive(SipMetadata):
                         href = metslib.parse_href(flocat_elem)
                         if href.startswith('file://'):
                             file_path = href[len('file://'):]
-                            long_path = "tests/data/musicarchive/source2/" + file_path
 
                 # validointi
-                        scraper_results = scrape_files(long_path, config)
+                        scraper_results = scrape_files(file_path, config)
                         for results in scraper_results:
-                            print(results)
-                            if not results["well_formed"]:
+                            if results["well-formed"] is False:
 
+                    # muuta mimetyyppi text/plain
                                 techmd_element.xpath(
                                     ".//premis:formatName",
                                     namespaces={
                                         'premis': 'info:lc/xmlns/premis-v2'})[0].text = "text/plain; alt-format=text/html"
 
-                    # muuta mimetyyppi text/plain
                     # poista formatVersion -elementti
-                    # if format_version:
-                    #     version_element = xml_object.xpath(
-                    #         ".//premis:formatVersion",
-                    #         namespaces={
-                    #             'premis': 'info:lc/xmlns/premis-v2'})[0]
-                    #     version_element.getparent().remove(version_element)
+                            if format_version:
+                                version_element = techmd_element.xpath(
+                                    ".//premis:formatVersion",
+                                    namespaces={
+                                        'premis': 'info:lc/xmlns/premis-v2'})[0]
+                                version_element.getparent().remove(version_element)
 
         return mets
 

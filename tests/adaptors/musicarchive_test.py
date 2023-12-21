@@ -137,7 +137,7 @@ def test_alt_identifier(tmpdir):
         ".//premis:objectIdentifier",
         namespaces={'premis': 'info:lc/xmlns/premis-v2'})) == 2
 
-def test_handle_html_files(tmpdir):
+def test_handle_format_elems(tmpdir):
     """
     Test appending an alternative PREMIS object identifier to METS
     """
@@ -199,7 +199,7 @@ def test_handle_html_files(tmpdir):
             </mets:fileGrp>
             <mets:fileGrp>
                 <mets:file ID="file015" ADMID="tech015 event-pdf-pdfa agent-csc agent-gs">
-                    <mets:FLocat LOCTYPE="URL" xlink:type="simple" xlink:href="file://tests/data/musicarchive/source2/data/invalid_html.html"/>
+                    <mets:FLocat LOCTYPE="URL" xlink:type="simple" xlink:href="file://tests/data/musicarchive/source2/testi.html"/>
                 </mets:file>
             </mets:fileGrp>
         </mets:fileSec>
@@ -214,14 +214,21 @@ def test_handle_html_files(tmpdir):
     sip_meta.populate("tests/data/musicarchive/source2", config)
     sip_meta.post_tasks(str(tmpdir))
     mets_xml = lxml.etree.parse(mets_file).getroot()
-    html_file = mets_xml.xpath(
-        ".//premis:objectCharacteristics",
+    format_elem = mets_xml.xpath(
+        ".//premis:format",
         namespaces={'premis': 'info:lc/xmlns/premis-v2'})
-    assert html_file[0].xpath(
-        "./premis:format/premis:formatDesignation/premis:formatName",
+    assert format_elem[0].xpath(
+        "./premis:formatDesignation/premis:formatName",
         namespaces={'premis': 'info:lc/xmlns/premis-v2'})[0].text.strip() == "text/plain; alt-format=text/html"
-    assert not html_file[0].xpath(
-        "./premis:format/premis:formatDesignation/premis:formatVersion",
+    assert format_elem[1].xpath(
+        "./premis:formatDesignation/premis:formatName",
+        namespaces={'premis': 'info:lc/xmlns/premis-v2'})[0].text.strip() == "text/plain; alt-format=text/html"
+
+    assert not format_elem[0].xpath(
+        "./premis:formatDesignation/premis:formatVersion",
+        namespaces={'premis': 'info:lc/xmlns/premis-v2'})
+    assert not format_elem[1].xpath(
+        "./premis:formatDesignation/premis:formatVersion",
         namespaces={'premis': 'info:lc/xmlns/premis-v2'})
 
 

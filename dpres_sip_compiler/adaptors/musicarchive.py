@@ -165,40 +165,44 @@ class SipMetadataMusicArchive(SipMetadata):
         return mets
 
     def _handle_html_files(self, mets):
-
-        file_elem_list = metslib.parse_files(mets)
         for techmd_element in metslib.iter_techmd(mets):
             (format_name, format_version) = premis.parse_format(techmd_element)
             if format_name == "text/html":
-                techmd_file_id = techmd_element.attrib["ID"]
-                for file_elem in file_elem_list:
-                    admid_id = metslib.parse_admid(file_elem)[0]
-                    if admid_id == techmd_file_id:
-                        flocat_elem = metslib.parse_flocats(file_elem)[0]
-                        href = metslib.parse_href(flocat_elem)
-                        if href.startswith('file://'):
-                            file_path = href[len('file://'):]
+                file_path = self._find_file_path_by_techmd_element(
+                    techmd_element, mets)
 
                 # validointi
-                        scraper = Scraper(file_path)
-                        scraper.scrape(check_wellformed=True)
-                        well_formed = scraper.well_formed
-                        if well_formed is False:
+                scraper = Scraper(file_path)
+                scraper.scrape(check_wellformed=True)
+                well_formed = scraper.well_formed
+                if well_formed is False:
                     # muuta mimetyyppi text/plain
-                            techmd_element.xpath(
-                                ".//premis:formatName",
-                                namespaces={
-                                    'premis': 'info:lc/xmlns/premis-v2'})[0].text = "text/plain; alt-format=text/html"
+                    techmd_element.xpath(
+                        ".//premis:formatName",
+                        namespaces={
+                            'premis': 'info:lc/xmlns/premis-v2'}
+                        )[0].text = "text/plain; alt-format=text/html"
 
                     # poista formatVersion -elementti
-                            if format_version:
-                                version_element = techmd_element.xpath(
-                                    ".//premis:formatVersion",
-                                    namespaces={
-                                        'premis': 'info:lc/xmlns/premis-v2'})[0]
-                                version_element.getparent().remove(version_element)
+                    if format_version:
+                        version_element = techmd_element.xpath(
+                            ".//premis:formatVersion",
+                            namespaces={
+                                'premis': 'info:lc/xmlns/premis-v2'})[0]
+                        version_element.getparent().remove(version_element)
 
         return mets
+
+    def _find_file_path_by_techmd_element(self, techmd_el, mets):
+        techmd_file_id = techmd_el.attrib["ID"]
+        for file_elem in metslib.parse_files(mets):
+            admid_id = metslib.parse_admid(file_elem)[0]
+            if admid_id == techmd_file_id:
+                flocat_elem = metslib.parse_flocats(file_elem)[0]
+                href = metslib.parse_href(flocat_elem)
+                if href.startswith('file://'):
+                    file_path = href[len('file://'):]
+        return file_path
 
 
 class PremisObjectMusicArchive(PremisObject):

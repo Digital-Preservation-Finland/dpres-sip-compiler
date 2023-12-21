@@ -7,6 +7,7 @@ import datetime
 import csv
 import premis
 import mets as metslib
+from file_scraper.scraper import Scraper
 from xml_helpers import utils as xml_utils
 from dpres_sip_compiler.base_adaptor import (
     SipMetadata, PremisObject, PremisEvent, PremisAgent, PremisLinking)
@@ -181,15 +182,15 @@ class SipMetadataMusicArchive(SipMetadata):
                             file_path = href[len('file://'):]
 
                 # validointi
-                        scraper_results = scrape_files(file_path, config)
-                        for results in scraper_results:
-                            if results["well-formed"] is False:
-
+                        scraper = Scraper(file_path)
+                        scraper.scrape(check_wellformed=True)
+                        well_formed = scraper.well_formed
+                        if well_formed is False:
                     # muuta mimetyyppi text/plain
-                                techmd_element.xpath(
-                                    ".//premis:formatName",
-                                    namespaces={
-                                        'premis': 'info:lc/xmlns/premis-v2'})[0].text = "text/plain; alt-format=text/html"
+                            techmd_element.xpath(
+                                ".//premis:formatName",
+                                namespaces={
+                                    'premis': 'info:lc/xmlns/premis-v2'})[0].text = "text/plain; alt-format=text/html"
 
                     # poista formatVersion -elementti
                             if format_version:

@@ -188,7 +188,7 @@ def test_handle_html_files(tmpdir):
     config = Config()
     config.configure("tests/data/musicarchive/config.conf")
     sip_meta.populate("tests/data/musicarchive/source2", config)
-    sip_meta.post_tasks(str(tmpdir), config)
+    sip_meta.post_tasks(str(tmpdir))
     mets_xml = lxml.etree.parse(mets_file).getroot()
     html_file = mets_xml.xpath(
         ".//premis:objectCharacteristics",

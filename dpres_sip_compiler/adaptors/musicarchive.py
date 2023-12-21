@@ -117,8 +117,7 @@ class SipMetadataMusicArchive(SipMetadata):
                 "*%s" % config.csv_ending,
                 ".[!/]*", "*/.[!/]*")  # Exclude all hidden files/directories
 
-    # def post_tasks(self, workspace, config):
-    def post_tasks(self, workspace, config):
+    def post_tasks(self, workspace):
 
         """
         Post tasks to workspace not supported by dpres-siptools.
@@ -135,7 +134,7 @@ class SipMetadataMusicArchive(SipMetadata):
         mets = self._append_alternative_ids(mets)
         # mets = self._handle_html_files(mets, config)
 
-        mets = self._handle_html_files(mets, config)
+        mets = self._handle_html_files(mets)
 
         with open(mets_file, 'wb+') as outfile:
             outfile.write(xml_utils.serialize(mets.getroot()))
@@ -165,8 +164,7 @@ class SipMetadataMusicArchive(SipMetadata):
 
         return mets
 
-    def _handle_html_files(self, mets, config):
-        from dpres_sip_compiler.validate import scrape_files
+    def _handle_html_files(self, mets):
 
         file_elem_list = metslib.parse_files(mets)
         for techmd_element in metslib.iter_techmd(mets):

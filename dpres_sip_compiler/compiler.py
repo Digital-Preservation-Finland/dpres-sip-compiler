@@ -176,7 +176,7 @@ class SipCompiler:
     def _post_adaptor_tasks(self):
         """Additional tasks to workspace.
         """
-        self.sip_meta.post_tasks(self.temp_path, self.config)
+        self.sip_meta.post_tasks(self.temp_path)
 
     def _compile_package(self):
         """Sign SIP and create TAR file

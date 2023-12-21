@@ -143,44 +143,68 @@ def test_handle_html_files(tmpdir):
     """
     xml_original = \
         """
-        <mets:mets xmlns:mets="http://www.loc.gov/METS/"
-                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                   xmlns:premis="info:lc/xmlns/premis-v2"
-                   xmlns:xlink="http://www.w3.org/1999/xlink">
-        <mets:amdSec><mets:techMD ID="tech014" CREATED="2015-04-29"><mets:mdWrap><mets:xmlData>
-        <premis:object xsi:type="premis:file">
-          <premis:objectIdentifier>
-            <premis:objectIdentifierType>UUID</premis:objectIdentifierType>
-            <premis:objectIdentifierValue>882d63db-c9b6-4f44-83ba-901b300821cc
-            </premis:objectIdentifierValue>
-          </premis:objectIdentifier>
-        <premis:objectCharacteristics>
-            <premis:format>
-                <premis:formatDesignation>
-                    <premis:formatName>text/html</premis:formatName>
-                    <premis:formatVersion>1a</premis:formatVersion>
-                </premis:formatDesignation>
-            </premis:format>
-        </premis:objectCharacteristics>
-        </premis:object>
-        </mets:xmlData></mets:mdWrap></mets:techMD></mets:amdSec>
+    <mets:mets xmlns:mets="http://www.loc.gov/METS/"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:premis="info:lc/xmlns/premis-v2"
+        xmlns:xlink="http://www.w3.org/1999/xlink">
+        <mets:amdSec>
+            <mets:techMD ID="tech014" CREATED="2015-04-29">
+                <mets:mdWrap>
+                    <mets:xmlData>
+                        <premis:object xsi:type="premis:file">
+                            <premis:objectIdentifier>
+                                <premis:objectIdentifierType>UUID</premis:objectIdentifierType>
+                                <premis:objectIdentifierValue>882d63db-c9b6-4f44-83ba-901b300821cc
+                                </premis:objectIdentifierValue>
+                            </premis:objectIdentifier>
+                            <premis:objectCharacteristics>
+                                <premis:format>
+                                    <premis:formatDesignation>
+                                        <premis:formatName>text/html</premis:formatName>
+                                        <premis:formatVersion>1a</premis:formatVersion>
+                                    </premis:formatDesignation>
+                                </premis:format>
+                            </premis:objectCharacteristics>
+                        </premis:object>
+                    </mets:xmlData>
+                </mets:mdWrap>
+            </mets:techMD>
+            <mets:techMD ID="tech015" CREATED="2015-04-29">
+                <mets:mdWrap>
+                    <mets:xmlData>
+                        <premis:object xsi:type="premis:file">
+                            <premis:objectIdentifier>
+                                <premis:objectIdentifierType>UUID</premis:objectIdentifierType>
+                                <premis:objectIdentifierValue>882d63db-c9b6-4f44-83ba-901b300821cc
+                                </premis:objectIdentifierValue>
+                            </premis:objectIdentifier>
+                            <premis:objectCharacteristics>
+                                <premis:format>
+                                    <premis:formatDesignation>
+                                        <premis:formatName>text/html</premis:formatName>
+                                        <premis:formatVersion>1a</premis:formatVersion>
+                                    </premis:formatDesignation>
+                                </premis:format>
+                            </premis:objectCharacteristics>
+                        </premis:object>
+                    </mets:xmlData>
+                </mets:mdWrap>
+            </mets:techMD>
+        </mets:amdSec>
         <mets:fileSec>
-		<mets:fileGrp>
-			<mets:file ID="file014" ADMID="tech014 event-pdf-pdfa agent-csc agent-gs">
-				<mets:FLocat LOCTYPE="URL" xlink:type="simple"
-                xlink:href="file://tests/data/musicarchive/source2/testi.html"/>
-			</mets:file>
-		</mets:fileGrp>
-        		<mets:fileGrp>
-			<mets:file ID="file015" ADMID="tech015 event-pdf-pdfa agent-csc agent-gs">
-				<mets:FLocat LOCTYPE="URL" xlink:type="simple"
-                xlink:href="file://tests/data/musicarchive/source2/data/invalid_html.html"/>
-			</mets:file>
-		</mets:fileGrp>
-
-    	</mets:fileSec>
-
-        </mets:mets>"""
+            <mets:fileGrp>
+                <mets:file ID="file014" ADMID="tech014 event-pdf-pdfa agent-csc agent-gs">
+                    <mets:FLocat LOCTYPE="URL" xlink:type="simple" xlink:href="file://tests/data/musicarchive/source2/testi.html"/>
+                </mets:file>
+            </mets:fileGrp>
+            <mets:fileGrp>
+                <mets:file ID="file015" ADMID="tech015 event-pdf-pdfa agent-csc agent-gs">
+                    <mets:FLocat LOCTYPE="URL" xlink:type="simple" xlink:href="file://tests/data/musicarchive/source2/data/invalid_html.html"/>
+                </mets:file>
+            </mets:fileGrp>
+        </mets:fileSec>
+    </mets:mets>
+        """
     mets_file = os.path.join(str(tmpdir), "mets.xml")
     with open(mets_file, 'wt') as outfile:
         outfile.write(xml_original)

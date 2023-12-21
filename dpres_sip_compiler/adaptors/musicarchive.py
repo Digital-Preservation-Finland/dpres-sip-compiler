@@ -23,8 +23,7 @@ def read_csv_file(filename):
     """
     def _open_file(filename):
         """
-        Open file in binary mode for Python 2,
-        Otherwise in utf-8 text mode.
+        Open file in utf-8 text mode.
 
         :filename: File to open
         """

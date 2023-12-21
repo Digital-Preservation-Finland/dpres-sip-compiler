@@ -177,12 +177,7 @@ class SipMetadataMusicArchive(SipMetadata):
                 well_formed = scraper.well_formed
                 if well_formed is False:
                     # muuta mimetyyppi text/plain
-                    techmd_element.xpath(
-                        ".//premis:formatName",
-                        namespaces={
-                            'premis': 'info:lc/xmlns/premis-v2'}
-                        )[0].text = "text/plain; alt-format=text/html"
-
+                    premis.modify_element_value(techmd_element, "formatName", "text/plain; alt-format=text/html")
                     # poista formatVersion -elementti
                     if format_version:
                         version_element = techmd_element.xpath(

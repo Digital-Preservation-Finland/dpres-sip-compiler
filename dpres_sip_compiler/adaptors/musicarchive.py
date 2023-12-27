@@ -131,8 +131,6 @@ class SipMetadataMusicArchive(SipMetadata):
 
         # Post tasks for the METS file
         mets = self._append_alternative_ids(mets)
-        # mets = self._handle_html_files(mets, config)
-
         mets = self._handle_html_files(mets)
 
         with open(mets_file, 'wb+') as outfile:
@@ -170,20 +168,18 @@ class SipMetadataMusicArchive(SipMetadata):
                 file_path = self._find_file_path_by_techmd_element(
                     techmd_element, mets)
 
-                # validointi
                 scraper = Scraper(file_path)
                 scraper.scrape(check_wellformed=True)
                 well_formed = scraper.well_formed
                 if well_formed is False:
-                    # muuta mimetyyppi text/plain
-                    premis.modify_element_value(techmd_element, "formatName", "text/plain; alt-format=text/html")
-                    # poista formatVersion -elementti
+                    premis.modify_element_value(
+                        techmd_element, "formatName", "text/plain; alt-format=text/html")
                     if format_version:
-                        version_element = techmd_element.xpath(
+                        format_version_element = techmd_element.xpath(
                             ".//premis:formatVersion",
                             namespaces={
                                 'premis': 'info:lc/xmlns/premis-v2'})[0]
-                        version_element.getparent().remove(version_element)
+                        format_version_element.getparent().remove(format_version_element)
 
         return mets
 
@@ -194,8 +190,7 @@ class SipMetadataMusicArchive(SipMetadata):
             if admid_id == techmd_file_id:
                 flocat_elem = metslib.parse_flocats(file_elem)[0]
                 href = metslib.parse_href(flocat_elem)
-                if href.startswith('file://'):
-                    file_path = href[len('file://'):]
+                file_path = href[len('file://'):]
         return file_path
 
 

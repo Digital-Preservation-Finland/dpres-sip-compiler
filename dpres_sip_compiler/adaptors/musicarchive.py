@@ -162,6 +162,11 @@ class SipMetadataMusicArchive(SipMetadata):
         return mets
 
     def _handle_html_files(self, mets):
+        """
+        Modify the format name of broken HTML files and remove their format version.
+        
+        :mets: METS XML root
+        """
         for techmd_element in metslib.iter_techmd(mets):
             (format_name, format_version) = premis.parse_format(techmd_element)
             if format_name == "text/html":
@@ -184,6 +189,12 @@ class SipMetadataMusicArchive(SipMetadata):
         return mets
 
     def _find_file_path_by_techmd_element(self, techmd_el, mets):
+        """
+        Find the file path that matches the given TechMD ID.
+        
+        :techmd_el: TechMD element object
+        :mets: METS XML root
+        """
         techmd_file_id = techmd_el.attrib["ID"]
         for file_elem in metslib.parse_files(mets):
             admid_id = metslib.parse_admid(file_elem)[0]

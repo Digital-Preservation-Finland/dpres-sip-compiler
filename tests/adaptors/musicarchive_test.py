@@ -194,12 +194,12 @@ def test_handle_format_elems(tmpdir):
         <mets:fileSec>
             <mets:fileGrp>
                 <mets:file ID="file014" ADMID="tech014 event-pdf-pdfa agent-csc agent-gs">
-                    <mets:FLocat LOCTYPE="URL" xlink:type="simple" xlink:href="file://tests/data/musicarchive/source2/testi.html"/>
+                    <mets:FLocat LOCTYPE="URL" xlink:type="simple" xlink:href="file://tests/data/musicarchive/source2/valid_html.html"/>
                 </mets:file>
             </mets:fileGrp>
             <mets:fileGrp>
                 <mets:file ID="file015" ADMID="tech015 event-pdf-pdfa agent-csc agent-gs">
-                    <mets:FLocat LOCTYPE="URL" xlink:type="simple" xlink:href="file://tests/data/musicarchive/source2/testi.html"/>
+                    <mets:FLocat LOCTYPE="URL" xlink:type="simple" xlink:href="file://tests/data/musicarchive/source2/invalid_html.html"/>
                 </mets:file>
             </mets:fileGrp>
         </mets:fileSec>
@@ -219,17 +219,17 @@ def test_handle_format_elems(tmpdir):
         namespaces={'premis': 'info:lc/xmlns/premis-v2'})
     assert format_elem[0].xpath(
         "./premis:formatDesignation/premis:formatName",
-        namespaces={'premis': 'info:lc/xmlns/premis-v2'})[0].text.strip() == "text/plain; alt-format=text/html"
+        namespaces={'premis': 'info:lc/xmlns/premis-v2'})[0].text.strip() == "text/html"
     assert format_elem[1].xpath(
         "./premis:formatDesignation/premis:formatName",
         namespaces={'premis': 'info:lc/xmlns/premis-v2'})[0].text.strip() == "text/plain; alt-format=text/html"
-
-    assert not format_elem[0].xpath(
+    assert format_elem[0].xpath(
         "./premis:formatDesignation/premis:formatVersion",
         namespaces={'premis': 'info:lc/xmlns/premis-v2'})
     assert not format_elem[1].xpath(
         "./premis:formatDesignation/premis:formatVersion",
         namespaces={'premis': 'info:lc/xmlns/premis-v2'})
+    #lisää ehjä html tiedosto!!
 
 
 

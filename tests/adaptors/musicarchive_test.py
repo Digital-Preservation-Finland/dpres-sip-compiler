@@ -195,12 +195,12 @@ def test_handle_html_files(tmpdir):
         <mets:fileSec>
             <mets:fileGrp>
                 <mets:file ID="file014" ADMID="tech014 event-pdf-pdfa agent-csc agent-gs">
-                    <mets:FLocat LOCTYPE="URL" xlink:type="simple" xlink:href="file://tests/data/musicarchive/source2/valid_html.html"/>
+                    <mets:FLocat LOCTYPE="URL" xlink:type="simple" xlink:href="file://tests/data/musicarchive/broken_html/valid_html.html"/>
                 </mets:file>
             </mets:fileGrp>
             <mets:fileGrp>
                 <mets:file ID="file015" ADMID="tech015 event-pdf-pdfa agent-csc agent-gs">
-                    <mets:FLocat LOCTYPE="URL" xlink:type="simple" xlink:href="file://tests/data/musicarchive/source2/invalid_html.html"/>
+                    <mets:FLocat LOCTYPE="URL" xlink:type="simple" xlink:href="file://tests/data/musicarchive/broken_html/invalid_html.html"/>
                 </mets:file>
             </mets:fileGrp>
         </mets:fileSec>
@@ -212,7 +212,7 @@ def test_handle_html_files(tmpdir):
     sip_meta = SipMetadataMusicArchive()
     config = Config()
     config.configure("tests/data/musicarchive/config.conf")
-    sip_meta.populate("tests/data/musicarchive/source2", config)
+    sip_meta.populate("tests/data/musicarchive/broken_html", config)
     sip_meta.post_tasks(str(tmpdir))
     mets_xml = lxml.etree.parse(mets_file).getroot()
     format_elem = mets_xml.xpath(

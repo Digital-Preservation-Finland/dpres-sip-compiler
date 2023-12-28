@@ -164,34 +164,36 @@ class SipMetadataMusicArchive(SipMetadata):
     def _handle_html_files(self, mets):
         """
         Modify the format name of broken HTML files and remove their format version.
-        
+
         :mets: METS XML root
         """
         for techmd_element in metslib.iter_techmd(mets):
-            (format_name, format_version) = premis.parse_format(techmd_element)
-            if format_name == "text/html":
-                file_path = self._find_file_path_by_techmd_element(
-                    techmd_element, mets)
 
-                scraper = Scraper(file_path)
-                scraper.scrape(check_wellformed=True)
-                well_formed = scraper.well_formed
-                if well_formed is False:
-                    premis.modify_element_value(
-                        techmd_element, "formatName", "text/plain; alt-format=text/html")
-                    if format_version:
-                        format_version_element = techmd_element.xpath(
-                            ".//premis:formatVersion",
-                            namespaces={
-                                'premis': 'info:lc/xmlns/premis-v2'})[0]
-                        format_version_element.getparent().remove(format_version_element)
+            if techmd_element.xpath(".//premis:format", namespaces={'premis': 'info:lc/xmlns/premis-v2'}):
+                (format_name, format_version) = premis.parse_format(techmd_element)
+                
+                if format_name == "text/html":
+                    file_path = self._find_file_path_by_techmd_element(techmd_element, mets)
+
+                    scraper = Scraper(file_path)
+                    scraper.scrape(check_wellformed=True)
+                    well_formed = scraper.well_formed
+                    if well_formed is False:
+                        premis.modify_element_value(
+                            techmd_element, "formatName", "text/plain; alt-format=text/html")
+                        if format_version:
+                            format_version_element = techmd_element.xpath(
+                                ".//premis:formatVersion",
+                                namespaces={
+                                    'premis': 'info:lc/xmlns/premis-v2'})[0]
+                            format_version_element.getparent().remove(format_version_element)
 
         return mets
 
     def _find_file_path_by_techmd_element(self, techmd_el, mets):
         """
         Find the file path that matches the given TechMD ID.
-        
+
         :techmd_el: TechMD element object
         :mets: METS XML root
         """
@@ -202,6 +204,7 @@ class SipMetadataMusicArchive(SipMetadata):
                 flocat_elem = metslib.parse_flocats(file_elem)[0]
                 href = metslib.parse_href(flocat_elem)
                 file_path = href[len('file://'):]
+
         return file_path
 
 

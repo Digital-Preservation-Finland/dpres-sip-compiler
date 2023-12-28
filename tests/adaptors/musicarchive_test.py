@@ -137,9 +137,10 @@ def test_alt_identifier(tmpdir):
         ".//premis:objectIdentifier",
         namespaces={'premis': 'info:lc/xmlns/premis-v2'})) == 2
 
-def test_handle_format_elems(tmpdir):
+def test_handle_html_files(tmpdir):
     """
-    Test appending an alternative PREMIS object identifier to METS
+    Test that broken HTML files are marked as TXT in METS file and
+    format version is removed.
     """
     xml_original = \
         """
@@ -229,8 +230,6 @@ def test_handle_format_elems(tmpdir):
     assert not format_elem[1].xpath(
         "./premis:formatDesignation/premis:formatVersion",
         namespaces={'premis': 'info:lc/xmlns/premis-v2'})
-    #lisää ehjä html tiedosto!!
-
 
 
 def test_object_properties():

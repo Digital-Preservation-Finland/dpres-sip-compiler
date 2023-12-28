@@ -224,12 +224,12 @@ def test_handle_html_files(tmpdir):
     assert format_elem[1].xpath(
         "./premis:formatDesignation/premis:formatName",
         namespaces={'premis': 'info:lc/xmlns/premis-v2'})[0].text.strip() == "text/plain; alt-format=text/html"
-    assert format_elem[0].xpath(
+    assert len(format_elem[0].xpath(
         "./premis:formatDesignation/premis:formatVersion",
-        namespaces={'premis': 'info:lc/xmlns/premis-v2'})
-    assert not format_elem[1].xpath(
+        namespaces={'premis': 'info:lc/xmlns/premis-v2'})) == 1
+    assert len(format_elem[1].xpath(
         "./premis:formatDesignation/premis:formatVersion",
-        namespaces={'premis': 'info:lc/xmlns/premis-v2'})
+        namespaces={'premis': 'info:lc/xmlns/premis-v2'})[0]) == 0
 
 
 def test_object_properties():

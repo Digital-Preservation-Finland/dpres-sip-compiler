@@ -163,44 +163,48 @@ class SipMetadataMusicArchive(SipMetadata):
 
     def _handle_html_files(self, mets):
         """
-        Modify the format name of broken HTML files and remove their format version.
+        Run validation on all HTML files. If the HTML file is broken, change
+        the formatName to TEXT and remove formatVersion in the METS file.
 
         :mets: METS XML root
         """
-        for techmd_element in metslib.iter_techmd(mets):
+        format_elems = mets.xpath(
+            f".//premis:format[.//premis:formatName='text/html']",
+            namespaces={'premis': 'info:lc/xmlns/premis-v2'})
+        if len(format_elems) > 0:
+            for format_elem in format_elems:
+                techmd_id = format_elem.xpath(
+                    "ancestor::mets:techMD/@ID",
+                    namespaces={
+                        'mets': 'http://www.loc.gov/METS/'})[0]
+                file_path = self._find_file_path_by_techmd_id(techmd_id, mets)
 
-            if techmd_element.xpath(".//premis:format", namespaces={'premis': 'info:lc/xmlns/premis-v2'}):
-                (format_name, format_version) = premis.parse_format(techmd_element)
-                
-                if format_name == "text/html":
-                    file_path = self._find_file_path_by_techmd_element(techmd_element, mets)
+                scraper = Scraper(file_path)
+                scraper.scrape(check_wellformed=True)
+                well_formed = scraper.well_formed
+                if well_formed is False:
+                    premis.modify_element_value(
+                        format_elem, "formatName", "text/plain; alt-format=text/html")
+                    format_version_element = format_elem.xpath(
+                        ".//premis:formatVersion",
+                        namespaces={
+                            'premis': 'info:lc/xmlns/premis-v2'})[0]
 
-                    scraper = Scraper(file_path)
-                    scraper.scrape(check_wellformed=True)
-                    well_formed = scraper.well_formed
-                    if well_formed is False:
-                        premis.modify_element_value(
-                            techmd_element, "formatName", "text/plain; alt-format=text/html")
-                        if format_version:
-                            format_version_element = techmd_element.xpath(
-                                ".//premis:formatVersion",
-                                namespaces={
-                                    'premis': 'info:lc/xmlns/premis-v2'})[0]
-                            format_version_element.getparent().remove(format_version_element)
+                    if len(format_version_element) > 0:
+                        format_version_element.getparent().remove(format_version_element)
 
         return mets
-
-    def _find_file_path_by_techmd_element(self, techmd_el, mets):
+    
+    def _find_file_path_by_techmd_id(self, techmd_id, mets):
         """
-        Find the file path that matches the given TechMD ID.
+        Find the file path that matches the given METS TechMD ID.
 
-        :techmd_el: TechMD element object
+        :techmd_id: TechMD element's ID value
         :mets: METS XML root
         """
-        techmd_file_id = techmd_el.attrib["ID"]
         for file_elem in metslib.parse_files(mets):
             admid_id = metslib.parse_admid(file_elem)[0]
-            if admid_id == techmd_file_id:
+            if admid_id == techmd_id:
                 flocat_elem = metslib.parse_flocats(file_elem)[0]
                 href = metslib.parse_href(flocat_elem)
                 file_path = href[len('file://'):]

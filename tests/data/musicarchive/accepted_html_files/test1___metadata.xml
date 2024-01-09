@@ -7,10 +7,10 @@
 	xmlns:dc="http://purl.org/dc/elements/1.1/">
 
 	<dc:title>
-		Some title
+		Testing the packaging of various HTML files
 	</dc:title>
 	<dc:description>
-		Description about something
+		Testing the packaging of various HTML files
 	</dc:description>
 	<dc:publisher>
 		CSC

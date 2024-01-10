@@ -171,27 +171,29 @@ class SipMetadataMusicArchive(SipMetadata):
         format_elems = mets.xpath(
             f".//premis:format[.//premis:formatName='text/html']",
             namespaces={'premis': 'info:lc/xmlns/premis-v2'})
-        if len(format_elems) > 0:
-            for format_elem in format_elems:
-                techmd_id = format_elem.xpath(
-                    "ancestor::mets:techMD/@ID",
+        if not format_elems:
+            return mets
+
+        for format_elem in format_elems:
+            techmd_id = format_elem.xpath(
+                "ancestor::mets:techMD/@ID",
+                namespaces={
+                    'mets': 'http://www.loc.gov/METS/'})[0]
+            file_path = self._find_file_path_by_techmd_id(techmd_id, mets)
+
+            scraper = Scraper(file_path)
+            scraper.scrape(check_wellformed=True)
+            well_formed = scraper.well_formed
+            if well_formed is False:
+                premis.modify_element_value(
+                    format_elem, "formatName", "text/plain; alt-format=text/html")
+                format_version_element = format_elem.xpath(
+                    ".//premis:formatVersion",
                     namespaces={
-                        'mets': 'http://www.loc.gov/METS/'})[0]
-                file_path = self._find_file_path_by_techmd_id(techmd_id, mets)
+                        'premis': 'info:lc/xmlns/premis-v2'})[0]
 
-                scraper = Scraper(file_path)
-                scraper.scrape(check_wellformed=True)
-                well_formed = scraper.well_formed
-                if well_formed is False:
-                    premis.modify_element_value(
-                        format_elem, "formatName", "text/plain; alt-format=text/html")
-                    format_version_element = format_elem.xpath(
-                        ".//premis:formatVersion",
-                        namespaces={
-                            'premis': 'info:lc/xmlns/premis-v2'})[0]
-
-                    if len(format_version_element) > 0:
-                        format_version_element.getparent().remove(format_version_element)
+                if len(format_version_element) > 0:
+                    format_version_element.getparent().remove(format_version_element)
 
         return mets
     

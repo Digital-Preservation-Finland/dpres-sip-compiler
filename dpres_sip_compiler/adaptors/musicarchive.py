@@ -174,12 +174,14 @@ class SipMetadataMusicArchive(SipMetadata):
         if not format_elems:
             return mets
 
+        paths_by_techmd_id = get_paths_by_techmd_id(mets)
+
         for format_elem in format_elems:
             techmd_id = format_elem.xpath(
                 "ancestor::mets:techMD/@ID",
                 namespaces={
                     'mets': 'http://www.loc.gov/METS/'})[0]
-            file_path = self._find_file_path_by_techmd_id(techmd_id, mets)
+            file_path = paths_by_techmd_id[techmd_id]
 
             scraper = Scraper(file_path)
             scraper.scrape(check_wellformed=True)
@@ -196,22 +198,36 @@ class SipMetadataMusicArchive(SipMetadata):
                     format_version_element.getparent().remove(format_version_element)
 
         return mets
-    
-    def _find_file_path_by_techmd_id(self, techmd_id, mets):
-        """
-        Find the file path that matches the given METS TechMD ID.
 
-        :techmd_id: TechMD element's ID value
-        :mets: METS XML root
-        """
-        for file_elem in metslib.parse_files(mets):
-            admid_id = metslib.parse_admid(file_elem)[0]
-            if admid_id == techmd_id:
-                flocat_elem = metslib.parse_flocats(file_elem)[0]
-                href = metslib.parse_href(flocat_elem)
-                file_path = href[len('file://'):]
 
-        return file_path
+def get_paths_by_techmd_id(mets):
+    """
+    Create a dictionary with techmd_ids and their respective file paths.
+
+    :mets: METS XML root
+    """
+    path_dict = {}
+
+    techmd_ids = set()
+    for techmd_elem in metslib.iter_techmd(mets):
+        wrap = metslib.parse_mdwrap(techmd_elem)
+        wrap_mdtype_dict = metslib.parse_wrap_mdtype(wrap)
+        if wrap_mdtype_dict["mdtype"] != "PREMIS:OBJECT":
+            continue
+        techmd_id = techmd_elem.get("ID")
+        techmd_ids.add(techmd_id)
+
+    for file_elem in metslib.parse_files(mets):
+        admid = metslib.parse_admid(file_elem)
+        intersection = techmd_ids.intersection(admid)
+        if len(intersection) == 1:
+            [techmd_id] = intersection
+            flocat_elem = metslib.parse_flocats(file_elem)[0]
+            href = metslib.parse_href(flocat_elem)
+            file_path = href[len('file://'):]
+            path_dict[techmd_id] = file_path
+
+    return path_dict
 
 
 class PremisObjectMusicArchive(PremisObject):

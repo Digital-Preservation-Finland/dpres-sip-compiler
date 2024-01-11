@@ -131,7 +131,7 @@ class SipMetadataMusicArchive(SipMetadata):
 
         # Post tasks for the METS file
         mets = self._append_alternative_ids(mets)
-        mets = self._handle_html_files(mets)
+        mets = handle_html_files(mets)
 
         with open(mets_file, 'wb+') as outfile:
             outfile.write(xml_utils.serialize(mets.getroot()))
@@ -161,43 +161,43 @@ class SipMetadataMusicArchive(SipMetadata):
 
         return mets
 
-    def _handle_html_files(self, mets):
-        """
-        Run validation on all HTML files. If the HTML file is broken, change
-        the formatName to TEXT and remove formatVersion in the METS file.
+def handle_html_files(mets):
+    """
+    Run validation on all HTML files. If the HTML file is broken, change
+    the formatName to TEXT and remove formatVersion in the METS file.
 
-        :mets: METS XML root
-        """
-        format_elems = mets.xpath(
-            f".//premis:format[.//premis:formatName='text/html']",
-            namespaces={'premis': 'info:lc/xmlns/premis-v2'})
-        if not format_elems:
-            return mets
-
-        paths_by_techmd_id = get_paths_by_techmd_id(mets)
-
-        for format_elem in format_elems:
-            techmd_id = format_elem.xpath(
-                "ancestor::mets:techMD/@ID",
-                namespaces={
-                    'mets': 'http://www.loc.gov/METS/'})[0]
-            file_path = paths_by_techmd_id[techmd_id]
-
-            scraper = Scraper(file_path)
-            scraper.scrape(check_wellformed=True)
-            well_formed = scraper.well_formed
-            if well_formed is False:
-                premis.modify_element_value(
-                    format_elem, "formatName", "text/plain; alt-format=text/html")
-                format_version_element = format_elem.xpath(
-                    ".//premis:formatVersion",
-                    namespaces={
-                        'premis': 'info:lc/xmlns/premis-v2'})[0]
-
-                if len(format_version_element) > 0:
-                    format_version_element.getparent().remove(format_version_element)
-
+    :mets: METS XML root
+    """
+    format_elems = mets.xpath(
+        ".//premis:format[contains(.//premis:formatName, 'text/html')]",
+        namespaces={'premis': 'info:lc/xmlns/premis-v2'})
+    if not format_elems:
         return mets
+
+    paths_by_techmd_id = get_paths_by_techmd_id(mets)
+
+    for format_elem in format_elems:
+        techmd_id = format_elem.xpath(
+            "ancestor::mets:techMD/@ID",
+            namespaces={
+                'mets': 'http://www.loc.gov/METS/'})[0]
+        file_path = paths_by_techmd_id[techmd_id]
+
+        scraper = Scraper(file_path)
+        scraper.scrape(check_wellformed=True)
+        well_formed = scraper.well_formed
+        if well_formed is False:
+            premis.modify_element_value(
+                format_elem, "formatName", "text/plain; alt-format=text/html")
+            format_version_element = format_elem.xpath(
+                ".//premis:formatVersion",
+                namespaces={
+                    'premis': 'info:lc/xmlns/premis-v2'})[0]
+
+            if len(format_version_element) > 0:
+                format_version_element.getparent().remove(format_version_element)
+
+    return mets
 
 
 def get_paths_by_techmd_id(mets):

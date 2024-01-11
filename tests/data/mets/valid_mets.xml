@@ -470,10 +470,10 @@
   <mets:fileSec>
     <mets:fileGrp>
       <mets:file ID="_5c15e263-1e70-4fd7-853c-40638145df8a" ADMID="_6fcd312fddb45d70d7b7cf378ec2d185">
-        <mets:FLocat LOCTYPE="URL" xlink:href="file://tests/data/musicarchive/accepted_html_files/html/invalid_html.html" xlink:type="simple"/>
+        <mets:FLocat LOCTYPE="URL" xlink:href="file://html/invalid_html.html" xlink:type="simple"/>
       </mets:file>
       <mets:file ID="_f0b3d158-b846-46a4-a7db-cf855a1a48cb" ADMID="_9b8741e0e4cd63729400ceb4d3c67122">
-        <mets:FLocat LOCTYPE="URL" xlink:href="file://tests/data/musicarchive/accepted_html_files/html/valid_html.html" xlink:type="simple"/>
+        <mets:FLocat LOCTYPE="URL" xlink:href="file://html/valid_html.html" xlink:type="simple"/>
       </mets:file>
     </mets:fileGrp>
   </mets:fileSec>

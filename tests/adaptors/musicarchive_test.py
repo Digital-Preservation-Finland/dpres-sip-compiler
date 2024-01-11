@@ -143,12 +143,16 @@ def sample_mets():
     """Well-formed sample mets"""
     return lxml.etree.parse("tests/data/mets/valid_mets.xml").getroot()
 
-def test_handle_html_files(sample_mets):
+@pytest.fixture
+def source_path():
+    return "tests/data/musicarchive/accepted_html_files"
+
+def test_handle_html_files(sample_mets, source_path):
     """
     Test that invalid HTML files are marked as TXT in METS file and format version is removed.
     Test that for valid HTML files the METS file content does not change.
     """
-    mets_xml = handle_html_files(sample_mets)
+    mets_xml = handle_html_files(sample_mets, source_path)
     format_elem = mets_xml.xpath(
         ".//premis:format",
         namespaces={'premis': 'info:lc/xmlns/premis-v2'})

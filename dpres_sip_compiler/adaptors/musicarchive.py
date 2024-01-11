@@ -116,7 +116,7 @@ class SipMetadataMusicArchive(SipMetadata):
                 "*%s" % config.csv_ending,
                 ".[!/]*", "*/.[!/]*")  # Exclude all hidden files/directories
 
-    def post_tasks(self, workspace):
+    def post_tasks(self, workspace, source_path):
 
         """
         Post tasks to workspace not supported by dpres-siptools.
@@ -131,7 +131,7 @@ class SipMetadataMusicArchive(SipMetadata):
 
         # Post tasks for the METS file
         mets = self._append_alternative_ids(mets)
-        mets = handle_html_files(mets)
+        mets = handle_html_files(mets, source_path)
 
         with open(mets_file, 'wb+') as outfile:
             outfile.write(xml_utils.serialize(mets.getroot()))
@@ -161,7 +161,7 @@ class SipMetadataMusicArchive(SipMetadata):
 
         return mets
 
-def handle_html_files(mets):
+def handle_html_files(mets, source_path):
     """
     Run validation on all HTML files. If the HTML file is broken, change
     the formatName to TEXT and remove formatVersion in the METS file.
@@ -183,7 +183,7 @@ def handle_html_files(mets):
                 'mets': 'http://www.loc.gov/METS/'})[0]
         file_path = paths_by_techmd_id[techmd_id]
 
-        scraper = Scraper(file_path)
+        scraper = Scraper(os.path.join(source_path, file_path))
         scraper.scrape(check_wellformed=True)
         well_formed = scraper.well_formed
         if well_formed is False:

@@ -9,7 +9,8 @@ from dpres_sip_compiler.adaptors.musicarchive import (
     PremisObjectMusicArchive,
     PremisEventMusicArchive,
     PremisAgentMusicArchive,
-    PremisLinkingMusicArchive
+    PremisLinkingMusicArchive,
+    handle_html_files
 )
 from dpres_sip_compiler.config import Config
 from dpres_sip_compiler.compiler import compile_sip
@@ -137,93 +138,26 @@ def test_alt_identifier(tmpdir):
         ".//premis:objectIdentifier",
         namespaces={'premis': 'info:lc/xmlns/premis-v2'})) == 2
 
-def test_handle_html_files(tmpdir):
+@pytest.fixture
+def sample_mets():
+    """Well-formed sample mets"""
+    return lxml.etree.parse("tests/data/mets/valid_mets.xml").getroot()
+
+def test_handle_html_files(sample_mets):
     """
-    Test that broken HTML files are marked as TXT in METS file and
-    format version is removed.
+    Test that invalid HTML files are marked as TXT in METS file and format version is removed.
+    Test that for valid HTML files the METS file content does not change.
     """
-    xml_original = \
-        """
-    <mets:mets xmlns:mets="http://www.loc.gov/METS/"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xmlns:premis="info:lc/xmlns/premis-v2"
-        xmlns:xlink="http://www.w3.org/1999/xlink">
-        <mets:amdSec>
-            <mets:techMD ID="tech014" CREATED="2015-04-29">
-                <mets:mdWrap>
-                    <mets:xmlData>
-                        <premis:object xsi:type="premis:file">
-                            <premis:objectIdentifier>
-                                <premis:objectIdentifierType>UUID</premis:objectIdentifierType>
-                                <premis:objectIdentifierValue>882d63db-c9b6-4f44-83ba-901b300821cc
-                                </premis:objectIdentifierValue>
-                            </premis:objectIdentifier>
-                            <premis:objectCharacteristics>
-                                <premis:format>
-                                    <premis:formatDesignation>
-                                        <premis:formatName>text/html</premis:formatName>
-                                        <premis:formatVersion>1a</premis:formatVersion>
-                                    </premis:formatDesignation>
-                                </premis:format>
-                            </premis:objectCharacteristics>
-                        </premis:object>
-                    </mets:xmlData>
-                </mets:mdWrap>
-            </mets:techMD>
-            <mets:techMD ID="tech015" CREATED="2015-04-29">
-                <mets:mdWrap>
-                    <mets:xmlData>
-                        <premis:object xsi:type="premis:file">
-                            <premis:objectIdentifier>
-                                <premis:objectIdentifierType>UUID</premis:objectIdentifierType>
-                                <premis:objectIdentifierValue>882d63db-c9b6-4f44-83ba-901b300821cc
-                                </premis:objectIdentifierValue>
-                            </premis:objectIdentifier>
-                            <premis:objectCharacteristics>
-                                <premis:format>
-                                    <premis:formatDesignation>
-                                        <premis:formatName>text/html</premis:formatName>
-                                        <premis:formatVersion>1a</premis:formatVersion>
-                                    </premis:formatDesignation>
-                                </premis:format>
-                            </premis:objectCharacteristics>
-                        </premis:object>
-                    </mets:xmlData>
-                </mets:mdWrap>
-            </mets:techMD>
-        </mets:amdSec>
-        <mets:fileSec>
-            <mets:fileGrp>
-                <mets:file ID="file014" ADMID="tech014 event-pdf-pdfa agent-csc agent-gs">
-                    <mets:FLocat LOCTYPE="URL" xlink:type="simple" xlink:href="file://tests/data/musicarchive/broken_html/valid_html.html"/>
-                </mets:file>
-            </mets:fileGrp>
-            <mets:fileGrp>
-                <mets:file ID="file015" ADMID="tech015 event-pdf-pdfa agent-csc agent-gs">
-                    <mets:FLocat LOCTYPE="URL" xlink:type="simple" xlink:href="file://tests/data/musicarchive/broken_html/invalid_html.html"/>
-                </mets:file>
-            </mets:fileGrp>
-        </mets:fileSec>
-    </mets:mets>
-        """
-    mets_file = os.path.join(str(tmpdir), "mets.xml")
-    with open(mets_file, 'wt') as outfile:
-        outfile.write(xml_original)
-    sip_meta = SipMetadataMusicArchive()
-    config = Config()
-    config.configure("tests/data/musicarchive/config.conf")
-    sip_meta.populate("tests/data/musicarchive/broken_html", config)
-    sip_meta.post_tasks(str(tmpdir))
-    mets_xml = lxml.etree.parse(mets_file).getroot()
+    mets_xml = handle_html_files(sample_mets)
     format_elem = mets_xml.xpath(
         ".//premis:format",
         namespaces={'premis': 'info:lc/xmlns/premis-v2'})
     assert format_elem[0].xpath(
         "./premis:formatDesignation/premis:formatName",
-        namespaces={'premis': 'info:lc/xmlns/premis-v2'})[0].text.strip() == "text/html"
+        namespaces={'premis': 'info:lc/xmlns/premis-v2'})[0].text.strip() == "text/plain; alt-format=text/html"
     assert format_elem[1].xpath(
         "./premis:formatDesignation/premis:formatName",
-        namespaces={'premis': 'info:lc/xmlns/premis-v2'})[0].text.strip() == "text/plain; alt-format=text/html"
+        namespaces={'premis': 'info:lc/xmlns/premis-v2'})[0].text.strip() == "text/html; charset=UTF-8"
     assert len(format_elem[0].xpath(
         "./premis:formatDesignation/premis:formatVersion",
         namespaces={'premis': 'info:lc/xmlns/premis-v2'})) == 1

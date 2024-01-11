@@ -1,0 +1,488 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<mets:mets xmlns:mets="http://www.loc.gov/METS/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:premis="info:lc/xmlns/premis-v2" xmlns:fi="http://digitalpreservation.fi/schemas/mets/fi-extensions" xmlns:xlink="http://www.w3.org/1999/xlink" PROFILE="http://digitalpreservation.fi/mets-profiles/cultural-heritage" OBJID="accepted_html_files" xsi:schemaLocation="http://www.loc.gov/METS/ http://digitalpreservation.fi/schemas/mets/mets.xsd" fi:CATALOG="1.7.5" fi:SPECIFICATION="1.7.5" fi:CONTENTID="accepted_html_files" fi:CONTRACTID="urn:uuid:474418c5-79a6-4e86-bfc8-5aed0a3337d7">
+  <mets:metsHdr CREATEDATE="2024-01-09T14:21:52+00:00" RECORDSTATUS="submission">
+    <mets:agent ROLE="CREATOR" TYPE="ORGANIZATION">
+      <mets:name>Archive X</mets:name>
+    </mets:agent>
+  </mets:metsHdr>
+  <mets:dmdSec ID="_f8c00927-cd3b-48a6-8d7d-a587a0b03f5f" CREATED="2024-01-09T14:21:52.119058+00:00">
+    <mets:mdWrap MDTYPE="DC" MDTYPEVERSION="2008">
+      <mets:xmlData>
+        <dc:title xmlns:dc="http://purl.org/dc/elements/1.1/">
+		Testing the packaging of various HTML files
+	</dc:title>
+        <dc:description xmlns:dc="http://purl.org/dc/elements/1.1/">
+		Testing the packaging of various HTML files
+	</dc:description>
+        <dc:publisher xmlns:dc="http://purl.org/dc/elements/1.1/">
+		CSC
+	</dc:publisher>
+        <dc:identifier xmlns:dc="http://purl.org/dc/elements/1.1/">
+		id-1234
+	</dc:identifier>
+      </mets:xmlData>
+    </mets:mdWrap>
+  </mets:dmdSec>
+  <mets:amdSec>
+    <mets:techMD ID="_6fcd312fddb45d70d7b7cf378ec2d185" CREATED="2024-01-09T14:21:52.060733+00:00">
+      <mets:mdWrap MDTYPE="PREMIS:OBJECT" MDTYPEVERSION="2.3">
+        <mets:xmlData>
+          <premis:object xsi:type="premis:file">
+            <premis:objectIdentifier>
+              <premis:objectIdentifierType>UUID</premis:objectIdentifierType>
+              <premis:objectIdentifierValue>882d63db-c9b6-4f44-83ba-901b300821dd</premis:objectIdentifierValue>
+            </premis:objectIdentifier>
+            <premis:objectIdentifier>
+              <premis:objectIdentifierType>local</premis:objectIdentifierType>
+              <premis:objectIdentifierValue>456</premis:objectIdentifierValue>
+            </premis:objectIdentifier>
+            <premis:objectCharacteristics>
+              <premis:compositionLevel>0</premis:compositionLevel>
+              <premis:fixity>
+                <premis:messageDigestAlgorithm>MD5</premis:messageDigestAlgorithm>
+                <premis:messageDigest>valid-digest-md5</premis:messageDigest>
+              </premis:fixity>
+              <premis:format>
+                <premis:formatDesignation>
+                  <premis:formatName>text/html; charset=UTF-8</premis:formatName>
+                  <premis:formatVersion>5.0</premis:formatVersion>
+                </premis:formatDesignation>
+              </premis:format>
+              <premis:creatingApplication>
+                <premis:dateCreatedByApplication>2024-01-09T13:32:20.196297</premis:dateCreatedByApplication>
+              </premis:creatingApplication>
+            </premis:objectCharacteristics>
+            <premis:originalName>invalid_html.html</premis:originalName>
+          </premis:object>
+        </mets:xmlData>
+      </mets:mdWrap>
+    </mets:techMD>
+    <mets:techMD ID="_9b8741e0e4cd63729400ceb4d3c67122" CREATED="2024-01-09T14:21:52.113142+00:00">
+      <mets:mdWrap MDTYPE="PREMIS:OBJECT" MDTYPEVERSION="2.3">
+        <mets:xmlData>
+          <premis:object xsi:type="premis:file">
+            <premis:objectIdentifier>
+              <premis:objectIdentifierType>UUID</premis:objectIdentifierType>
+              <premis:objectIdentifierValue>882d63db-c9b6-4f44-83ba-901b300821cc</premis:objectIdentifierValue>
+            </premis:objectIdentifier>
+            <premis:objectIdentifier>
+              <premis:objectIdentifierType>local</premis:objectIdentifierType>
+              <premis:objectIdentifierValue>123</premis:objectIdentifierValue>
+            </premis:objectIdentifier>
+            <premis:objectCharacteristics>
+              <premis:compositionLevel>0</premis:compositionLevel>
+              <premis:fixity>
+                <premis:messageDigestAlgorithm>MD5</premis:messageDigestAlgorithm>
+                <premis:messageDigest>valid-digest-md5</premis:messageDigest>
+              </premis:fixity>
+              <premis:format>
+                <premis:formatDesignation>
+                  <premis:formatName>text/html; charset=UTF-8</premis:formatName>
+                  <premis:formatVersion>5.0</premis:formatVersion>
+                </premis:formatDesignation>
+              </premis:format>
+              <premis:creatingApplication>
+                <premis:dateCreatedByApplication>2024-01-09T13:33:13.896938</premis:dateCreatedByApplication>
+              </premis:creatingApplication>
+            </premis:objectCharacteristics>
+            <premis:originalName>valid_html.html</premis:originalName>
+          </premis:object>
+        </mets:xmlData>
+      </mets:mdWrap>
+    </mets:techMD>
+    <mets:digiprovMD ID="_9b00645ab4a334bab1e07c404e033b56" CREATED="2024-01-09T14:21:52.071372+00:00">
+      <mets:mdWrap MDTYPE="PREMIS:AGENT" MDTYPEVERSION="2.3">
+        <mets:xmlData>
+          <premis:agent>
+            <premis:agentIdentifier>
+              <premis:agentIdentifierType>local</premis:agentIdentifierType>
+              <premis:agentIdentifierValue>807a7670f6dbea6e3934406938dfce99</premis:agentIdentifierValue>
+            </premis:agentIdentifier>
+            <premis:agentName>DetectedMimeVersionMetadataScraper-v0.63</premis:agentName>
+            <premis:agentType>software</premis:agentType>
+          </premis:agent>
+        </mets:xmlData>
+      </mets:mdWrap>
+    </mets:digiprovMD>
+    <mets:digiprovMD ID="_eb1cfc16ac5482887a5493ddde1b4afd" CREATED="2024-01-09T14:21:52.125551+00:00">
+      <mets:mdWrap MDTYPE="PREMIS:AGENT" MDTYPEVERSION="2.3">
+        <mets:xmlData>
+          <premis:agent>
+            <premis:agentIdentifier>
+              <premis:agentIdentifierType>local</premis:agentIdentifierType>
+              <premis:agentIdentifierValue>228d694b7b84798b3efa64cad046a36c</premis:agentIdentifierValue>
+            </premis:agentIdentifier>
+            <premis:agentName>dpres-siptools-v0.68</premis:agentName>
+            <premis:agentType>software</premis:agentType>
+          </premis:agent>
+        </mets:xmlData>
+      </mets:mdWrap>
+    </mets:digiprovMD>
+    <mets:digiprovMD ID="_c7b4bb62646885cb891811ed585263a5" CREATED="2024-01-09T14:21:52.074012+00:00">
+      <mets:mdWrap MDTYPE="PREMIS:AGENT" MDTYPEVERSION="2.3">
+        <mets:xmlData>
+          <premis:agent>
+            <premis:agentIdentifier>
+              <premis:agentIdentifierType>local</premis:agentIdentifierType>
+              <premis:agentIdentifierValue>6834570bc3612163f5c8e08ef9e4c1b4</premis:agentIdentifierValue>
+            </premis:agentIdentifier>
+            <premis:agentName>ResultsMergeScraper-v0.63</premis:agentName>
+            <premis:agentType>software</premis:agentType>
+          </premis:agent>
+        </mets:xmlData>
+      </mets:mdWrap>
+    </mets:digiprovMD>
+    <mets:digiprovMD ID="_3caea797acae88433588c5edf2314f7d" CREATED="2024-01-09T14:21:52.116931+00:00">
+      <mets:mdWrap MDTYPE="PREMIS:AGENT" MDTYPEVERSION="2.3">
+        <mets:xmlData>
+          <premis:agent>
+            <premis:agentIdentifier>
+              <premis:agentIdentifierType>local</premis:agentIdentifierType>
+              <premis:agentIdentifierValue>agent-1</premis:agentIdentifierValue>
+            </premis:agentIdentifier>
+            <premis:agentName>Testaaja, Teppo</premis:agentName>
+            <premis:agentType>person</premis:agentType>
+          </premis:agent>
+        </mets:xmlData>
+      </mets:mdWrap>
+    </mets:digiprovMD>
+    <mets:digiprovMD ID="_68909ca33bc4d3115a3e3f6a60a50a8f" CREATED="2024-01-09T14:21:52.122594+00:00">
+      <mets:mdWrap MDTYPE="PREMIS:EVENT" MDTYPEVERSION="2.3">
+        <mets:xmlData>
+          <premis:event>
+            <premis:eventIdentifier>
+              <premis:eventIdentifierType>UUID</premis:eventIdentifierType>
+              <premis:eventIdentifierValue>57c84137-2785-42b9-8931-eb7c8b16ab78</premis:eventIdentifierValue>
+            </premis:eventIdentifier>
+            <premis:eventType>metadata extraction</premis:eventType>
+            <premis:eventDateTime>2024-01-09T14:21:52+00:00</premis:eventDateTime>
+            <premis:eventDetail>Descriptive metadata import from external source</premis:eventDetail>
+            <premis:eventOutcomeInformation>
+              <premis:eventOutcome>success</premis:eventOutcome>
+              <premis:eventOutcomeDetail>
+                <premis:eventOutcomeDetailNote>Descriptive metadata imported to mets dmdSec from external source</premis:eventOutcomeDetailNote>
+              </premis:eventOutcomeDetail>
+            </premis:eventOutcomeInformation>
+            <premis:linkingAgentIdentifier>
+              <premis:linkingAgentIdentifierType>local</premis:linkingAgentIdentifierType>
+              <premis:linkingAgentIdentifierValue>c5707538028162f8754bc503d0cf944e</premis:linkingAgentIdentifierValue>
+            </premis:linkingAgentIdentifier>
+          </premis:event>
+        </mets:xmlData>
+      </mets:mdWrap>
+    </mets:digiprovMD>
+    <mets:digiprovMD ID="_80cdea8cdac2b221218766f3d71c04f4" CREATED="2024-01-09T14:21:52.126723+00:00">
+      <mets:mdWrap MDTYPE="PREMIS:EVENT" MDTYPEVERSION="2.3">
+        <mets:xmlData>
+          <premis:event>
+            <premis:eventIdentifier>
+              <premis:eventIdentifierType>UUID</premis:eventIdentifierType>
+              <premis:eventIdentifierValue>fb64ae99-e356-44b5-974d-d8a91dd0394f</premis:eventIdentifierValue>
+            </premis:eventIdentifier>
+            <premis:eventType>creation</premis:eventType>
+            <premis:eventDateTime>2024-01-09T14:21:52+00:00</premis:eventDateTime>
+            <premis:eventDetail>Creation of structural metadata with the compile-structmap script</premis:eventDetail>
+            <premis:eventOutcomeInformation>
+              <premis:eventOutcome>success</premis:eventOutcome>
+              <premis:eventOutcomeDetail>
+                <premis:eventOutcomeDetailNote>Created METS structural map of type directory</premis:eventOutcomeDetailNote>
+              </premis:eventOutcomeDetail>
+            </premis:eventOutcomeInformation>
+            <premis:linkingAgentIdentifier>
+              <premis:linkingAgentIdentifierType>local</premis:linkingAgentIdentifierType>
+              <premis:linkingAgentIdentifierValue>228d694b7b84798b3efa64cad046a36c</premis:linkingAgentIdentifierValue>
+              <premis:linkingAgentRole>executing program</premis:linkingAgentRole>
+            </premis:linkingAgentIdentifier>
+          </premis:event>
+        </mets:xmlData>
+      </mets:mdWrap>
+    </mets:digiprovMD>
+    <mets:digiprovMD ID="_1cb84311f49acab3b292faf19606bdb7" CREATED="2024-01-09T14:21:52.073130+00:00">
+      <mets:mdWrap MDTYPE="PREMIS:AGENT" MDTYPEVERSION="2.3">
+        <mets:xmlData>
+          <premis:agent>
+            <premis:agentIdentifier>
+              <premis:agentIdentifierType>local</premis:agentIdentifierType>
+              <premis:agentIdentifierValue>e5ecb88316dd7df58aef2281ad7f9a93</premis:agentIdentifierValue>
+            </premis:agentIdentifier>
+            <premis:agentName>TextEncodingMetaScraper-v0.63</premis:agentName>
+            <premis:agentType>software</premis:agentType>
+          </premis:agent>
+        </mets:xmlData>
+      </mets:mdWrap>
+    </mets:digiprovMD>
+    <mets:digiprovMD ID="_7da9d1f55db42bebe20b5921547381b3" CREATED="2024-01-09T14:21:52.084892+00:00">
+      <mets:mdWrap MDTYPE="PREMIS:EVENT" MDTYPEVERSION="2.3">
+        <mets:xmlData>
+          <premis:event>
+            <premis:eventIdentifier>
+              <premis:eventIdentifierType>UUID</premis:eventIdentifierType>
+              <premis:eventIdentifierValue>9e2ccc47-bb85-4e2f-814c-265d1c28f9c1</premis:eventIdentifierValue>
+            </premis:eventIdentifier>
+            <premis:eventType>format identification</premis:eventType>
+            <premis:eventDateTime>2024-01-09T16:21:51.695911</premis:eventDateTime>
+            <premis:eventDetail>MIME type and version identification</premis:eventDetail>
+            <premis:eventOutcomeInformation>
+              <premis:eventOutcome>success</premis:eventOutcome>
+              <premis:eventOutcomeDetail>
+                <premis:eventOutcomeDetailNote>File MIME type and format version successfully identified.</premis:eventOutcomeDetailNote>
+              </premis:eventOutcomeDetail>
+            </premis:eventOutcomeInformation>
+            <premis:linkingAgentIdentifier>
+              <premis:linkingAgentIdentifierType>local</premis:linkingAgentIdentifierType>
+              <premis:linkingAgentIdentifierValue>6a7800fa8811fa607c380ac934a5add4</premis:linkingAgentIdentifierValue>
+              <premis:linkingAgentRole>executing program</premis:linkingAgentRole>
+            </premis:linkingAgentIdentifier>
+            <premis:linkingAgentIdentifier>
+              <premis:linkingAgentIdentifierType>local</premis:linkingAgentIdentifierType>
+              <premis:linkingAgentIdentifierValue>8acf013227b420fa050b503bf186b853</premis:linkingAgentIdentifierValue>
+              <premis:linkingAgentRole>executing program</premis:linkingAgentRole>
+            </premis:linkingAgentIdentifier>
+            <premis:linkingAgentIdentifier>
+              <premis:linkingAgentIdentifierType>local</premis:linkingAgentIdentifierType>
+              <premis:linkingAgentIdentifierValue>74a1fb1adc9dcfa0f3240dca0fb83439</premis:linkingAgentIdentifierValue>
+              <premis:linkingAgentRole>executing program</premis:linkingAgentRole>
+            </premis:linkingAgentIdentifier>
+            <premis:linkingAgentIdentifier>
+              <premis:linkingAgentIdentifierType>local</premis:linkingAgentIdentifierType>
+              <premis:linkingAgentIdentifierValue>7ccab9e659ee41246c0c18fd0413f6a3</premis:linkingAgentIdentifierValue>
+              <premis:linkingAgentRole>executing program</premis:linkingAgentRole>
+            </premis:linkingAgentIdentifier>
+            <premis:linkingAgentIdentifier>
+              <premis:linkingAgentIdentifierType>local</premis:linkingAgentIdentifierType>
+              <premis:linkingAgentIdentifierValue>2317f24a21eb7c74e4e6887804a979d6</premis:linkingAgentIdentifierValue>
+              <premis:linkingAgentRole>executing program</premis:linkingAgentRole>
+            </premis:linkingAgentIdentifier>
+          </premis:event>
+        </mets:xmlData>
+      </mets:mdWrap>
+    </mets:digiprovMD>
+    <mets:digiprovMD ID="_ca5b19d729501de3a8bb8cbe2b2ef604" CREATED="2024-01-09T14:21:52.074906+00:00">
+      <mets:mdWrap MDTYPE="PREMIS:AGENT" MDTYPEVERSION="2.3">
+        <mets:xmlData>
+          <premis:agent>
+            <premis:agentIdentifier>
+              <premis:agentIdentifierType>local</premis:agentIdentifierType>
+              <premis:agentIdentifierValue>ace83bf3480c450cb5b63146bf10485f</premis:agentIdentifierValue>
+            </premis:agentIdentifier>
+            <premis:agentName>MimeMatchScraper-v0.63</premis:agentName>
+            <premis:agentType>software</premis:agentType>
+          </premis:agent>
+        </mets:xmlData>
+      </mets:mdWrap>
+    </mets:digiprovMD>
+    <mets:digiprovMD ID="_f60700e4f88efe2640e67b47793a911c" CREATED="2024-01-09T14:21:52.068431+00:00">
+      <mets:mdWrap MDTYPE="PREMIS:AGENT" MDTYPEVERSION="2.3">
+        <mets:xmlData>
+          <premis:agent>
+            <premis:agentIdentifier>
+              <premis:agentIdentifierType>local</premis:agentIdentifierType>
+              <premis:agentIdentifierValue>74a1fb1adc9dcfa0f3240dca0fb83439</premis:agentIdentifierValue>
+            </premis:agentIdentifier>
+            <premis:agentName>PredefinedDetector-v0.63</premis:agentName>
+            <premis:agentType>software</premis:agentType>
+          </premis:agent>
+        </mets:xmlData>
+      </mets:mdWrap>
+    </mets:digiprovMD>
+    <mets:digiprovMD ID="_8769b3b82fe35f3b53daa3c99cb837fd" CREATED="2024-01-09T14:21:52.118040+00:00">
+      <mets:mdWrap MDTYPE="PREMIS:EVENT" MDTYPEVERSION="2.3">
+        <mets:xmlData>
+          <premis:event>
+            <premis:eventIdentifier>
+              <premis:eventIdentifierType>UUID</premis:eventIdentifierType>
+              <premis:eventIdentifierValue>95dd30fb-a54f-4f0b-aa7f-78fdb4118d2b</premis:eventIdentifierValue>
+            </premis:eventIdentifier>
+            <premis:eventType>information package creation</premis:eventType>
+            <premis:eventDateTime>2022-02-02T00:00:00/2022-02-02T00:00:02</premis:eventDateTime>
+            <premis:eventDetail>Creation of submission information package.</premis:eventDetail>
+            <premis:eventOutcomeInformation>
+              <premis:eventOutcome>success</premis:eventOutcome>
+              <premis:eventOutcomeDetail>
+                <premis:eventOutcomeDetailNote>Submission information package created as: null</premis:eventOutcomeDetailNote>
+              </premis:eventOutcomeDetail>
+            </premis:eventOutcomeInformation>
+            <premis:linkingAgentIdentifier>
+              <premis:linkingAgentIdentifierType>local</premis:linkingAgentIdentifierType>
+              <premis:linkingAgentIdentifierValue>agent-1</premis:linkingAgentIdentifierValue>
+              <premis:linkingAgentRole>implementer</premis:linkingAgentRole>
+            </premis:linkingAgentIdentifier>
+          </premis:event>
+        </mets:xmlData>
+      </mets:mdWrap>
+    </mets:digiprovMD>
+    <mets:digiprovMD ID="_52d9bb778d98c43bb75007bd2b652e45" CREATED="2024-01-09T14:21:52.070471+00:00">
+      <mets:mdWrap MDTYPE="PREMIS:AGENT" MDTYPEVERSION="2.3">
+        <mets:xmlData>
+          <premis:agent>
+            <premis:agentIdentifier>
+              <premis:agentIdentifierType>local</premis:agentIdentifierType>
+              <premis:agentIdentifierValue>2317f24a21eb7c74e4e6887804a979d6</premis:agentIdentifierValue>
+            </premis:agentIdentifier>
+            <premis:agentName>SegYDetector-v0.63</premis:agentName>
+            <premis:agentType>software</premis:agentType>
+          </premis:agent>
+        </mets:xmlData>
+      </mets:mdWrap>
+    </mets:digiprovMD>
+    <mets:digiprovMD ID="_a7af20854c747fdc58bf48df31927730" CREATED="2024-01-09T14:21:52.069429+00:00">
+      <mets:mdWrap MDTYPE="PREMIS:AGENT" MDTYPEVERSION="2.3">
+        <mets:xmlData>
+          <premis:agent>
+            <premis:agentIdentifier>
+              <premis:agentIdentifierType>local</premis:agentIdentifierType>
+              <premis:agentIdentifierValue>7ccab9e659ee41246c0c18fd0413f6a3</premis:agentIdentifierValue>
+            </premis:agentIdentifier>
+            <premis:agentName>SiardDetector-v0.63</premis:agentName>
+            <premis:agentType>software</premis:agentType>
+          </premis:agent>
+        </mets:xmlData>
+      </mets:mdWrap>
+    </mets:digiprovMD>
+    <mets:digiprovMD ID="_0fe2fc1581b0c2b9ce74a29e083fdd6c" CREATED="2024-01-09T14:21:52.072246+00:00">
+      <mets:mdWrap MDTYPE="PREMIS:AGENT" MDTYPEVERSION="2.3">
+        <mets:xmlData>
+          <premis:agent>
+            <premis:agentIdentifier>
+              <premis:agentIdentifierType>local</premis:agentIdentifierType>
+              <premis:agentIdentifierValue>8a6756b176a21ec6feaed21df29562c2</premis:agentIdentifierValue>
+            </premis:agentIdentifier>
+            <premis:agentName>MagicTextScraper-v0.63</premis:agentName>
+            <premis:agentType>software</premis:agentType>
+          </premis:agent>
+        </mets:xmlData>
+      </mets:mdWrap>
+    </mets:digiprovMD>
+    <mets:digiprovMD ID="_ed47959bef7be8e791ba663ec856a763" CREATED="2024-01-09T14:21:52.066652+00:00">
+      <mets:mdWrap MDTYPE="PREMIS:AGENT" MDTYPEVERSION="2.3">
+        <mets:xmlData>
+          <premis:agent>
+            <premis:agentIdentifier>
+              <premis:agentIdentifierType>local</premis:agentIdentifierType>
+              <premis:agentIdentifierValue>8acf013227b420fa050b503bf186b853</premis:agentIdentifierValue>
+            </premis:agentIdentifier>
+            <premis:agentName>FidoDetector-v0.63</premis:agentName>
+            <premis:agentType>software</premis:agentType>
+          </premis:agent>
+        </mets:xmlData>
+      </mets:mdWrap>
+    </mets:digiprovMD>
+    <mets:digiprovMD ID="_b47df348fadfad5834fb946a9add10c7" CREATED="2024-01-09T14:21:52.067489+00:00">
+      <mets:mdWrap MDTYPE="PREMIS:AGENT" MDTYPEVERSION="2.3">
+        <mets:xmlData>
+          <premis:agent>
+            <premis:agentIdentifier>
+              <premis:agentIdentifierType>local</premis:agentIdentifierType>
+              <premis:agentIdentifierValue>6a7800fa8811fa607c380ac934a5add4</premis:agentIdentifierValue>
+            </premis:agentIdentifier>
+            <premis:agentName>MagicDetector-v0.63</premis:agentName>
+            <premis:agentType>software</premis:agentType>
+          </premis:agent>
+        </mets:xmlData>
+      </mets:mdWrap>
+    </mets:digiprovMD>
+    <mets:digiprovMD ID="_53508abecec4d65be419dac591119e2c" CREATED="2024-01-09T14:21:52.076220+00:00">
+      <mets:mdWrap MDTYPE="PREMIS:EVENT" MDTYPEVERSION="2.3">
+        <mets:xmlData>
+          <premis:event>
+            <premis:eventIdentifier>
+              <premis:eventIdentifierType>UUID</premis:eventIdentifierType>
+              <premis:eventIdentifierValue>4ed17ec1-c68f-4e7a-a6e8-12ba5cf576a0</premis:eventIdentifierValue>
+            </premis:eventIdentifier>
+            <premis:eventType>metadata extraction</premis:eventType>
+            <premis:eventDateTime>2024-01-09T16:21:51.695911</premis:eventDateTime>
+            <premis:eventDetail>Technical metadata extraction as premis metadata from digital objects</premis:eventDetail>
+            <premis:eventOutcomeInformation>
+              <premis:eventOutcome>success</premis:eventOutcome>
+              <premis:eventOutcomeDetail>
+                <premis:eventOutcomeDetailNote>Premis metadata successfully created from extracted technical metadata.</premis:eventOutcomeDetailNote>
+              </premis:eventOutcomeDetail>
+            </premis:eventOutcomeInformation>
+            <premis:linkingAgentIdentifier>
+              <premis:linkingAgentIdentifierType>local</premis:linkingAgentIdentifierType>
+              <premis:linkingAgentIdentifierValue>6834570bc3612163f5c8e08ef9e4c1b4</premis:linkingAgentIdentifierValue>
+              <premis:linkingAgentRole>executing program</premis:linkingAgentRole>
+            </premis:linkingAgentIdentifier>
+            <premis:linkingAgentIdentifier>
+              <premis:linkingAgentIdentifierType>local</premis:linkingAgentIdentifierType>
+              <premis:linkingAgentIdentifierValue>e5ecb88316dd7df58aef2281ad7f9a93</premis:linkingAgentIdentifierValue>
+              <premis:linkingAgentRole>executing program</premis:linkingAgentRole>
+            </premis:linkingAgentIdentifier>
+            <premis:linkingAgentIdentifier>
+              <premis:linkingAgentIdentifierType>local</premis:linkingAgentIdentifierType>
+              <premis:linkingAgentIdentifierValue>6a7800fa8811fa607c380ac934a5add4</premis:linkingAgentIdentifierValue>
+              <premis:linkingAgentRole>executing program</premis:linkingAgentRole>
+            </premis:linkingAgentIdentifier>
+            <premis:linkingAgentIdentifier>
+              <premis:linkingAgentIdentifierType>local</premis:linkingAgentIdentifierType>
+              <premis:linkingAgentIdentifierValue>ace83bf3480c450cb5b63146bf10485f</premis:linkingAgentIdentifierValue>
+              <premis:linkingAgentRole>executing program</premis:linkingAgentRole>
+            </premis:linkingAgentIdentifier>
+            <premis:linkingAgentIdentifier>
+              <premis:linkingAgentIdentifierType>local</premis:linkingAgentIdentifierType>
+              <premis:linkingAgentIdentifierValue>8acf013227b420fa050b503bf186b853</premis:linkingAgentIdentifierValue>
+              <premis:linkingAgentRole>executing program</premis:linkingAgentRole>
+            </premis:linkingAgentIdentifier>
+            <premis:linkingAgentIdentifier>
+              <premis:linkingAgentIdentifierType>local</premis:linkingAgentIdentifierType>
+              <premis:linkingAgentIdentifierValue>8a6756b176a21ec6feaed21df29562c2</premis:linkingAgentIdentifierValue>
+              <premis:linkingAgentRole>executing program</premis:linkingAgentRole>
+            </premis:linkingAgentIdentifier>
+            <premis:linkingAgentIdentifier>
+              <premis:linkingAgentIdentifierType>local</premis:linkingAgentIdentifierType>
+              <premis:linkingAgentIdentifierValue>74a1fb1adc9dcfa0f3240dca0fb83439</premis:linkingAgentIdentifierValue>
+              <premis:linkingAgentRole>executing program</premis:linkingAgentRole>
+            </premis:linkingAgentIdentifier>
+            <premis:linkingAgentIdentifier>
+              <premis:linkingAgentIdentifierType>local</premis:linkingAgentIdentifierType>
+              <premis:linkingAgentIdentifierValue>807a7670f6dbea6e3934406938dfce99</premis:linkingAgentIdentifierValue>
+              <premis:linkingAgentRole>executing program</premis:linkingAgentRole>
+            </premis:linkingAgentIdentifier>
+            <premis:linkingAgentIdentifier>
+              <premis:linkingAgentIdentifierType>local</premis:linkingAgentIdentifierType>
+              <premis:linkingAgentIdentifierValue>7ccab9e659ee41246c0c18fd0413f6a3</premis:linkingAgentIdentifierValue>
+              <premis:linkingAgentRole>executing program</premis:linkingAgentRole>
+            </premis:linkingAgentIdentifier>
+            <premis:linkingAgentIdentifier>
+              <premis:linkingAgentIdentifierType>local</premis:linkingAgentIdentifierType>
+              <premis:linkingAgentIdentifierValue>2317f24a21eb7c74e4e6887804a979d6</premis:linkingAgentIdentifierValue>
+              <premis:linkingAgentRole>executing program</premis:linkingAgentRole>
+            </premis:linkingAgentIdentifier>
+          </premis:event>
+        </mets:xmlData>
+      </mets:mdWrap>
+    </mets:digiprovMD>
+    <mets:digiprovMD ID="_0da0977f732383d1b295edd0af706357" CREATED="2024-01-09T14:21:52.121534+00:00">
+      <mets:mdWrap MDTYPE="PREMIS:AGENT" MDTYPEVERSION="2.3">
+        <mets:xmlData>
+          <premis:agent>
+            <premis:agentIdentifier>
+              <premis:agentIdentifierType>local</premis:agentIdentifierType>
+              <premis:agentIdentifierValue>c5707538028162f8754bc503d0cf944e</premis:agentIdentifierValue>
+            </premis:agentIdentifier>
+            <premis:agentName>compiler.py</premis:agentName>
+            <premis:agentType>software</premis:agentType>
+          </premis:agent>
+        </mets:xmlData>
+      </mets:mdWrap>
+    </mets:digiprovMD>
+  </mets:amdSec>
+  <mets:fileSec>
+    <mets:fileGrp>
+      <mets:file ID="_5c15e263-1e70-4fd7-853c-40638145df8a" ADMID="_6fcd312fddb45d70d7b7cf378ec2d185">
+        <mets:FLocat LOCTYPE="URL" xlink:href="file://tests/data/musicarchive/accepted_html_files/html/invalid_html.html" xlink:type="simple"/>
+      </mets:file>
+      <mets:file ID="_f0b3d158-b846-46a4-a7db-cf855a1a48cb" ADMID="_9b8741e0e4cd63729400ceb4d3c67122">
+        <mets:FLocat LOCTYPE="URL" xlink:href="file://tests/data/musicarchive/accepted_html_files/html/valid_html.html" xlink:type="simple"/>
+      </mets:file>
+    </mets:fileGrp>
+  </mets:fileSec>
+  <mets:structMap>
+    <mets:div TYPE="directory" DMDID="_f8c00927-cd3b-48a6-8d7d-a587a0b03f5f" ADMID="_0fe2fc1581b0c2b9ce74a29e083fdd6c _eb1cfc16ac5482887a5493ddde1b4afd _3caea797acae88433588c5edf2314f7d _a7af20854c747fdc58bf48df31927730 _8769b3b82fe35f3b53daa3c99cb837fd _ed47959bef7be8e791ba663ec856a763 _ca5b19d729501de3a8bb8cbe2b2ef604 _80cdea8cdac2b221218766f3d71c04f4 _68909ca33bc4d3115a3e3f6a60a50a8f _52d9bb778d98c43bb75007bd2b652e45 _9b00645ab4a334bab1e07c404e033b56 _f60700e4f88efe2640e67b47793a911c _1cb84311f49acab3b292faf19606bdb7 _c7b4bb62646885cb891811ed585263a5 _7da9d1f55db42bebe20b5921547381b3 _53508abecec4d65be419dac591119e2c _b47df348fadfad5834fb946a9add10c7 _0da0977f732383d1b295edd0af706357">
+      <mets:div TYPE="html">
+        <mets:fptr FILEID="_5c15e263-1e70-4fd7-853c-40638145df8a"/>
+        <mets:fptr FILEID="_f0b3d158-b846-46a4-a7db-cf855a1a48cb"/>
+      </mets:div>
+    </mets:div>
+  </mets:structMap>
+</mets:mets>

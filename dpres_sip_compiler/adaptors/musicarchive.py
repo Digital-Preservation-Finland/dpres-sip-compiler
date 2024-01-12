@@ -186,23 +186,25 @@ def handle_html_files(mets, source_path):
         scraper = Scraper(os.path.join(source_path, file_path))
         scraper.scrape(check_wellformed=True)
         well_formed = scraper.well_formed
+
         if well_formed is False:
             premis.modify_element_value(
                 format_elem, "formatName", "text/plain; alt-format=text/html")
             format_version_element = format_elem.xpath(
                 ".//premis:formatVersion",
                 namespaces={
-                    'premis': 'info:lc/xmlns/premis-v2'})[0]
+                    'premis': 'info:lc/xmlns/premis-v2'})
 
             if len(format_version_element) > 0:
-                format_version_element.getparent().remove(format_version_element)
+                format_version_element[0].getparent().remove(
+                    format_version_element[0])
 
     return mets
 
 
 def find_path_by_techmd_id(mets, techmd_id):
     """
-    Find the file path that matches the given METS TechMD ID.  
+    Find the file path that matches the given METS TechMD ID.
     :mets: METS XML root
     :techmd_id: TechMD element's ID value
     """

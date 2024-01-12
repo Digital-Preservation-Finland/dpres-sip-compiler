@@ -16,7 +16,6 @@ from dpres_sip_compiler.config import Config
 from dpres_sip_compiler.compiler import compile_sip
 
 
-
 def test_populate():
     """Test that CSV is populated.
     """
@@ -138,36 +137,45 @@ def test_alt_identifier(tmpdir):
         ".//premis:objectIdentifier",
         namespaces={'premis': 'info:lc/xmlns/premis-v2'})) == 2
 
-@pytest.fixture
+
+@pytest.fixture(scope="function")
 def sample_mets():
     """Well-formed sample mets"""
     return lxml.etree.parse("tests/data/mets/valid_mets.xml").getroot()
 
-@pytest.fixture
-def source_path():
+
+@pytest.fixture(scope="function")
+def path_to_files():
+    """Source path to test files"""
     return "tests/data/musicarchive/accepted_html_files"
 
-def test_handle_html_files(sample_mets, source_path):
+
+def test_handle_html_files(sample_mets, path_to_files):
     """
-    Test that invalid HTML files are marked as TXT in METS file and format version is removed.
+    Test that invalid HTML files are marked as TXT in METS file and format
+    version is removed.
     Test that for valid HTML files the METS file content does not change.
     """
-    mets_xml = handle_html_files(sample_mets, source_path)
+    mets_xml = handle_html_files(sample_mets, path_to_files)
     format_elem = mets_xml.xpath(
         ".//premis:format",
         namespaces={'premis': 'info:lc/xmlns/premis-v2'})
-    assert format_elem[0].xpath(
+    # invalid html
+    assert (format_elem[0].xpath(
         "./premis:formatDesignation/premis:formatName",
-        namespaces={'premis': 'info:lc/xmlns/premis-v2'})[0].text.strip() == "text/plain; alt-format=text/html"
-    assert format_elem[1].xpath(
-        "./premis:formatDesignation/premis:formatName",
-        namespaces={'premis': 'info:lc/xmlns/premis-v2'})[0].text.strip() == "text/html; charset=UTF-8"
+        namespaces={'premis': 'info:lc/xmlns/premis-v2'})[0].text.strip()
+        == "text/plain; alt-format=text/html")
     assert len(format_elem[0].xpath(
         "./premis:formatDesignation/premis:formatVersion",
-        namespaces={'premis': 'info:lc/xmlns/premis-v2'})) == 1
+        namespaces={'premis': 'info:lc/xmlns/premis-v2'})) == 0
+    # valid html
+    assert (format_elem[1].xpath(
+        "./premis:formatDesignation/premis:formatName",
+        namespaces={'premis': 'info:lc/xmlns/premis-v2'})[0].text.strip()
+        == "text/html; charset=UTF-8")
     assert len(format_elem[1].xpath(
         "./premis:formatDesignation/premis:formatVersion",
-        namespaces={'premis': 'info:lc/xmlns/premis-v2'})[0]) == 0
+        namespaces={'premis': 'info:lc/xmlns/premis-v2'})) == 1
 
 
 def test_object_properties():

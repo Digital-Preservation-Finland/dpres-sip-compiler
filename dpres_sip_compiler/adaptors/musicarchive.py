@@ -174,14 +174,12 @@ def handle_html_files(mets, source_path):
     if not format_elems:
         return mets
 
-    paths_by_techmd_id = get_paths_by_techmd_id(mets)
-
     for format_elem in format_elems:
         techmd_id = format_elem.xpath(
             "ancestor::mets:techMD/@ID",
             namespaces={
                 'mets': 'http://www.loc.gov/METS/'})[0]
-        file_path = paths_by_techmd_id[techmd_id]
+        file_path = find_path_by_techmd_id(mets, techmd_id)
 
         scraper = Scraper(os.path.join(source_path, file_path))
         scraper.scrape(check_wellformed=True)
@@ -200,34 +198,20 @@ def handle_html_files(mets, source_path):
     return mets
 
 
-def get_paths_by_techmd_id(mets):
+def find_path_by_techmd_id(mets, techmd_id):
     """
-    Create a dictionary with techmd_ids and their respective file paths.
-
+    Find the file path that matches the given METS TechMD ID.  
     :mets: METS XML root
+    :techmd_id: TechMD element's ID value
     """
-    path_dict = {}
-
-    techmd_ids = set()
-    for techmd_elem in metslib.iter_techmd(mets):
-        wrap = metslib.parse_mdwrap(techmd_elem)
-        wrap_mdtype_dict = metslib.parse_wrap_mdtype(wrap)
-        if wrap_mdtype_dict["mdtype"] != "PREMIS:OBJECT":
-            continue
-        techmd_id = techmd_elem.get("ID")
-        techmd_ids.add(techmd_id)
-
     for file_elem in metslib.parse_files(mets):
-        admid = metslib.parse_admid(file_elem)
-        intersection = techmd_ids.intersection(admid)
-        if len(intersection) == 1:
-            [techmd_id] = intersection
+        admid_list = metslib.parse_admid(file_elem)
+        if techmd_id in admid_list:
             flocat_elem = metslib.parse_flocats(file_elem)[0]
             href = metslib.parse_href(flocat_elem)
             file_path = href[len('file://'):]
-            path_dict[techmd_id] = file_path
 
-    return path_dict
+    return file_path
 
 
 class PremisObjectMusicArchive(PremisObject):

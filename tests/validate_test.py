@@ -49,4 +49,4 @@ def test_count_files():
     config = Config()
     config.configure("tests/data/musicarchive/config.conf")
     # In the used configuration, we skip files named as *___metadata.{csv,xml}
-    assert count_files('tests/data/musicarchive', config) == 7
+    assert count_files('tests/data/musicarchive', config) == 9

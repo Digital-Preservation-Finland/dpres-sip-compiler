@@ -106,7 +106,7 @@ def test_alt_identifier(tmpdir):
     config = Config()
     config.configure("tests/data/musicarchive/config.conf")
     sip_meta.populate("tests/data/musicarchive/source2", config)
-    sip_meta.post_tasks(str(tmpdir))
+    sip_meta.post_tasks(str(tmpdir), "tests/data/musicarchive/source2")
     mets_xml = lxml.etree.parse(mets_file).getroot()
     premis_ids = mets_xml.xpath(
         ".//premis:objectIdentifier",
@@ -132,7 +132,7 @@ def test_alt_identifier(tmpdir):
         namespaces={'premis': 'info:lc/xmlns/premis-v2'})) == 2
 
     # Test that alt ID can not be added twice
-    sip_meta.post_tasks(str(tmpdir))
+    sip_meta.post_tasks(str(tmpdir), "tests/data/musicarchive/source2")
     mets_xml = lxml.etree.parse(mets_file).getroot()
     assert len(mets_xml.xpath(
         ".//premis:objectIdentifier",

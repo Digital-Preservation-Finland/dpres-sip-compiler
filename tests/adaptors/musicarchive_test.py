@@ -138,18 +138,6 @@ def test_alt_identifier(tmpdir):
         namespaces={'premis': 'info:lc/xmlns/premis-v2'})) == 2
 
 
-@pytest.fixture(scope="function")
-def sample_mets():
-    """Well-formed sample mets"""
-    return lxml.etree.parse("tests/data/mets/valid_mets.xml").getroot()
-
-
-@pytest.fixture(scope="function")
-def path_to_files():
-    """Source path to test files"""
-    return "tests/data/musicarchive/accepted_html_files"
-
-
 def test_handle_html_files(sample_mets, path_to_files):
     """
     Test that invalid HTML files are marked as TXT in METS file and format

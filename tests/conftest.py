@@ -2,6 +2,7 @@
 """
 import os
 import tarfile
+import lxml
 from click.testing import CliRunner
 import pytest
 from dpres_sip_compiler.config import Config
@@ -69,3 +70,15 @@ def run_cli():
         return result
 
     return _run_cli
+
+
+@pytest.fixture(scope="function")
+def sample_mets():
+    """Well-formed sample mets"""
+    return lxml.etree.parse("tests/data/mets/valid_mets.xml").getroot()
+
+
+@pytest.fixture(scope="function")
+def path_to_files():
+    """Source path to test files"""
+    return "tests/data/musicarchive/accepted_html_files"

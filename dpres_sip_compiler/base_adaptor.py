@@ -109,6 +109,7 @@ class SipMetadata:
         Post tasks to workspace not supported by dpres-siptools.
 
         :workspace: Workspace path
+        :source_path: Source path of files to be packaged
         """
         pass
 

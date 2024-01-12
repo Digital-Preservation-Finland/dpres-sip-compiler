@@ -125,6 +125,7 @@ class SipMetadataMusicArchive(SipMetadata):
         future tasks are assumend to be related to METS.
 
         :workspace: Workspace path
+        :source_path: Source path of files to be packaged
         """
         mets_file = os.path.join(workspace, "mets.xml")
         mets = xml_utils.readfile(mets_file)
@@ -167,6 +168,7 @@ def handle_html_files(mets, source_path):
     the formatName to TEXT and remove formatVersion in the METS file.
 
     :mets: METS XML root
+    :source_path: Source path of files to be packaged
     """
     format_elems = mets.xpath(
         ".//premis:format[contains(.//premis:formatName, 'text/html')]",

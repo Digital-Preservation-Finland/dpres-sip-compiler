@@ -179,26 +179,15 @@ def handle_html_files(mets, source_path):
     for format_elem in format_elems:
         techmd_id = format_elem.xpath(
             "ancestor::mets:techMD/@ID",
-            namespaces={
-                'mets': 'http://www.loc.gov/METS/'})[0]
+            namespaces={'mets': 'http://www.loc.gov/METS/'})[0]
         file_path = find_path_by_techmd_id(mets, techmd_id)
 
         scraper = Scraper(os.path.join(source_path, file_path))
         scraper.scrape(check_wellformed=True)
-        well_formed = scraper.well_formed
 
-        if well_formed is False:
-            premis.modify_element_value(
-                format_elem, "formatName", "text/plain; alt-format=text/html")
-            format_version_element = format_elem.xpath(
-                ".//premis:formatVersion",
-                namespaces={
-                    'premis': 'info:lc/xmlns/premis-v2'})
-
-            if format_version_element:
-                format_version_element[0].getparent().remove(
-                    format_version_element[0])
-
+        if scraper.well_formed is False:
+            set_format_plaintext(format_elem,
+                "text/plain; alt-format=text/html")
     return mets
 
 
@@ -216,6 +205,21 @@ def find_path_by_techmd_id(mets, techmd_id):
             file_path = href[len('file://'):]
 
     return file_path
+
+def set_format_plaintext(format_element, new_value):
+    """
+    Change formatName value to given value and remove formatVersion.
+    :format_element: Object. Premis format element.
+    :new_value: String. New value of formatName element.
+    """
+    format_name_element = format_element.xpath(".//premis:formatName",
+        namespaces={'premis': 'info:lc/xmlns/premis-v2'})
+    format_name_element[0].text = new_value
+    
+    format_version_element = format_element.xpath(".//premis:formatVersion",
+        namespaces={'premis': 'info:lc/xmlns/premis-v2'})
+    if format_version_element:
+        format_version_element[0].getparent().remove(format_version_element[0])
 
 
 class PremisObjectMusicArchive(PremisObject):

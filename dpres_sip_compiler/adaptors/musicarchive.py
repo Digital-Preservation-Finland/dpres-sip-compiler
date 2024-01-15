@@ -195,7 +195,7 @@ def handle_html_files(mets, source_path):
                 namespaces={
                     'premis': 'info:lc/xmlns/premis-v2'})
 
-            if len(format_version_element) > 0:
+            if format_version_element:
                 format_version_element[0].getparent().remove(
                     format_version_element[0])
 

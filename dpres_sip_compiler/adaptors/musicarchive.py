@@ -162,6 +162,7 @@ class SipMetadataMusicArchive(SipMetadata):
 
         return mets
 
+
 def handle_html_files(mets, source_path):
     """
     Run validation on all HTML files. If the HTML file is broken, change
@@ -186,7 +187,8 @@ def handle_html_files(mets, source_path):
         scraper.scrape(check_wellformed=True)
 
         if scraper.well_formed is False:
-            set_format_plaintext(format_elem,
+            set_format_plaintext(
+                format_elem,
                 "text/plain; alt-format=text/html")
     return mets
 
@@ -206,17 +208,20 @@ def find_path_by_techmd_id(mets, techmd_id):
 
     return file_path
 
+
 def set_format_plaintext(format_element, new_value):
     """
     Change formatName value to given value and remove formatVersion.
     :format_element: Object. Premis format element.
     :new_value: String. New value of formatName element.
     """
-    format_name_element = format_element.xpath(".//premis:formatName",
+    format_name_element = format_element.xpath(
+        ".//premis:formatName",
         namespaces={'premis': 'info:lc/xmlns/premis-v2'})
     format_name_element[0].text = new_value
-    
-    format_version_element = format_element.xpath(".//premis:formatVersion",
+
+    format_version_element = format_element.xpath(
+        ".//premis:formatVersion",
         namespaces={'premis': 'info:lc/xmlns/premis-v2'})
     if format_version_element:
         format_version_element[0].getparent().remove(format_version_element[0])

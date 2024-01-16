@@ -88,7 +88,8 @@ def test_alt_identifier(tmpdir):
         <mets:mets xmlns:mets="http://www.loc.gov/METS/"
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xmlns:premis="info:lc/xmlns/premis-v2">
-        <mets:amdSec><mets:techMD ID="tech014" CREATED="2015-04-29"><mets:mdWrap><mets:xmlData>
+        <mets:amdSec><mets:techMD ID="tech014" CREATED="2015-04-29">
+        <mets:mdWrap><mets:xmlData>
         <premis:object xsi:type="premis:file">
           <premis:objectIdentifier>
             <premis:objectIdentifierType>UUID</premis:objectIdentifierType>
@@ -152,7 +153,7 @@ def test_handle_html_files(sample_mets, path_to_files):
     assert (format_elem[0].xpath(
         "./premis:formatDesignation/premis:formatName",
         namespaces={'premis': 'info:lc/xmlns/premis-v2'})[0].text.strip()
-        == "text/plain; alt-format=text/html")
+            == "text/plain; alt-format=text/html")
     assert len(format_elem[0].xpath(
         "./premis:formatDesignation/premis:formatVersion",
         namespaces={'premis': 'info:lc/xmlns/premis-v2'})) == 0
@@ -160,7 +161,7 @@ def test_handle_html_files(sample_mets, path_to_files):
     assert (format_elem[1].xpath(
         "./premis:formatDesignation/premis:formatName",
         namespaces={'premis': 'info:lc/xmlns/premis-v2'})[0].text.strip()
-        == "text/html; charset=UTF-8")
+            == "text/html; charset=UTF-8")
     assert len(format_elem[1].xpath(
         "./premis:formatDesignation/premis:formatVersion",
         namespaces={'premis': 'info:lc/xmlns/premis-v2'})) == 1

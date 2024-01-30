@@ -1,6 +1,12 @@
 Release notes
 =============
 
+Version 0.13
+------------
+
+   * Handle broken HTML files in Music Archive adaptor.
+   * Code cleanups and syntax fixes.
+
 Version 0.12
 ------------
 

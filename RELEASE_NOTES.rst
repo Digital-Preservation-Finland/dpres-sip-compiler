@@ -1,9 +1,10 @@
 Release notes
 =============
 
-Version 0.13
+Version 0.13-0.14
 ------------
 
+   * Add RHEL9 RPM spec file.
    * Handle broken HTML files in Music Archive adaptor.
    * Code cleanups and syntax fixes.
 

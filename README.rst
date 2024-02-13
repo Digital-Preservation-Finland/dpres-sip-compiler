@@ -18,46 +18,23 @@ This tool is currently a work-in-progress project, and therefore
 the possible command line interface updates may be incompatible with the
 previous versions.
 
-Installation
+Requirements
 ------------
 
-Installation and usage requires Python 3.6 or newer.
-The software is tested with Python 3.6 on Centos 7.x release.
+Installation and usage requires Python 3.9 or newer.
+The software is tested with Python 3.9 on AlmaLinux 9 release.
 
-If Pre-Ingest Tool (dpres-siptools) is installed, then it is enough to
-reactivate the environment, update the latest versions of the installed packages
-and install this software with the following commands::
+Installation using RPM packages (preferred)
+-------------------------------------------
 
-    source venv/bin/activate       # Example command
-    pip install -r requirements_github.txt --upgrade
-    pip install .
+Installation on Linux distributions is done by using the RPM Package Manager.
+See how to `configure the PAS-jakelu RPM repositories`_ to setup necessary software sources.
 
-If this is the case, you may skip the following installation guide. If there is
-no Pre-Ingest Tool environment present, the following process is needed.
+.. _configure the PAS-jakelu RPM repositories: https://www.digitalpreservation.fi/user_guide/installation_of_tools 
 
-Packages python3-devel, openssl-devel, swig and gcc are required in your system
-to install M2Crypto, which is used for signing the packages with digital
-signature.
+After the repository has been added, the package can be installed by running the following command::
 
-Create a virtual environment::
-
-    python3 -m venv venv
-
-Run the following to activate the virtual environment::
-
-    source venv/bin/activate
-
-Install the required software with commands::
-
-    pip install --upgrade pip==20.2.4 setuptools
-    pip install -r requirements_github.txt
-    pip install .
-
-See the README from file-scraper repository for additional installation
-requirements: https://github.com/Digital-Preservation-Finland/file-scraper/blob/master/README.rst
-
-To deactivate the virtual environment, run ``deactivate``. To reactivate it,
-run the ``source`` command above.
+    sudo dnf install python3-dpres-sip-compiler
 
 Configuration
 -------------
@@ -154,6 +131,33 @@ invalid results.
 If the used adaptor defined in the configuration is set to skip some files in
 compilation (for example hidden files), then these are also skipped in
 validation without any notice in the target files.
+
+Installation using Python Virtualenv for development purposes
+-------------------------------------------------------------
+
+Packages python3-devel, openssl-devel, swig and gcc are required in your system
+to install M2Crypto, which is used for signing the packages with digital
+signature.
+
+Create a virtual environment::
+
+    python3 -m venv venv
+
+Run the following to activate the virtual environment::
+
+    source venv/bin/activate
+
+Install the required software with commands::
+
+    pip install --upgrade pip==20.2.4 setuptools
+    pip install -r requirements_github.txt
+    pip install .
+
+See the README from file-scraper repository for additional installation
+requirements: https://github.com/Digital-Preservation-Finland/file-scraper/blob/master/README.rst
+
+To deactivate the virtual environment, run ``deactivate``. To reactivate it,
+run the ``source`` command above.
 
 Copyright
 ---------

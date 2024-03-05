@@ -277,7 +277,7 @@ class PremisEventMusicArchive(PremisEvent):
     """
     DETAIL_KEYS = ["tiiviste", "tiiviste-tyyppi", "tiiviste-aika",
                    "pon-korvattu-nimi", "objekti-nimi", "sip-tunniste",
-                   "event-selite"]
+                   "event-selite", "poo-sip-obj-x-rooli-selite"]
 
     def __init__(self, csv_row):
         """Initialize.
@@ -341,6 +341,9 @@ class PremisEventMusicArchive(PremisEvent):
         if self.event_type == "metadata modification":
             return "Modification of metadata."
 
+        if self.event_type in ["normalization", "migration"]:
+            return "Normalization event."
+
         raise NotImplementedError(
             "Not implemented event type '%s'." % (self.event_type))
 
@@ -386,6 +389,9 @@ class PremisEventMusicArchive(PremisEvent):
 
         if self.event_type in ["metadata modification"]:
             return "%sMetadata has been modified." % out
+
+        if self.event_type in ["normalization", "migration"]:
+            return "%sObject has been normalized." % out
 
         raise NotImplementedError(
             "Not implemented event type '%s'." % (self.event_type))

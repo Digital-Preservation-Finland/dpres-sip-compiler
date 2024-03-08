@@ -203,7 +203,8 @@ def test_event_properties():
         "tiiviste-aika": "2022-02-01 14:00:05",
         "pon-korvattu-nimi": None,
         "objekti-nimi": "filename",
-        "sip-tunniste": "sip-123"
+        "sip-tunniste": "sip-123",
+        "poo-sip-obj-x-rooli-selite": "null"
     }
     event = PremisEventMusicArchive(source_dict)
     event.add_detail_info(source_dict)
@@ -237,7 +238,8 @@ def test_event_noend(end_timestamp):
         "tiiviste-aika": None,
         "pon-korvattu-nimi": None,
         "objekti-nimi": "filename",
-        "sip-tunniste": "sip-123"
+        "sip-tunniste": "sip-123",
+        "poo-sip-obj-x-rooli-selite": "null"
     }
     event = PremisEventMusicArchive(source_dict)
     event.add_detail_info(source_dict)
@@ -259,7 +261,8 @@ def test_add_detail_info():
         "tiiviste-aika": "2022-02-01 14:00:05",
         "pon-korvattu-nimi": None,
         "objekti-nimi": "filename1",
-        "sip-tunniste": "sip-123"
+        "sip-tunniste": "sip-123",
+        "poo-sip-obj-x-rooli-selite": "null"
     }
     event = PremisEventMusicArchive(source_dict)
     event.add_detail_info(source_dict)

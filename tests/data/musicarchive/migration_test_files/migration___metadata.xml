@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+
+<metadata
+	xmlns="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://purl.org/dc/elements/1.1/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/">
+
+	<dc:title>
+		Testing linking of migrated or normalized files with their original files.
+	</dc:title>
+	<dc:description>
+		Testing linking of migrated or normalized files with their original files.
+	</dc:description>
+	<dc:publisher>
+		CSC
+	</dc:publisher>
+	<dc:identifier>
+		id-1234
+	</dc:identifier>
+
+</metadata>

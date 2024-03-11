@@ -341,8 +341,11 @@ class PremisEventMusicArchive(PremisEvent):
         if self.event_type == "metadata modification":
             return "Modification of metadata."
 
-        if self.event_type in ["normalization", "migration"]:
+        if self.event_type == "normalization":
             return "Normalization event."
+
+        if self.event_type == "migration":
+            return "Migration event."
 
         raise NotImplementedError(
             "Not implemented event type '%s'." % (self.event_type))
@@ -390,8 +393,11 @@ class PremisEventMusicArchive(PremisEvent):
         if self.event_type in ["metadata modification"]:
             return "%sMetadata has been modified." % out
 
-        if self.event_type in ["normalization", "migration"]:
+        if self.event_type == "normalization":
             return "%sObject has been normalized." % out
+
+        if self.event_type == "migration":
+            return "%sObject has been migrated." % out
 
         raise NotImplementedError(
             "Not implemented event type '%s'." % (self.event_type))

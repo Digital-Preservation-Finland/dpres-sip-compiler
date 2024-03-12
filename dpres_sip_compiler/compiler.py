@@ -119,7 +119,10 @@ class SipCompiler:
             for link in self.sip_meta.premis_linkings[
                     event.identifier].object_links:
                 obj = self.sip_meta.premis_objects[link["linking_object"]]
-                linking_objects.append(("target", obj.filepath))
+                if link["linking_object_role"]:
+                    linking_objects.append((link["linking_object_role"], obj.filepath))
+                else:
+                    linking_objects.append(("target", obj.filepath))
             premis_event(
                 event_type=event.event_type,
                 event_datetime=event.event_datetime,

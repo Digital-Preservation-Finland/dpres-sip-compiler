@@ -119,8 +119,9 @@ class SipCompiler:
             for link in self.sip_meta.premis_linkings[
                     event.identifier].object_links:
                 obj = self.sip_meta.premis_objects[link["linking_object"]]
-                if link["linking_object_role"]:
-                    linking_objects.append((link["linking_object_role"], obj.filepath))
+                obj_role = obj.__getattr__("object_role")
+                if obj_role in ["source", "outcome"]:
+                    linking_objects.append((obj_role, obj.filepath))
                 else:
                     linking_objects.append(("target", obj.filepath))
             premis_event(

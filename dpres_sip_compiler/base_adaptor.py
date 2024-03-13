@@ -344,7 +344,7 @@ class PremisLinking:
         self.object_links = []  # List of object IDs
         self.agent_links = []   # List of agent IDs and roles
 
-    def add_object_link(self, identifier, role=None):
+    def add_object_link(self, identifier):
         """Add object to linking, if it does not exist.
 
         :identifier: Object ID to be added.
@@ -354,7 +354,7 @@ class PremisLinking:
         for obj in self.object_links:
             if identifier == obj["linking_object"]:
                 return
-        self.object_links.append({"linking_object": identifier, "linking_object_role": role})
+        self.object_links.append({"linking_object": identifier})
 
     def add_agent_link(self, identifier, agent_role):
         """Add agent to linking, if it does not exist.

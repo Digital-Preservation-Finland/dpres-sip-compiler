@@ -271,7 +271,10 @@ class PremisObjectMusicArchive(PremisObject):
             raise OSError("Digital object %s was not found!"
                           "" % (self.original_name))
 
-
+    @property
+    def object_link_role(self):
+        return self.object_role
+    
 class PremisEventMusicArchive(PremisEvent):
     """
     Music Archive specific PREMIS Event handler.

@@ -119,7 +119,7 @@ class SipCompiler:
             for link in self.sip_meta.premis_linkings[
                     event.identifier].object_links:
                 obj = self.sip_meta.premis_objects[link["linking_object"]]
-                obj_role = obj.__getattr__("object_role")
+                obj_role = obj.object_link_role
                 if obj_role in ["source", "outcome"]:
                     linking_objects.append((obj_role, obj.filepath))
                 else:

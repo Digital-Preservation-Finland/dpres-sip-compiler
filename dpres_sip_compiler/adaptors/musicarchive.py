@@ -249,7 +249,8 @@ class PremisObjectMusicArchive(PremisObject):
             "message_digest": csv_row["tiiviste"],
             "alt_identifier_type": "local",
             "alt_identifier_value": csv_row["objekti-id"],
-            "object_role": csv_row["poo-sip-obj-x-rooli-selite"]
+            "object_role": csv_row["poo-sip-obj-x-rooli-selite"],
+            "event_type": csv_row["event"]
         }
         super().__init__(metadata)
 

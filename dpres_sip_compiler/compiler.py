@@ -72,30 +72,33 @@ class SipCompiler:
                           event_datetime=event_datetime,
                           event_target=".",
                           skip_wellformed_check=not self.validation)
-            streams = read_json_streams(obj.filepath, self.temp_path)
-            if any(stream["stream_type"] == "image"
-                   for stream in streams.values()):
-                create_mix(obj.filepath, workspace=self.temp_path,
-                           base_path=self.source_path)
-            if any(stream["stream_type"] == "video"
-                   for stream in streams.values()):
-                create_videomd(obj.filepath, workspace=self.temp_path,
-                               base_path=self.source_path)
-            if any(stream["stream_type"] == "audio"
-                   for stream in streams.values()):
-                create_audiomd(obj.filepath, workspace=self.temp_path,
-                               base_path=self.source_path)
-            if streams[0]["mimetype"] == "text/csv":
-                create_addml(filename=obj.filepath,
-                             workspace=self.temp_path,
-                             base_path=self.source_path,
-                             header=True,
-                             charset=streams[0]["charset"],
-                             delim=streams[0]["delimiter"],
-                             sep=streams[0]["separator"],
-                             quot=streams[0]["quotechar"])
+            self._create_technical_metadata_by_stream_type(obj)
         print("Technical metadata created for %d file(s)."
               "" % (len(self.sip_meta.premis_objects)))
+
+    def _create_technical_metadata_by_stream_type(self, obj):
+        streams = read_json_streams(obj.filepath, self.temp_path)
+        if any(stream["stream_type"] == "image"
+               for stream in streams.values()):
+            create_mix(obj.filepath, workspace=self.temp_path,
+                       base_path=self.source_path)
+        if any(stream["stream_type"] == "video"
+               for stream in streams.values()):
+            create_videomd(obj.filepath, workspace=self.temp_path,
+                           base_path=self.source_path)
+        if any(stream["stream_type"] == "audio"
+               for stream in streams.values()):
+            create_audiomd(obj.filepath, workspace=self.temp_path,
+                           base_path=self.source_path)
+        if streams[0]["mimetype"] == "text/csv":
+            create_addml(filename=obj.filepath,
+                         workspace=self.temp_path,
+                         base_path=self.source_path,
+                         header=True,
+                         charset=streams[0]["charset"],
+                         delim=streams[0]["delimiter"],
+                         sep=streams[0]["separator"],
+                         quot=streams[0]["quotechar"])
 
     def _create_provenance_metadata(self):
         """Create provenance matadata

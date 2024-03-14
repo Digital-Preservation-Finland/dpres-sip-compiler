@@ -274,14 +274,15 @@ class PremisObjectMusicArchive(PremisObject):
     @property
     def object_link_role(self):
         return self.object_role
-    
+
+
 class PremisEventMusicArchive(PremisEvent):
     """
     Music Archive specific PREMIS Event handler.
     """
     DETAIL_KEYS = ["tiiviste", "tiiviste-tyyppi", "tiiviste-aika",
                    "pon-korvattu-nimi", "objekti-nimi", "sip-tunniste",
-                   "event-selite", "poo-sip-obj-x-rooli-selite"]
+                   "event-selite"]
 
     def __init__(self, csv_row):
         """Initialize.

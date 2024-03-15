@@ -62,7 +62,6 @@ class SipCompiler:
 
             if obj.format_name is None:
                 file_format = ()
-            self._create_technical_metadata_by_stream_type(obj)
             if obj.event_type in ["migration", "normalization"]:
                 if obj.object_link_role == "source":
                     import_object(filepaths=[obj.filepath],
@@ -76,9 +75,9 @@ class SipCompiler:
                                                 obj.message_digest),
                                     event_datetime=event_datetime,
                                     event_target=".",
-                                    bit_level=True,
-                                    skip_wellformed_check=True)
-
+                                    # bit_level=True,
+                                    skip_wellformed_check=not self.validation)
+                    self._create_technical_metadata_by_stream_type(obj)
             else:
                 import_object(filepaths=[obj.filepath],
                             workspace=self.temp_path,
@@ -92,6 +91,7 @@ class SipCompiler:
                             event_datetime=event_datetime,
                             event_target=".",
                             skip_wellformed_check=not self.validation)
+                self._create_technical_metadata_by_stream_type(obj)
 
         print("Technical metadata created for %d file(s)."
               "" % (len(self.sip_meta.premis_objects)))

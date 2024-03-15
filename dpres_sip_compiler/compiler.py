@@ -56,29 +56,43 @@ class SipCompiler:
         print("Creating technical metadata for %d file(s)."
               "" % (len(self.sip_meta.premis_objects)))
         event_datetime = datetime.datetime.now().isoformat()
-        migration_pairs = []
 
         for obj in self.sip_meta.objects:
             file_format = (obj.format_name, obj.format_version)
+
             if obj.format_name is None:
                 file_format = ()
-
+            self._create_technical_metadata_by_stream_type(obj)
             if obj.event_type in ["migration", "normalization"]:
                 if obj.object_link_role == "source":
-                    migration_pairs.append()  # TODO
-                elif obj.object_link_role == "outcome":
-                    counterpart = None  # TODO
+                    import_object(filepaths=[obj.filepath],
+                                    workspace=self.temp_path,
+                                    base_path=self.source_path,
+                                    original_name=obj.original_name,
+                                    file_format=file_format,
+                                    identifier=(obj.object_identifier_type,
+                                                obj.object_identifier_value),
+                                    checksum=(obj.message_digest_algorithm,
+                                                obj.message_digest),
+                                    event_datetime=event_datetime,
+                                    event_target=".",
+                                    bit_level=True,
+                                    skip_wellformed_check=True)
 
-            for pair in migration_pairs:  # TODO
-                source_obj = pair["source"]
-                outcome_obj = pair["outcome"]
-                self.import_normalization_objects(source_obj, outcome_obj,
-                                                  event_datetime, file_format,
-                                                  obj.eventtityyppi)
             else:
-                self.import_objects(obj, event_datetime, file_format)
+                import_object(filepaths=[obj.filepath],
+                            workspace=self.temp_path,
+                            base_path=self.source_path,
+                            original_name=obj.original_name,
+                            file_format=file_format,
+                            identifier=(obj.object_identifier_type,
+                                        obj.object_identifier_value),
+                            checksum=(obj.message_digest_algorithm,
+                                        obj.message_digest),
+                            event_datetime=event_datetime,
+                            event_target=".",
+                            skip_wellformed_check=not self.validation)
 
-            self._create_technical_metadata_by_stream_type(obj)
         print("Technical metadata created for %d file(s)."
               "" % (len(self.sip_meta.premis_objects)))
 

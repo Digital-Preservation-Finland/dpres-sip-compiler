@@ -19,7 +19,7 @@ from siptools.scripts.compile_structmap import compile_structmap
 from siptools.scripts.compile_mets import compile_mets
 from siptools.scripts.sign_mets import sign_mets
 from siptools.scripts.compress import compress
-from siptools.utils import read_json_streams, fsencode_path
+from siptools.utils import read_json_streams, fsencode_path, scrape_file
 from dpres_sip_compiler.base_adaptor import build_sip_metadata
 from dpres_sip_compiler.adaptor_list import ADAPTOR_DICT
 from dpres_sip_compiler.config import (Config, get_default_config_path,
@@ -66,11 +66,13 @@ class SipCompiler:
                 self.import_objects(obj, event_datetime, file_format)
             else:
                 if obj.object_link_role == "source":
+                    results = scrape_file(os.path.join(self.source_path, obj.filepath), skip_well_check=True)
+                    format_version = (results[0][0]["mimetype"], results[0][0]["version"])
                     import_object(filepaths=[obj.filepath],
                                   workspace=self.temp_path,
                                   base_path=self.source_path,
                                   original_name=obj.original_name,
-                                  file_format=file_format,
+                                  file_format=format_version,
                                   identifier=(obj.object_identifier_type,
                                               obj.object_identifier_value),
                                   checksum=(obj.message_digest_algorithm,

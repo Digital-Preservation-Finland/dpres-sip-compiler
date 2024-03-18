@@ -62,36 +62,26 @@ class SipCompiler:
 
             if obj.format_name is None:
                 file_format = ()
-            if obj.event_type in ["migration", "normalization"]:
+            if obj.event_type not in ["migration", "normalization"]:
+                self.import_objects(obj, event_datetime, file_format)
+            else:
                 if obj.object_link_role == "source":
                     import_object(filepaths=[obj.filepath],
-                                    workspace=self.temp_path,
-                                    base_path=self.source_path,
-                                    original_name=obj.original_name,
-                                    file_format=file_format,
-                                    identifier=(obj.object_identifier_type,
-                                                obj.object_identifier_value),
-                                    checksum=(obj.message_digest_algorithm,
-                                                obj.message_digest),
-                                    event_datetime=event_datetime,
-                                    event_target=".",
-                                    # bit_level=True,
-                                    skip_wellformed_check=not self.validation)
-                    self._create_technical_metadata_by_stream_type(obj)
-            else:
-                import_object(filepaths=[obj.filepath],
-                            workspace=self.temp_path,
-                            base_path=self.source_path,
-                            original_name=obj.original_name,
-                            file_format=file_format,
-                            identifier=(obj.object_identifier_type,
-                                        obj.object_identifier_value),
-                            checksum=(obj.message_digest_algorithm,
-                                        obj.message_digest),
-                            event_datetime=event_datetime,
-                            event_target=".",
-                            skip_wellformed_check=not self.validation)
-                self._create_technical_metadata_by_stream_type(obj)
+                                  workspace=self.temp_path,
+                                  base_path=self.source_path,
+                                  original_name=obj.original_name,
+                                  file_format=file_format,
+                                  identifier=(obj.object_identifier_type,
+                                              obj.object_identifier_value),
+                                  checksum=(obj.message_digest_algorithm,
+                                            obj.message_digest),
+                                  event_datetime=event_datetime,
+                                  event_target=".",
+                                  bit_level=True,
+                                  skip_wellformed_check=True)
+                else:
+                    self.import_objects(obj, event_datetime, file_format)
+            self._create_technical_metadata_by_stream_type(obj)
 
         print("Technical metadata created for %d file(s)."
               "" % (len(self.sip_meta.premis_objects)))

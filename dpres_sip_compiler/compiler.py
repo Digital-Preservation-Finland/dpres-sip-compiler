@@ -58,62 +58,38 @@ class SipCompiler:
         event_datetime = datetime.datetime.now().isoformat()
 
         for obj in self.sip_meta.objects:
-            file_format = (obj.format_name, obj.format_version)
-
-            if obj.format_name is None:
-                file_format = ()
-            if obj.event_type not in ["migration", "normalization"]:
-                self.import_objects(obj, event_datetime, file_format)
+            if (obj.event_type in ["migration", "normalization"]
+                    and obj.object_link_role == "source"):
+                scraper_results = scrape_file(
+                    os.path.join(self.source_path, obj.filepath),
+                    skip_well_check=True)
+                file_format = (scraper_results[0][0]["mimetype"],
+                               scraper_results[0][0]["version"])
+                bit_level = True
+                skip_well_check = True
             else:
-                if obj.object_link_role == "source":
-                    results = scrape_file(os.path.join(self.source_path, obj.filepath), skip_well_check=True)
-                    format_version = (results[0][0]["mimetype"], results[0][0]["version"])
-                    import_object(filepaths=[obj.filepath],
-                                  workspace=self.temp_path,
-                                  base_path=self.source_path,
-                                  original_name=obj.original_name,
-                                  file_format=format_version,
-                                  identifier=(obj.object_identifier_type,
-                                              obj.object_identifier_value),
-                                  checksum=(obj.message_digest_algorithm,
-                                            obj.message_digest),
-                                  event_datetime=event_datetime,
-                                  event_target=".",
-                                  bit_level=True,
-                                  skip_wellformed_check=True)
-                else:
-                    self.import_objects(obj, event_datetime, file_format)
+                file_format = (obj.format_name, obj.format_version)
+                if obj.format_name is None:
+                    file_format = ()
+                bit_level = False
+                skip_well_check = not self.validation
+            import_object(filepaths=[obj.filepath],
+                          workspace=self.temp_path,
+                          base_path=self.source_path,
+                          original_name=obj.original_name,
+                          file_format=file_format,
+                          identifier=(obj.object_identifier_type,
+                                      obj.object_identifier_value),
+                          checksum=(obj.message_digest_algorithm,
+                                    obj.message_digest),
+                          event_datetime=event_datetime,
+                          event_target=".",
+                          bit_level=bit_level,
+                          skip_wellformed_check=skip_well_check)
             self._create_technical_metadata_by_stream_type(obj)
 
         print("Technical metadata created for %d file(s)."
               "" % (len(self.sip_meta.premis_objects)))
-
-    def import_objects(self, obj, event_datetime, file_format):
-        """TODO"""
-        import_object(filepaths=[obj.filepath],
-                      workspace=self.temp_path,
-                      base_path=self.source_path,
-                      original_name=obj.original_name,
-                      file_format=file_format,
-                      identifier=(obj.object_identifier_type,
-                                  obj.object_identifier_value),
-                      checksum=(obj.message_digest_algorithm,
-                                obj.message_digest),
-                      event_datetime=event_datetime,
-                      event_target=".",
-                      skip_wellformed_check=not self.validation)
-
-    def import_normalization_objects(self, source_obj, outcome_obj,
-                                     event_datetime, file_format, event_type):
-        """TODO"""
-        import_object(skip_wellformed_check=True,
-                      filepaths=[source_obj.filepath],
-                      file_format=file_format,
-                      event_datetime=event_datetime)
-        import_object(filepaths=[outcome_obj.filepath],
-                      file_format=file_format,
-                      event_datetime=event_datetime)
-        premis_event(event_type=event_type)
 
     def _create_technical_metadata_by_stream_type(self, obj):
         """TODO"""

@@ -72,7 +72,9 @@ def test_find_path():
         "objekti-nimi": "testfile1.wav",
         "tiiviste-tyyppi": "MD5",
         "tiiviste": "abc",
-        "objekti-id": "alt-123"
+        "objekti-id": "alt-123",
+        "poo-sip-obj-x-rooli-selite": "null",
+        "event": "null"
     }
     obj = PremisObjectMusicArchive(source_dict)
     obj.find_path("tests/data/musicarchive/source1")
@@ -175,7 +177,9 @@ def test_object_properties():
         "objekti-nimi": "filename",
         "tiiviste-tyyppi": "MD5",
         "tiiviste": "abc",
-        "objekti-id": "alt-123"
+        "objekti-id": "alt-123",
+        "poo-sip-obj-x-rooli-selite": "null",
+        "event": "null"
     }
     obj = PremisObjectMusicArchive(source_dict)
     assert obj.identifier == "object-id-123"

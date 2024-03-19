@@ -92,7 +92,10 @@ class SipCompiler:
               "" % (len(self.sip_meta.premis_objects)))
 
     def _create_technical_metadata_by_stream_type(self, obj):
-        """TODO"""
+        """Create stream type specific technical metadata.
+
+        :obj: PREMIS object
+        """
         streams = read_json_streams(obj.filepath, self.temp_path)
         if any(stream["stream_type"] == "image"
                for stream in streams.values()):
@@ -117,7 +120,7 @@ class SipCompiler:
                          quot=streams[0]["quotechar"])
 
     def _create_provenance_metadata(self):
-        """Create provenance matadata
+        """Create provenance metadata.
         """
         print("Creating provenance metadata for %d event(s)."
               "" % (len(self.sip_meta.premis_events)))

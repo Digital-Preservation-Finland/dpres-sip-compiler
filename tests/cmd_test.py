@@ -105,7 +105,7 @@ def test_validate(run_cli, tmpdir, summary):
             unsupported_files_count += 1
 
     # In the used configuration, we skip files named as *___metadata.{csv,xml}
-    assert supported_files_count == 7
+    assert supported_files_count == 12
     assert unsupported_files_count == 2
 
     assert os.path.isfile(

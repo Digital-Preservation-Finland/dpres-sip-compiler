@@ -58,6 +58,8 @@ class SipCompiler:
         event_datetime = datetime.datetime.now().isoformat()
 
         for obj in self.sip_meta.objects:
+            # dpres-siptools requires file-format information for objects
+            # that are marked as bit_level
             if (obj.event_type in ["migration", "normalization"]
                     and obj.object_link_role == "source"):
                 scraper_results = scrape_file(

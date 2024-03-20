@@ -58,23 +58,25 @@ class SipCompiler:
         event_datetime = datetime.datetime.now().isoformat()
 
         for obj in self.sip_meta.objects:
+            file_format = (obj.format_name, obj.format_version)
+            if obj.format_name is None:
+                file_format = ()
             # dpres-siptools requires file-format information for objects
             # that are marked as bit_level
             if (obj.event_type in ["migration", "normalization"]
                     and obj.object_link_role == "source"):
-                scraper_results = scrape_file(
-                    os.path.join(self.source_path, obj.filepath),
-                    skip_well_check=True)
-                file_format = (scraper_results[0][0]["mimetype"],
-                               scraper_results[0][0]["version"])
+                if obj.format_name is None:
+                    scraper_results = scrape_file(
+                        os.path.join(self.source_path, obj.filepath),
+                        skip_well_check=True)
+                    file_format = (scraper_results[0][0]["mimetype"],
+                                   scraper_results[0][0]["version"])
                 bit_level = True
                 skip_well_check = True
             else:
-                file_format = (obj.format_name, obj.format_version)
-                if obj.format_name is None:
-                    file_format = ()
                 bit_level = False
                 skip_well_check = not self.validation
+
             import_object(filepaths=[obj.filepath],
                           workspace=self.temp_path,
                           base_path=self.source_path,

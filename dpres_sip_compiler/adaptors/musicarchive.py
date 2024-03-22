@@ -80,9 +80,9 @@ class SipMetadataMusicArchive(SipMetadata):
         self.add_agent(PremisAgentMusicArchive(csv_row))
         self.add_linking(p_linking=PremisLinkingMusicArchive(csv_row),
                          object_id=csv_row["objekti-uuid"],
+                         object_role=csv_row["poo-sip-obj-x-rooli-selite"],
                          agent_id="agent-"+csv_row["agent-id"],
-                         agent_role=csv_row["agent-rooli"],
-                         object_role=csv_row["poo-sip-obj-x-rooli-selite"])
+                         agent_role=csv_row["agent-rooli"])
 
     def descriptive_files(self, desc_path, config):
         """
@@ -448,6 +448,7 @@ class PremisLinkingMusicArchive(PremisLinking):
         Add object to linking. Skip object adding if event type is
         'information package creation'.
         :identifier: PREMIS Object identifier
+        :object_role: Object role in event.
         """
         if self._event_type == "information package creation":
             return

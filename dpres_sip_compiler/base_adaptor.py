@@ -131,7 +131,7 @@ class SipMetadata:
         """
         add_premis(p_agent, self.premis_agents)
 
-    def add_linking(self, p_linking, object_id, agent_id, agent_role):
+    def add_linking(self, p_linking, object_id, agent_id, agent_role, object_role):
         """
         Create PREMIS linkings between events and objects/agents.
 
@@ -151,7 +151,7 @@ class SipMetadata:
         :agent_role: Role of the PREMIS Agent in linking
         """
         add_premis(p_linking, self.premis_linkings)
-        self.premis_linkings[p_linking.identifier].add_object_link(object_id)
+        self.premis_linkings[p_linking.identifier].add_object_link(object_id, object_role)
         self.premis_linkings[p_linking.identifier].add_agent_link(
             agent_id, agent_role)
 
@@ -344,7 +344,7 @@ class PremisLinking:
         self.object_links = []  # List of object IDs
         self.agent_links = []   # List of agent IDs and roles
 
-    def add_object_link(self, identifier):
+    def add_object_link(self, identifier, object_role):
         """Add object to linking, if it does not exist.
 
         :identifier: Object ID to be added.
@@ -354,7 +354,8 @@ class PremisLinking:
         for obj in self.object_links:
             if identifier == obj["linking_object"]:
                 return
-        self.object_links.append({"linking_object": identifier})
+        self.object_links.append({"linking_object": identifier,
+                                  "object_role": object_role})
 
     def add_agent_link(self, identifier, agent_role):
         """Add agent to linking, if it does not exist.

@@ -81,7 +81,8 @@ class SipMetadataMusicArchive(SipMetadata):
         self.add_linking(p_linking=PremisLinkingMusicArchive(csv_row),
                          object_id=csv_row["objekti-uuid"],
                          agent_id="agent-"+csv_row["agent-id"],
-                         agent_role=csv_row["agent-rooli"])
+                         agent_role=csv_row["agent-rooli"],
+                         object_role=csv_row["poo-sip-obj-x-rooli-selite"])
 
     def descriptive_files(self, desc_path, config):
         """
@@ -444,8 +445,9 @@ class PremisLinkingMusicArchive(PremisLinking):
         super().__init__()
         self._event_type = csv_row["event"]
         self.identifier = csv_row["event-id"]
+        self.object_role = csv_row["poo-sip-obj-x-rooli-selite"]
 
-    def add_object_link(self, identifier):
+    def add_object_link(self, identifier, object_role):
         """
         Add object to linking. Skip object adding if event type is
         'information package creation'.
@@ -453,4 +455,4 @@ class PremisLinkingMusicArchive(PremisLinking):
         """
         if self._event_type == "information package creation":
             return
-        super().add_object_link(identifier)
+        super().add_object_link(identifier, object_role)

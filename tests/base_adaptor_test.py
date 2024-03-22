@@ -139,9 +139,9 @@ def test_linkings():
     linking1 = PremisLinkingTest(1)
     linking2 = PremisLinkingTest(2)
     sip_meta = SipMetadata()
-    sip_meta.add_linking(linking1, 1, 2, "tester")
-    sip_meta.add_linking(linking2, 3, 4, "tester")
-    sip_meta.add_linking(linking1, 1, 2, "tester")  # Duplicate, not added
+    sip_meta.add_linking(linking1, 1, 2, "tester", "null")
+    sip_meta.add_linking(linking2, 3, 4, "tester", "null")
+    sip_meta.add_linking(linking1, 1, 2, "tester", "null")  # Duplicate, not added
     assert len(sip_meta.premis_linkings) == 2
     assert sip_meta.premis_linkings[1]
     assert sip_meta.premis_linkings[2]
@@ -156,11 +156,12 @@ def test_add_object_link():
     """Test that object links can be added without duplicates.
     """
     linking = PremisLinking()
-    linking.add_object_link(1)
-    linking.add_object_link(2)
-    linking.add_object_link(1)  # Duplicate, not added
+    linking.add_object_link(1, "null")
+    linking.add_object_link(2, "null")
+    linking.add_object_link(1, "null")  # Duplicate, not added
     assert linking.object_links == [
-        {"linking_object": 1}, {"linking_object": 2}]
+        {"linking_object": 1, "object_role": "null"},
+        {"linking_object": 2, "object_role": "null"}]
 
 
 def test_add_agent_link():

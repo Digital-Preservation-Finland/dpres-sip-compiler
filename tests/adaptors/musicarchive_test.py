@@ -313,10 +313,11 @@ def test_skip_object():
     """
     source_row = {
         "event-id": "event-id-123",
-        "event": "information package creation"
+        "event": "information package creation",
+        "poo-sip-obj-x-rooli-selite": "null"
     }
     linking = PremisLinkingMusicArchive(source_row)
-    linking.add_object_link(1)
+    linking.add_object_link(1, "null")
     assert linking.object_links == []
 
 

@@ -62,7 +62,7 @@ class SipCompiler:
             if obj.format_name is None:
                 file_format = ()
             if (obj.event_type in ["migration", "normalization"]
-                    and obj.object_link_role == "source"):
+                    and obj.object_role == "source"):
                 # dpres-siptools requires file-format information for objects
                 # that are marked as bit_level
                 if obj.format_name is None:
@@ -144,8 +144,9 @@ class SipCompiler:
             linking_objects = []
             for link in self.sip_meta.premis_linkings[
                     event.identifier].object_links:
-                obj = self.sip_meta.premis_objects[link["linking_object"]]
-                obj_role = obj.object_link_role
+                obj, obj_role = (self.sip_meta.premis_objects[
+                                 link["linking_object"]],
+                                 link["object_role"])
                 if obj_role in ["source", "outcome"]:
                     linking_objects.append((obj_role, obj.filepath))
                 else:

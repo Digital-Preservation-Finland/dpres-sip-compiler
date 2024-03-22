@@ -61,10 +61,10 @@ class SipCompiler:
             file_format = (obj.format_name, obj.format_version)
             if obj.format_name is None:
                 file_format = ()
-            # dpres-siptools requires file-format information for objects
-            # that are marked as bit_level
             if (obj.event_type in ["migration", "normalization"]
                     and obj.object_link_role == "source"):
+                # dpres-siptools requires file-format information for objects
+                # that are marked as bit_level
                 if obj.format_name is None:
                     scraper_results = scrape_file(
                         os.path.join(self.source_path, obj.filepath),

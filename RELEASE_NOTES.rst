@@ -1,6 +1,13 @@
 Release notes
 =============
 
+
+Unreleased
+----------
+
+   * Handle normalization and migration events with correct linking in
+     Music Archive Adaptor.
+
 Version 0.15
 ------------
 

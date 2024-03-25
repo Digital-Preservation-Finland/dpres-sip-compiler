@@ -178,7 +178,7 @@ def test_object_properties():
         "tiiviste-tyyppi": "MD5",
         "tiiviste": "abc",
         "objekti-id": "alt-123",
-        "poo-sip-obj-x-rooli-selite": "null",
+        "poo-sip-obj-x-rooli-selite": "source",
         "event": "null"
     }
     obj = PremisObjectMusicArchive(source_dict)
@@ -190,6 +190,7 @@ def test_object_properties():
     assert obj.message_digest == "abc"
     assert obj.alt_identifier_type == "local"
     assert obj.alt_identifier_value == "alt-123"
+    assert obj.object_role == "source"
 
 
 def test_event_properties():
@@ -342,6 +343,6 @@ def test_skip_hidden(tmpdir, pick_files_tar):
 
     assert os.path.isfile(tar_file)
     tar_list = pick_files_tar(tar_file, None, None)
-    assert not "./.hidden_file" in tar_list
+    assert "./.hidden_file" not in tar_list
     assert "./mets.xml" in tar_list
     assert "./signature.sig" in tar_list

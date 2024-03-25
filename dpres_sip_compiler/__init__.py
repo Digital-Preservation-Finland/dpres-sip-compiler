@@ -1,2 +1,2 @@
 """dpres-sip-compiler module."""
-__version__ = '0.14'
+__version__ = '0.15'

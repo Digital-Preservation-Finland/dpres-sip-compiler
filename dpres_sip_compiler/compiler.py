@@ -61,8 +61,7 @@ class SipCompiler:
             file_format = (obj.format_name, obj.format_version)
             if obj.format_name is None:
                 file_format = ()
-            if (obj.event_type in ["migration", "normalization"]
-                    and obj.object_role == "source"):
+            if obj.bit_level:
                 # dpres-siptools requires file-format information for objects
                 # that are marked as bit_level
                 if obj.format_name is None:
@@ -71,10 +70,8 @@ class SipCompiler:
                         skip_well_check=True)
                     file_format = (scraper_results[0][0]["mimetype"],
                                    scraper_results[0][0]["version"])
-                bit_level = True
                 skip_well_check = True
             else:
-                bit_level = False
                 skip_well_check = not self.validation
 
             import_object(filepaths=[obj.filepath],
@@ -88,7 +85,7 @@ class SipCompiler:
                                     obj.message_digest),
                           event_datetime=event_datetime,
                           event_target=".",
-                          bit_level=bit_level,
+                          bit_level=obj.bit_level,
                           skip_wellformed_check=skip_well_check)
             self._create_technical_metadata_by_stream_type(obj)
 

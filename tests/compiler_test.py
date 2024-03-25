@@ -170,6 +170,72 @@ def test_provenance(tmpdir, prepare_workspace):
     assert agent_xml.xpath(".//premis:agentType",
                            namespaces=NAMESPACES)[0].text == "person"
 
+def _get_provenance_for_normalization(temp_path):
+    """
+    To do
+    """
+    event_xml_list = []
+    for root, _, files in os.walk(temp_path, topdown=False):
+        for name in files:
+            if name.endswith("PREMIS%3AEVENT-amd.xml"):
+                file_path = os.path.join(root, name)
+                parsed_xml = lxml.etree.parse(file_path)
+                event_type_element = parsed_xml.xpath(
+                    ".//premis:eventType",
+                    namespaces=NAMESPACES)
+                if event_type_element and event_type_element[0].text in \
+                    ["normalization", "migration"]:
+                    event_xml_list.append(parsed_xml)
+    return event_xml_list
+
+
+def test_normalization_events(tmpdir, prepare_workspace):
+    """
+    To do
+    """
+    (source_path, _, temp_path, config) = prepare_workspace(
+        tmpdir,
+        source="migration_test_files")
+    sip_meta = build_sip_metadata(ADAPTOR_DICT, source_path, config)
+    compiler = SipCompiler(source_path=source_path, temp_path=temp_path,
+                           config=config, sip_meta=sip_meta)
+    compiler._create_technical_metadata()
+    compiler._create_provenance_metadata()
+    event_xml_list = _get_provenance_for_normalization(temp_path)
+    for event in event_xml_list:
+        event_type_element = event.xpath(
+                                ".//premis:eventType",
+                                namespaces=NAMESPACES)[0]
+        if event_type_element.text == "migration":
+            original_file_obj = event.xpath(
+                './/premis:linkingObjectIdentifier \
+                [premis:linkingObjectIdentifierValue="tunniste-12"]',
+                namespaces=NAMESPACES)[0]
+            assert original_file_obj.xpath(
+                ".//premis:linkingObjectRole",
+                namespaces=NAMESPACES)[0].text == "source"
+            migrated_file_objs = event.xpath(
+                './/premis:linkingObjectIdentifier \
+                [premis:linkingObjectRole="outcome"]',
+                namespaces=NAMESPACES)
+            assert len(migrated_file_objs) == 2
+
+        if event_type_element.text == "normalization":
+            original_file_obj = event.xpath(
+                './/premis:linkingObjectIdentifier \
+                [premis:linkingObjectIdentifierValue="tunniste-1"]',
+                namespaces=NAMESPACES)[0]
+            assert original_file_obj.xpath(
+                ".//premis:linkingObjectRole",
+                namespaces=NAMESPACES)[0].text == "source"
+            normalized_file_obj = event.xpath(
+                './/premis:linkingObjectIdentifier \
+                [premis:linkingObjectIdentifierValue="tunniste-2"]',
+                namespaces=NAMESPACES)[0]
+            assert normalized_file_obj.xpath(
+                ".//premis:linkingObjectRole",
+                namespaces=NAMESPACES)[0].text == "outcome"
+
 
 def test_descriptive(tmpdir, prepare_workspace):
     """

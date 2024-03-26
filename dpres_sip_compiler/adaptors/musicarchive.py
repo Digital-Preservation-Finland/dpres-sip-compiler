@@ -250,7 +250,7 @@ class PremisObjectMusicArchive(PremisObject):
             "message_digest": csv_row["tiiviste"],
             "alt_identifier_type": "local",
             "alt_identifier_value": csv_row["objekti-id"],
-            "bit_level": self.set_bit_level_status(csv_row)
+            "bit_level": False
         }
         super().__init__(metadata)
 
@@ -271,18 +271,6 @@ class PremisObjectMusicArchive(PremisObject):
         if not found:
             raise OSError("Digital object %s was not found!"
                           "" % (self.original_name))
-
-    def set_bit_level_status(self, csv_row):
-        """
-        Set bit level status based on event type and object role.
-        :csv_row: One row from a CSV file.
-        """
-        obj_event_type = csv_row["event"]
-        obj_event_role = csv_row["poo-sip-obj-x-rooli-selite"]
-        if all((obj_event_type in ["normalization", "migration"],
-                obj_event_role == "source")):
-            return True
-        return False
 
 
 class PremisEventMusicArchive(PremisEvent):

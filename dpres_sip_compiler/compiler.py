@@ -56,7 +56,7 @@ class SipCompiler:
         print("Creating technical metadata for %d file(s)."
               "" % (len(self.sip_meta.premis_objects)))
         event_datetime = datetime.datetime.now().isoformat()
-
+        self._set_bit_level_for_objects()
         for obj in self.sip_meta.objects:
             file_format = (obj.format_name, obj.format_version)
             if obj.format_name is None:
@@ -91,6 +91,20 @@ class SipCompiler:
 
         print("Technical metadata created for %d file(s)."
               "" % (len(self.sip_meta.premis_objects)))
+
+    def _set_bit_level_for_objects(self):
+        """
+        Set bit level to True for objects that are source files in
+        normalization and migration events.
+        """
+        for event in self.sip_meta.events:
+            for link in self.sip_meta.premis_linkings[
+                    event.identifier].object_links:
+                        obj, obj_role = (self.sip_meta.premis_objects[
+                                            link["linking_object"]],
+                                            link["object_role"])
+                        if obj_role == "source":
+                            obj.bit_level = True
 
     def _create_technical_metadata_by_stream_type(self, obj):
         """Create stream type specific technical metadata.

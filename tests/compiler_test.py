@@ -21,6 +21,7 @@ NAMESPACES = {
     'premis': 'info:lc/xmlns/premis-v2',
     'fi': 'http://digitalpreservation.fi/schemas/mets/fi-extensions',
     'audiomd': 'http://www.loc.gov/audioMD/',
+    'xlink': 'http://www.w3.org/1999/xlink',
 }
 
 
@@ -235,6 +236,32 @@ def test_normalization_events(tmpdir, prepare_workspace):
             assert normalized_file_obj.xpath(
                 ".//premis:linkingObjectRole",
                 namespaces=NAMESPACES)[0].text == "outcome"
+
+
+def test_bit_level_files(tmpdir, prepare_workspace):
+    """Test that a file imported for bit-level preservation gets a
+    correct USE value.
+    """
+
+    (source_path, _, temp_path, config) = prepare_workspace(
+        tmpdir, source="migration_test_files")
+    sip_meta = build_sip_metadata(ADAPTOR_DICT, source_path, config)
+    compiler = SipCompiler(source_path=source_path, temp_path=temp_path,
+                           config=config, sip_meta=sip_meta)
+    compiler._create_technical_metadata()
+    compiler._compile_metadata()
+
+    mets_xml = lxml.etree.parse(os.path.join(temp_path, "mets.xml"))
+    assert mets_xml.xpath(
+        "/mets:mets/mets:fileSec/mets:fileGrp/mets:file"
+        "[mets:FLocat/@xlink:href='file://files/test_file_original_01.txt']/"
+        "@USE",
+        namespaces=NAMESPACES)[0] == "fi-dpres-no-file-format-validation"
+    assert mets_xml.xpath(
+        "/mets:mets/mets:fileSec/mets:fileGrp/mets:file"
+        "[mets:FLocat/@xlink:href='file://files/test_file_original_02.txt']/"
+        "@USE",
+        namespaces=NAMESPACES)[0] == "fi-dpres-no-file-format-validation"
 
 
 def test_descriptive(tmpdir, prepare_workspace):

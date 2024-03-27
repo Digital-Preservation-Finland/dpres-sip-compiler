@@ -171,9 +171,14 @@ def test_provenance(tmpdir, prepare_workspace):
     assert agent_xml.xpath(".//premis:agentType",
                            namespaces=NAMESPACES)[0].text == "person"
 
+
 def _get_provenance_for_normalization(temp_path):
     """
-    To do
+    Find 'normalization' and 'migration' events from temporary files.
+
+    :temp_path: Path for temporary files
+    :returns: List of Event XML trees
+
     """
     event_xml_list = []
     for root, _, files in os.walk(temp_path, topdown=False):
@@ -185,14 +190,20 @@ def _get_provenance_for_normalization(temp_path):
                     ".//premis:eventType",
                     namespaces=NAMESPACES)
                 if event_type_element and event_type_element[0].text in \
-                    ["normalization", "migration"]:
+                        ["normalization", "migration"]:
                     event_xml_list.append(parsed_xml)
     return event_xml_list
 
 
 def test_normalization_events(tmpdir, prepare_workspace):
     """
-    To do
+    The tests are run with the Music Archive adaptor, because in
+    the time of writing, this is the only existing adaptor.
+
+    Test that the content of 'normalization' and 'migration' events
+    with linked 'source' and 'outcome' files added to METS meet the
+    info found in the given CSV file.
+
     """
     (source_path, _, temp_path, config) = prepare_workspace(
         tmpdir,

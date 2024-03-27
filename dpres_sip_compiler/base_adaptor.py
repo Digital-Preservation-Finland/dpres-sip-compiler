@@ -202,7 +202,8 @@ class PremisObject:
                     "object_identifier_value",
                     "original_name",
                     "message_digest_algorithm",
-                    "message_digest"]:
+                    "message_digest",
+                    "bit_level"]:
             if key not in self._metadata:
                 self._metadata[key] = None
 

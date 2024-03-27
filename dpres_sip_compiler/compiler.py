@@ -102,7 +102,6 @@ class SipCompiler:
                 obj, obj_role = (self.sip_meta.premis_objects[
                                 obj_link["linking_object"]],
                                 obj_link["object_role"])
-                obj.bit_level = False
                 if obj_role == "source":
                     obj.bit_level = True
 

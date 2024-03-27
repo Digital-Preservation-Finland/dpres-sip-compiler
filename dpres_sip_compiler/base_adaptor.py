@@ -206,6 +206,7 @@ class PremisObject:
                     "bit_level"]:
             if key not in self._metadata:
                 self._metadata[key] = None
+        self._metadata["bit_level"] = False
 
     def __getattr__(self, attr):
         """

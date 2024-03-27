@@ -97,14 +97,13 @@ class SipCompiler:
         Set bit level to True for objects that are source files in
         normalization and migration events.
         """
-        for event in self.sip_meta.events:
-            for link in self.sip_meta.premis_linkings[
-                    event.identifier].object_links:
-                        obj, obj_role = (self.sip_meta.premis_objects[
-                                            link["linking_object"]],
-                                            link["object_role"])
-                        if obj_role == "source":
-                            obj.bit_level = True
+        for link in self.sip_meta.premis_linkings.values():
+            for obj_link in link.object_links:
+                obj, obj_role = (self.sip_meta.premis_objects[
+                                    obj_link["linking_object"]],
+                                    obj_link["object_role"])
+                if obj_role == "source":
+                    obj.bit_level = True
 
     def _create_technical_metadata_by_stream_type(self, obj):
         """Create stream type specific technical metadata.

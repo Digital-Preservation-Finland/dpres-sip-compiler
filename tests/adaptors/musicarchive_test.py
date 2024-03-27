@@ -178,8 +178,7 @@ def test_object_properties():
         "tiiviste-tyyppi": "MD5",
         "tiiviste": "abc",
         "objekti-id": "alt-123",
-        "poo-sip-obj-x-rooli-selite": "source",
-        "event": "null"
+        "bit_level": False,
     }
     obj = PremisObjectMusicArchive(source_dict)
     assert obj.identifier == "object-id-123"
@@ -190,7 +189,7 @@ def test_object_properties():
     assert obj.message_digest == "abc"
     assert obj.alt_identifier_type == "local"
     assert obj.alt_identifier_value == "alt-123"
-    assert obj.object_role == "source"
+    assert obj.bit_level == False
 
 
 def test_event_properties():
@@ -209,7 +208,6 @@ def test_event_properties():
         "pon-korvattu-nimi": None,
         "objekti-nimi": "filename",
         "sip-tunniste": "sip-123",
-        "poo-sip-obj-x-rooli-selite": "null"
     }
     event = PremisEventMusicArchive(source_dict)
     event.add_detail_info(source_dict)
@@ -244,7 +242,6 @@ def test_event_noend(end_timestamp):
         "pon-korvattu-nimi": None,
         "objekti-nimi": "filename",
         "sip-tunniste": "sip-123",
-        "poo-sip-obj-x-rooli-selite": "null"
     }
     event = PremisEventMusicArchive(source_dict)
     event.add_detail_info(source_dict)
@@ -267,7 +264,6 @@ def test_add_detail_info():
         "pon-korvattu-nimi": None,
         "objekti-nimi": "filename1",
         "sip-tunniste": "sip-123",
-        "poo-sip-obj-x-rooli-selite": "null"
     }
     event = PremisEventMusicArchive(source_dict)
     event.add_detail_info(source_dict)

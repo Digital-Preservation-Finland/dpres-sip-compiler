@@ -2,7 +2,7 @@ Release notes
 =============
 
 
-Unreleased
+Version 0.16
 ----------
 
    * Handle normalization and migration events with correct linking in

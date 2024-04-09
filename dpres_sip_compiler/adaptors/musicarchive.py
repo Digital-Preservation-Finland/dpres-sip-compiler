@@ -441,6 +441,11 @@ class PremisLinkingMusicArchive(PremisLinking):
         self._event_type = csv_row["event"]
         self.identifier = csv_row["event-id"]
         self.object_role = csv_row["poo-sip-obj-x-rooli-selite"]
+        self.counterpart_obj_uuid = csv_row["poo-vastinpari-obj-uuid"]
+        self.counterpart_obj_id = csv_row["poo-vastinpari-obj-id"]
+        self.counterpart_obj_name = csv_row["poo-vastinpari-obj-nimi"]
+        self.counterpart_obj_status = csv_row["poo-vastinpari-obj-status"]
+
 
     def add_object_link(self, identifier, object_role):
         """

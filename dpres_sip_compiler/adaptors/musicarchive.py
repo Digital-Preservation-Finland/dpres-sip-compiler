@@ -456,4 +456,6 @@ class PremisLinkingMusicArchive(PremisLinking):
         """
         if self._event_type == "information package creation":
             return
+        if self.counterpart_obj_status == "xxx":
+            super().add_object_link(self.counterpart_obj_uuid, "source")  #source?
         super().add_object_link(identifier, object_role)

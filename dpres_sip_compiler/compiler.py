@@ -99,11 +99,14 @@ class SipCompiler:
         """
         for link in self.sip_meta.premis_linkings.values():
             for obj_link in link.object_links:
-                obj, obj_role = (self.sip_meta.premis_objects[
-                                obj_link["linking_object"]],
-                                obj_link["object_role"])
-                if obj_role == "source":
-                    obj.bit_level = True
+                if obj_link["linking_object"] not in self.sip_meta.premis_objects.keys():
+                    pass
+                else:
+                    obj, obj_role = (self.sip_meta.premis_objects[
+                                    obj_link["linking_object"]],
+                                    obj_link["object_role"])
+                    if obj_role == "source":
+                        obj.bit_level = True
 
     def _create_technical_metadata_by_stream_type(self, obj):
         """Create stream type specific technical metadata.
@@ -154,13 +157,17 @@ class SipCompiler:
             linking_objects = []
             for link in self.sip_meta.premis_linkings[
                     event.identifier].object_links:
-                obj, obj_role = (self.sip_meta.premis_objects[
-                                 link["linking_object"]],
-                                 link["object_role"])
-                if obj_role in ["source", "outcome"]:
-                    linking_objects.append((obj_role, obj.filepath))
+                if link["linking_object"] not in self.sip_meta.premis_objects.keys():
+                    if link["object_role"] == "source":
+                        linking_objects.append((link["object_role"], "files/"))
                 else:
-                    linking_objects.append(("target", obj.filepath))
+                    obj, obj_role = (self.sip_meta.premis_objects[
+                                    link["linking_object"]],
+                                    link["object_role"])
+                    if obj_role in ["source", "outcome"]:
+                        linking_objects.append((obj_role, obj.filepath))
+                    else:
+                        linking_objects.append(("target", obj.filepath))
             premis_event(
                 event_type=event.event_type,
                 event_datetime=event.event_datetime,

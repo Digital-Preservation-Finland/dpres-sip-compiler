@@ -64,6 +64,7 @@ class SipMetadata:
         self.premis_events = {}     # PREMIS Events
         self.premis_agents = {}     # PREMIS Agents
         self.premis_linkings = {}   # Linkings inside PREMIS
+        self.premis_representations = {}  # Missing native files
 
     def populate(self, source_path, config):
         """Create metadata objects based on source path.
@@ -157,6 +158,13 @@ class SipMetadata:
             object_id, object_role)
         self.premis_linkings[p_linking.identifier].add_agent_link(
             agent_id, agent_role)
+
+    def add_representation_object(self, p_object):
+        """
+        To do
+        """
+        
+        add_premis(p_object, self.premis_representations)
 
     @property
     def objects(self):
@@ -376,3 +384,37 @@ class PremisLinking:
                 return
         self.agent_links.append({"linking_agent": identifier,
                                  "agent_role": agent_role})
+
+class PremisRepresentation:
+
+    def __init__(self, metadata):
+        """Initialize xxx.
+        :metadata: Metadata dict for xxx.
+        """
+        self._metadata = metadata
+        for key in ["object_identifier_type",
+                    "object_identifier_value",
+                    "alt_identifier_type",
+                    "alt_identifier_value",
+                    "original_name",
+                    "object_status"]:
+            if key not in self._metadata:
+                self._metadata[key] = None
+
+    def __getattr__(self, attr):
+        """
+        Set metadata items as properties.
+        :attr: Attribute name
+        :returns: Value for given attribute or None
+        """
+        if attr in self._metadata:
+            return self._metadata[attr]
+
+        return None
+
+    @property
+    def identifier(self):
+        """Identifier of XXX Object, to be used as internal id.
+        PREMIS objectIdentifierValue by default.
+        """
+        return self.object_identifier_value

@@ -10,7 +10,7 @@ import mets as metslib
 from file_scraper.scraper import Scraper
 from xml_helpers import utils as xml_utils
 from dpres_sip_compiler.base_adaptor import (
-    SipMetadata, PremisObject, PremisEvent, PremisAgent, PremisLinking)
+    PremisRepresentation, SipMetadata, PremisObject, PremisEvent, PremisAgent, PremisLinking)
 
 
 def read_csv_file(filename):
@@ -83,6 +83,7 @@ class SipMetadataMusicArchive(SipMetadata):
                          object_role=csv_row["poo-sip-obj-x-rooli-selite"],
                          agent_id="agent-"+csv_row["agent-id"],
                          agent_role=csv_row["agent-rooli"])
+        self.add_representation_object(PremisRepresentationMusicArchive(csv_row))
 
     def descriptive_files(self, desc_path, config):
         """
@@ -459,3 +460,18 @@ class PremisLinkingMusicArchive(PremisLinking):
         if self.counterpart_obj_status == "xxx":
             super().add_object_link(self.counterpart_obj_uuid, "source")  #source?
         super().add_object_link(identifier, object_role)
+
+class PremisRepresentationMusicArchive(PremisRepresentation):
+    
+    def __init__(self, csv_row):
+        
+
+        metadata = {
+            "object_identifier_type": "UUID",
+            "object_identifier_value": csv_row["poo-vastinpari-obj-uuid"],
+            "original_name": csv_row["poo-vastinpari-obj-nimi"],
+            "alt_identifier_type": "local",
+            "alt_identifier_value": csv_row["poo-vastinpari-obj-id"],
+            "object_status": csv_row["poo-vastinpari-obj-status"]
+        }
+        super().__init__(metadata)

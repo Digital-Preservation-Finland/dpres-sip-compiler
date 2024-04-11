@@ -7,7 +7,7 @@ import os
 import subprocess
 import re
 import datetime
-from siptools.scripts.import_object import import_object
+from siptools.scripts.import_object import import_object, import_representation_object
 from siptools.scripts.create_mix import create_mix
 from siptools.scripts.create_videomd import create_videomd
 from siptools.scripts.create_audiomd import create_audiomd
@@ -155,13 +155,10 @@ class SipCompiler:
                     create_agent_file="siptools-tmp-%s-agent-file"
                                       "" % event.identifier)
             linking_objects = []
-            missing_native_file_objects = []
             for link in self.sip_meta.premis_linkings[
                     event.identifier].object_links:
                 if link["linking_object"] not in self.sip_meta.premis_objects.keys():
-                    if self.sip_meta.premis_representations[link["linking_object"]].object_status == "xxx":
-                        # missing_native_file_objects.append(link["linking_object"])
-                        linking_objects.append((link["object_role"], "files/"))
+                    linking_objects.append((link["object_role"], ""))
                 else:
                     obj, obj_role = (self.sip_meta.premis_objects[
                                     link["linking_object"]],
@@ -182,9 +179,12 @@ class SipCompiler:
                 create_agent_file="siptools-tmp-%s-agent-file"
                                   "" % event.identifier,
                 add_object_links=True)
-            # luodaan representation kaikista missing_native_file_objects:n obj
         print("Provenance metadata created for %d event(s)."
               "" % (len(self.sip_meta.premis_events)))
+        
+        for obj in self.sip_meta.premis_representations.values():
+            import_representation_object(self.temp_path, obj)
+        
 
     def _import_descriptive_metadata(self):
         """Import descriptive metadata

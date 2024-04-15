@@ -10,7 +10,8 @@ import mets as metslib
 from file_scraper.scraper import Scraper
 from xml_helpers import utils as xml_utils
 from dpres_sip_compiler.base_adaptor import (
-    PremisRepresentation, SipMetadata, PremisObject, PremisEvent, PremisAgent, PremisLinking)
+    PremisRepresentation, SipMetadata, PremisObject, PremisEvent, PremisAgent,
+    PremisLinking)
 
 
 def read_csv_file(filename):
@@ -435,7 +436,6 @@ class PremisLinkingMusicArchive(PremisLinking):
     """
     Music Archive specific PREMIS Linking handler.
     """
-
     def __init__(self, csv_row):
         """Initialize.
         :csv_row: One row from a CSV file.
@@ -449,7 +449,6 @@ class PremisLinkingMusicArchive(PremisLinking):
         self.counterpart_obj_name = csv_row["poo-vastinpari-obj-nimi"]
         self.counterpart_obj_status = csv_row["poo-vastinpari-obj-status"]
 
-
     def add_object_link(self, identifier, object_role):
         """
         Add object to linking. Skip object adding if event type is
@@ -460,14 +459,16 @@ class PremisLinkingMusicArchive(PremisLinking):
         if self._event_type == "information package creation":
             return
         if self.counterpart_obj_status == "xxx":
-            super().add_object_link(self.counterpart_obj_uuid, "source")  #source?
+            super().add_object_link(self.counterpart_obj_uuid, "source")
         super().add_object_link(identifier, object_role)
 
-class PremisRepresentationMusicArchive(PremisRepresentation):
-    
-    def __init__(self, csv_row):
-        
 
+class PremisRepresentationMusicArchive(PremisRepresentation):
+    """Music Archive specific PREMIS Representation handler."""
+    def __init__(self, csv_row):
+        """Initialize.
+        :csv_row: One row from a CSV file.
+        """
         metadata = {
             "object_identifier_type": "UUID",
             "object_identifier_value": csv_row["poo-vastinpari-obj-uuid"],

@@ -7,7 +7,8 @@ import os
 import subprocess
 import re
 import datetime
-from siptools.scripts.import_object import import_object, import_representation_object
+from siptools.scripts.import_object import (import_object,
+                                            import_representation_object)
 from siptools.scripts.create_mix import create_mix
 from siptools.scripts.create_videomd import create_videomd
 from siptools.scripts.create_audiomd import create_audiomd
@@ -99,12 +100,13 @@ class SipCompiler:
         """
         for link in self.sip_meta.premis_linkings.values():
             for obj_link in link.object_links:
-                if obj_link["linking_object"] not in self.sip_meta.premis_objects.keys():
+                if (obj_link["linking_object"] not in
+                        self.sip_meta.premis_objects.keys()):
                     pass
                 else:
                     obj, obj_role = (self.sip_meta.premis_objects[
-                                    obj_link["linking_object"]],
-                                    obj_link["object_role"])
+                        obj_link["linking_object"]],
+                                     obj_link["object_role"])
                     if obj_role == "source":
                         obj.bit_level = True
 
@@ -157,12 +159,13 @@ class SipCompiler:
             linking_objects = []
             for link in self.sip_meta.premis_linkings[
                     event.identifier].object_links:
-                if link["linking_object"] not in self.sip_meta.premis_objects.keys():
+                if (link["linking_object"] not in
+                        self.sip_meta.premis_objects.keys()):
                     linking_objects.append((link["object_role"], ""))
                 else:
                     obj, obj_role = (self.sip_meta.premis_objects[
-                                    link["linking_object"]],
-                                    link["object_role"])
+                        link["linking_object"]],
+                                     link["object_role"])
                     if obj_role in ["source", "outcome"]:
                         linking_objects.append((obj_role, obj.filepath))
                     else:
@@ -181,10 +184,9 @@ class SipCompiler:
                 add_object_links=True)
         print("Provenance metadata created for %d event(s)."
               "" % (len(self.sip_meta.premis_events)))
-        
+
         for obj in self.sip_meta.premis_representations.values():
             import_representation_object(self.temp_path, obj)
-        
 
     def _import_descriptive_metadata(self):
         """Import descriptive metadata

@@ -161,9 +161,10 @@ class SipMetadata:
 
     def add_representation_object(self, p_object):
         """
-        To do
+        Add PREMIS representation object to a dict.
+
+        :p_object: PREMIS representation object
         """
-        
         add_premis(p_object, self.premis_representations)
 
     @property
@@ -385,11 +386,14 @@ class PremisLinking:
         self.agent_links.append({"linking_agent": identifier,
                                  "agent_role": agent_role})
 
-class PremisRepresentation:
 
+class PremisRepresentation:
+    """Class for a PREMIS Representation.
+    Can be overwritten with metadata type specific adaptors.
+    """
     def __init__(self, metadata):
-        """Initialize xxx.
-        :metadata: Metadata dict for xxx.
+        """Initialize representation.
+        :metadata: Metadata dict for representation.
         """
         self._metadata = metadata
         for key in ["object_identifier_type",
@@ -414,7 +418,8 @@ class PremisRepresentation:
 
     @property
     def identifier(self):
-        """Identifier of XXX Object, to be used as internal id.
+        """Identifier of PREMIS Representation Object, to be used as
+        internal id.
         PREMIS objectIdentifierValue by default.
         """
         return self.object_identifier_value

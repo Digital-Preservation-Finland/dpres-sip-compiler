@@ -185,8 +185,9 @@ class SipCompiler:
         print("Provenance metadata created for %d event(s)."
               "" % (len(self.sip_meta.premis_events)))
 
-        for obj in self.sip_meta.premis_representations.values():
-            import_representation_object(self.temp_path, obj)
+        for obj_list in self.sip_meta.premis_representations.values():
+            for obj in obj_list:
+                import_representation_object(self.temp_path, obj)
 
     def _import_descriptive_metadata(self):
         """Import descriptive metadata

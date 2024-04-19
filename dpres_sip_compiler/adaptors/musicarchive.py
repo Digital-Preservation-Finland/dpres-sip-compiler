@@ -475,6 +475,7 @@ class PremisRepresentationMusicArchive(PremisRepresentation):
             "original_name": csv_row["poo-vastinpari-obj-nimi"],
             "alt_identifier_type": "local",
             "alt_identifier_value": csv_row["poo-vastinpari-obj-id"],
-            "object_status": csv_row["poo-vastinpari-obj-status"]
+            "object_status": csv_row["poo-vastinpari-obj-status"],
+            "outcome_filename": csv_row["objekti-nimi"]
         }
         super().__init__(metadata)

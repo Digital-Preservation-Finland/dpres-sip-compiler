@@ -165,7 +165,9 @@ class SipMetadata:
 
         :p_object: PREMIS representation object
         """
-        add_premis(p_object, self.premis_representations)
+        if p_object.identifier not in self.premis_representations:
+            self.premis_representations[p_object.identifier] = []
+        self.premis_representations[p_object.identifier].append(p_object)
 
     @property
     def objects(self):
@@ -401,7 +403,8 @@ class PremisRepresentation:
                     "alt_identifier_type",
                     "alt_identifier_value",
                     "original_name",
-                    "object_status"]:
+                    "object_status",
+                    "outcome_filename"]:
             if key not in self._metadata:
                 self._metadata[key] = None
 

@@ -189,7 +189,7 @@ def test_object_properties():
     assert obj.message_digest == "abc"
     assert obj.alt_identifier_type == "local"
     assert obj.alt_identifier_value == "alt-123"
-    assert obj.bit_level == False
+    assert obj.bit_level is False
 
 
 def test_event_properties():
@@ -311,7 +311,11 @@ def test_skip_object():
     source_row = {
         "event-id": "event-id-123",
         "event": "information package creation",
-        "poo-sip-obj-x-rooli-selite": "null"
+        "poo-sip-obj-x-rooli-selite": "null",
+        "poo-vastinpari-obj-uuid": "null",
+        "poo-vastinpari-obj-id": "null",
+        "poo-vastinpari-obj-nimi": "null",
+        "poo-vastinpari-obj-status": "null"
     }
     linking = PremisLinkingMusicArchive(source_row)
     linking.add_object_link(1, "null")

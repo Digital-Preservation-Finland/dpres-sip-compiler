@@ -2,6 +2,12 @@ Release notes
 =============
 
 
+Unreleased
+----------
+
+   * Handle normalization and migration events without the native file
+     in Music Archive Adaptor.
+
 Version 0.16
 ----------
 

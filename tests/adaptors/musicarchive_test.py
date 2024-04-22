@@ -10,6 +10,7 @@ from dpres_sip_compiler.adaptors.musicarchive import (
     PremisEventMusicArchive,
     PremisAgentMusicArchive,
     PremisLinkingMusicArchive,
+    PremisRepresentationMusicArchive,
     handle_html_files
 )
 from dpres_sip_compiler.config import Config
@@ -346,3 +347,23 @@ def test_skip_hidden(tmpdir, pick_files_tar):
     assert "./.hidden_file" not in tar_list
     assert "./mets.xml" in tar_list
     assert "./signature.sig" in tar_list
+
+
+def test_representation_properties():
+    """Test that representation properties result values from given dict.
+    """
+    source_dict = {
+        "poo-vastinpari-obj-uuid": "test_uuid_123",
+        "poo-vastinpari-obj-nimi": "missing_original_file.txt",
+        "poo-vastinpari-obj-id": "test_id_123",
+        "poo-vastinpari-obj-status": "xxx",
+        "objekti-nimi": "test_outcome_file123.txt"
+    }
+    representation = PremisRepresentationMusicArchive(source_dict)
+    assert representation.object_identifier_type == "UUID"
+    assert representation.object_identifier_value == "test_uuid_123"
+    assert representation.original_name == "missing_original_file.txt"
+    assert representation.alt_identifier_type == "local"
+    assert representation.alt_identifier_value == "test_id_123"
+    assert representation.object_status == "xxx"
+    assert representation.outcome_filename == "test_outcome_file123.txt"

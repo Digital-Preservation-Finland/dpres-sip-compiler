@@ -2,7 +2,7 @@
 """
 from dpres_sip_compiler.base_adaptor import (
     SipMetadata, PremisObject, PremisEvent, PremisAgent, PremisLinking,
-    build_sip_metadata
+    PremisRepresentation, build_sip_metadata
 )
 from dpres_sip_compiler.adaptor_list import ADAPTOR_DICT
 from dpres_sip_compiler.config import Config
@@ -74,6 +74,21 @@ class PremisLinkingTest(PremisLinking):
         """
         super().__init__()
         self.identifier = identifier
+
+
+class PremisRepresentationTest(PremisRepresentation):
+    """Test class for representations.
+    """
+    def __init__(self, identifier):
+        """ """
+        super().__init__({})
+        self.object_identifier_value = identifier
+
+    @property
+    def identifier(self):
+        """Return given identifier.
+        """
+        return self.object_identifier_value
 
 
 def test_objects():
@@ -174,3 +189,23 @@ def test_add_agent_link():
     assert linking.agent_links == [
         {"linking_agent": 1, "agent_role": "tester"},
         {"linking_agent": 2, "agent_role": "improver"}]
+
+
+def test_add_representation_object():
+    """Test that representations are added correctly. One object can have
+    multiple representations, which are added to a dictionary according to
+    the object's id.
+    """
+    representation1 = PremisRepresentationTest(1)
+    representation2 = PremisRepresentationTest(2)
+    sip_meta = SipMetadata()
+    sip_meta.add_representation_object(representation1)
+    sip_meta.add_representation_object(representation2)
+    assert len(sip_meta.premis_representations) == 2
+
+    # One object can have multiple representations
+    representation3 = PremisRepresentationTest(1)
+    sip_meta.add_representation_object(representation3)
+    assert len(sip_meta.premis_representations) == 2
+    assert len(sip_meta.premis_representations[1]) == 2
+    assert len(sip_meta.premis_representations[2]) == 1

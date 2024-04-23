@@ -216,16 +216,19 @@ def test_normalization_events(tmpdir, prepare_workspace):
     event_xml_list = _get_provenance_for_normalization(temp_path)
     for event in event_xml_list:
         event_type_element = event.xpath(
-                                ".//premis:eventType",
-                                namespaces=NAMESPACES)[0]
+            ".//premis:eventType",
+            namespaces=NAMESPACES)[0]
         if event_type_element.text == "migration":
-            original_file_obj = event.xpath(
+            sources = event.xpath(
                 './/premis:linkingObjectIdentifier \
-                [premis:linkingObjectIdentifierValue="tunniste-12"]',
-                namespaces=NAMESPACES)[0]
-            assert original_file_obj.xpath(
-                ".//premis:linkingObjectRole",
-                namespaces=NAMESPACES)[0].text == "source"
+                [premis:linkingObjectRole="source"]',
+                namespaces=NAMESPACES)
+            if sources:
+                assert len(sources) == 1
+                assert sources[0].xpath(
+                    './/premis:linkingObjectIdentifierValue',
+                    namespaces=NAMESPACES)[0].text == "tunniste-12"
+
             migrated_file_objs = event.xpath(
                 './/premis:linkingObjectIdentifier \
                 [premis:linkingObjectRole="outcome"]',

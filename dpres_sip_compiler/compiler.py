@@ -7,8 +7,9 @@ import os
 import subprocess
 import re
 import datetime
-from siptools.scripts.import_object import (import_object,
-                                            import_representation_object)
+from siptools.scripts.import_object import import_object
+from siptools.import_representation_object import  \
+    import_representation_object
 from siptools.scripts.create_mix import create_mix
 from siptools.scripts.create_videomd import create_videomd
 from siptools.scripts.create_audiomd import create_audiomd

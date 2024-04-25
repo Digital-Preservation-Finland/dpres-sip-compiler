@@ -3,6 +3,7 @@ Base adaptor for handling PREMIS metadata in packaging.
 
 Adaptors can overwrite the required methods and properties as needed.
 """
+import os
 
 
 def build_sip_metadata(adaptor_dict, source_path, config):
@@ -426,3 +427,16 @@ class PremisRepresentation:
         PREMIS objectIdentifierValue by default.
         """
         return self.object_identifier_value
+
+    def find_target_path(self, source_path):
+        """
+        Find file path to outcome object.
+        :source_path: Source data path.
+        :returns: Path to target file.
+        """
+        for root, _, files in os.walk(source_path):
+            if self.outcome_filename in files:
+                target_path = os.path.relpath(os.path.join(
+                    root, self.outcome_filename), source_path)
+                return target_path
+        raise OSError(f"Digital object {self.outcome_filename} was not found!")

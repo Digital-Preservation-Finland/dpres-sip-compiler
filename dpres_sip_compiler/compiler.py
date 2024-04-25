@@ -187,11 +187,12 @@ class SipCompiler:
 
         for obj_list in self.sip_meta.premis_representations.values():
             for obj in obj_list:
+                target_filepath = obj.find_target_path(self.source_path)
                 import_representation_object(self.temp_path,
                                              obj.object_identifier_value,
                                              obj.alt_identifier_value,
                                              obj.original_name,
-                                             obj.outcome_filename)
+                                             target_filepath)
 
     def _import_descriptive_metadata(self):
         """Import descriptive metadata

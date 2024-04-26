@@ -191,21 +191,21 @@ def test_add_agent_link():
         {"linking_agent": 2, "agent_role": "improver"}]
 
 
-def test_add_representation_object():
-    """Test that representations are added correctly. One object can have
-    multiple representations, which are added to a dictionary according to
-    the object's id.
+def test_add_digiprov_representation_object():
+    """Test that digiprovMD representations are added correctly. One object
+    can have multiple representations, which are added to a dictionary
+    according to the object's id.
     """
     representation1 = PremisRepresentationTest(1)
     representation2 = PremisRepresentationTest(2)
     sip_meta = SipMetadata()
-    sip_meta.add_representation_object(representation1)
-    sip_meta.add_representation_object(representation2)
-    assert len(sip_meta.premis_representations) == 2
+    sip_meta.add_digiprov_representation_object(representation1)
+    sip_meta.add_digiprov_representation_object(representation2)
+    assert len(sip_meta.premis_digiprov_representations) == 2
 
     # One object can have multiple representations
     representation3 = PremisRepresentationTest(1)
-    sip_meta.add_representation_object(representation3)
-    assert len(sip_meta.premis_representations) == 2
-    assert len(sip_meta.premis_representations[1]) == 2
-    assert len(sip_meta.premis_representations[2]) == 1
+    sip_meta.add_digiprov_representation_object(representation3)
+    assert len(sip_meta.premis_digiprov_representations) == 2
+    assert len(sip_meta.premis_digiprov_representations[1]) == 2
+    assert len(sip_meta.premis_digiprov_representations[2]) == 1

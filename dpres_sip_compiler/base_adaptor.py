@@ -52,6 +52,15 @@ class SipMetadata:
     """
     Metadata handler for a SIP to be compiled.
     Can be overwritten with metadata type specific adaptors.
+
+    Attributes:
+        objid: METS objid
+        premis_objects: Dictionary of PREMIS Objects
+        premis_events: Dictionary of PREMIS Events
+        premis_agents: Dictionary of PREMIS Agents
+        premis_linkings: Dictionary of Linkings inside PREMIS
+        premis_digiprov_representations: Dictionary of PREMIS
+            Representations as digiprov MD
     """
 
     # pylint: disable=no-self-use
@@ -60,12 +69,12 @@ class SipMetadata:
         """
         Initialize SIP PREMIS handler.
         """
-        self.objid = None           # METS OBJID
-        self.premis_objects = {}    # PREMIS Objects
-        self.premis_events = {}     # PREMIS Events
-        self.premis_agents = {}     # PREMIS Agents
-        self.premis_linkings = {}   # Linkings inside PREMIS
-        self.premis_representations = {}  # Missing native files
+        self.objid = None
+        self.premis_objects = {}
+        self.premis_events = {}
+        self.premis_agents = {}
+        self.premis_linkings = {}
+        self.premis_digiprov_representations = {}
 
     def populate(self, source_path, config):
         """Create metadata objects based on source path.
@@ -160,15 +169,16 @@ class SipMetadata:
         self.premis_linkings[p_linking.identifier].add_agent_link(
             agent_id, agent_role)
 
-    def add_representation_object(self, p_object):
+    def add_digiprov_representation_object(self, p_object):
         """
         Add PREMIS representation object to a dict.
 
         :p_object: PREMIS representation object
         """
-        if p_object.identifier not in self.premis_representations:
-            self.premis_representations[p_object.identifier] = []
-        self.premis_representations[p_object.identifier].append(p_object)
+        if p_object.identifier not in self.premis_digiprov_representations:
+            self.premis_digiprov_representations[p_object.identifier] = []
+        self.premis_digiprov_representations[p_object.identifier].append(
+                p_object)
 
     @property
     def objects(self):

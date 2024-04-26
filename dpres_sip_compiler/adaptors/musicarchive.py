@@ -85,7 +85,7 @@ class SipMetadataMusicArchive(SipMetadata):
                          agent_id="agent-"+csv_row["agent-id"],
                          agent_role=csv_row["agent-rooli"])
         if csv_row["poo-vastinpari-obj-status"] == "xxx":
-            self.add_representation_object(
+            self.add_digiprov_representation_object(
                 PremisRepresentationMusicArchive(csv_row))
 
     def descriptive_files(self, desc_path, config):

@@ -3,7 +3,6 @@ Base adaptor for handling PREMIS metadata in packaging.
 
 Adaptors can overwrite the required methods and properties as needed.
 """
-import os
 
 
 def build_sip_metadata(adaptor_dict, source_path, config):
@@ -273,6 +272,14 @@ class PremisObject:
         """
         self._metadata.pop(metadata_key, None)
 
+    def find_target_path(self, source_path):
+        """Implemented in the adaptors.
+        Find file path to target file.
+        :source_path: Source data path.
+        :returns: Path to target file.
+        """
+        return None
+
 
 class PremisEvent:
     """Class for a PREMIS Event.
@@ -398,55 +405,3 @@ class PremisLinking:
                 return
         self.agent_links.append({"linking_agent": identifier,
                                  "agent_role": agent_role})
-
-
-class PremisRepresentation:
-    """Class for a PREMIS Representation.
-    Can be overwritten with metadata type specific adaptors.
-    """
-    def __init__(self, metadata):
-        """Initialize representation.
-        :metadata: Metadata dict for representation.
-        """
-        self._metadata = metadata
-        for key in ["object_identifier_type",
-                    "object_identifier_value",
-                    "alt_identifier_type",
-                    "alt_identifier_value",
-                    "original_name",
-                    "object_status",
-                    "outcome_filename"]:
-            if key not in self._metadata:
-                self._metadata[key] = None
-
-    def __getattr__(self, attr):
-        """
-        Set metadata items as properties.
-        :attr: Attribute name
-        :returns: Value for given attribute or None
-        """
-        if attr in self._metadata:
-            return self._metadata[attr]
-
-        return None
-
-    @property
-    def identifier(self):
-        """Identifier of PREMIS Representation Object, to be used as
-        internal id.
-        PREMIS objectIdentifierValue by default.
-        """
-        return self.object_identifier_value
-
-    def find_target_path(self, source_path):
-        """
-        Find file path to outcome object.
-        :source_path: Source data path.
-        :returns: Path to target file.
-        """
-        for root, _, files in os.walk(source_path):
-            if self.outcome_filename in files:
-                target_path = os.path.relpath(os.path.join(
-                    root, self.outcome_filename), source_path)
-                return target_path
-        raise OSError(f"Digital object {self.outcome_filename} was not found!")

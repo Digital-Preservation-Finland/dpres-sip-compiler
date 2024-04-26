@@ -10,7 +10,7 @@ import mets as metslib
 from file_scraper.scraper import Scraper
 from xml_helpers import utils as xml_utils
 from dpres_sip_compiler.base_adaptor import (
-    PremisRepresentation, SipMetadata, PremisObject, PremisEvent, PremisAgent,
+    SipMetadata, PremisObject, PremisEvent, PremisAgent,
     PremisLinking)
 
 
@@ -463,7 +463,7 @@ class PremisLinkingMusicArchive(PremisLinking):
         super().add_object_link(identifier, object_role)
 
 
-class PremisRepresentationMusicArchive(PremisRepresentation):
+class PremisRepresentationMusicArchive(PremisObject):
     """Music Archive specific PREMIS Representation handler."""
     def __init__(self, csv_row):
         """Initialize.
@@ -479,3 +479,16 @@ class PremisRepresentationMusicArchive(PremisRepresentation):
             "outcome_filename": csv_row["objekti-nimi"]
         }
         super().__init__(metadata)
+
+    def find_target_path(self, source_path):
+        """
+        Find file path to outcome object.
+        :source_path: Source data path.
+        :returns: Path to target file.
+        """
+        for root, _, files in os.walk(source_path):
+            if self.outcome_filename in files:
+                target_path = os.path.relpath(os.path.join(
+                    root, self.outcome_filename), source_path)
+                return target_path
+        raise OSError(f"Digital object {self.outcome_filename} was not found!")

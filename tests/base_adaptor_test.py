@@ -2,7 +2,7 @@
 """
 from dpres_sip_compiler.base_adaptor import (
     SipMetadata, PremisObject, PremisEvent, PremisAgent, PremisLinking,
-    PremisRepresentation, build_sip_metadata
+    build_sip_metadata
 )
 from dpres_sip_compiler.adaptor_list import ADAPTOR_DICT
 from dpres_sip_compiler.config import Config
@@ -74,21 +74,6 @@ class PremisLinkingTest(PremisLinking):
         """
         super().__init__()
         self.identifier = identifier
-
-
-class PremisRepresentationTest(PremisRepresentation):
-    """Test class for representations.
-    """
-    def __init__(self, identifier):
-        """ """
-        super().__init__({})
-        self.object_identifier_value = identifier
-
-    @property
-    def identifier(self):
-        """Return given identifier.
-        """
-        return self.object_identifier_value
 
 
 def test_objects():
@@ -192,20 +177,22 @@ def test_add_agent_link():
 
 
 def test_add_digiprov_representation_object():
-    """Test that digiprovMD representations are added correctly. One object
-    can have multiple representations, which are added to a dictionary
-    according to the object's id.
+    """Test that digiprovMD representations are added correctly. One
+    representation can have multiple outcome files, which are added to
+    a dictionary according to the representation's id.
     """
-    representation1 = PremisRepresentationTest(1)
-    representation2 = PremisRepresentationTest(2)
+    test_object1 = PremisObjectTest(1)
+    test_object2 = PremisObjectTest(2)
     sip_meta = SipMetadata()
-    sip_meta.add_digiprov_representation_object(representation1)
-    sip_meta.add_digiprov_representation_object(representation2)
+
+    sip_meta.add_digiprov_representation_object(test_object1)
+    sip_meta.add_digiprov_representation_object(test_object2)
     assert len(sip_meta.premis_digiprov_representations) == 2
 
-    # One object can have multiple representations
-    representation3 = PremisRepresentationTest(1)
-    sip_meta.add_digiprov_representation_object(representation3)
+    test_object3 = PremisObjectTest(1)
+    sip_meta.add_digiprov_representation_object(test_object3)
     assert len(sip_meta.premis_digiprov_representations) == 2
+    # there are two representation objects in the dict with ID 1
     assert len(sip_meta.premis_digiprov_representations[1]) == 2
+    # there's one representation object in the dict with ID 2
     assert len(sip_meta.premis_digiprov_representations[2]) == 1

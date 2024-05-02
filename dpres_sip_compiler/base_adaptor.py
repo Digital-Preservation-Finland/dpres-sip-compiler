@@ -272,14 +272,6 @@ class PremisObject:
         """
         self._metadata.pop(metadata_key, None)
 
-    def find_target_path(self, source_path):
-        """Implemented in the adaptors.
-        Find file path to target file.
-        :source_path: Source data path.
-        :returns: Path to target file.
-        """
-        return None
-
 
 class PremisEvent:
     """Class for a PREMIS Event.

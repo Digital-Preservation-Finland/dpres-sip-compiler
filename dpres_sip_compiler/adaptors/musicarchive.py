@@ -85,8 +85,9 @@ class SipMetadataMusicArchive(SipMetadata):
                          agent_id="agent-"+csv_row["agent-id"],
                          agent_role=csv_row["agent-rooli"])
         if csv_row["poo-vastinpari-obj-status"] == "xxx":
-            self.add_digiprov_representation_object(
-                PremisRepresentationMusicArchive(csv_row))
+            r_object = PremisRepresentationMusicArchive(csv_row)
+            r_object.find_target_path(source_path)
+            self.add_digiprov_representation_object(r_object)
 
     def descriptive_files(self, desc_path, config):
         """
@@ -484,11 +485,11 @@ class PremisRepresentationMusicArchive(PremisObject):
         """
         Find file path to outcome object.
         :source_path: Source data path.
-        :returns: Path to target file.
         """
         for root, _, files in os.walk(source_path):
             if self.outcome_filename in files:
                 target_path = os.path.relpath(os.path.join(
                     root, self.outcome_filename), source_path)
-                return target_path
+                self.filepath = target_path
+                return
         raise OSError(f"Digital object {self.outcome_filename} was not found!")

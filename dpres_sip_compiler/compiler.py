@@ -106,7 +106,7 @@ class SipCompiler:
                     pass
                 else:
                     obj, obj_role = (self.sip_meta.premis_objects[
-                        obj_link["linking_object"]],
+                                     obj_link["linking_object"]],
                                      obj_link["object_role"])
                     if obj_role == "source":
                         obj.bit_level = True
@@ -165,7 +165,7 @@ class SipCompiler:
                     linking_objects.append((link["object_role"], ""))
                 else:
                     obj, obj_role = (self.sip_meta.premis_objects[
-                        link["linking_object"]],
+                                     link["linking_object"]],
                                      link["object_role"])
                     if obj_role in ["source", "outcome"]:
                         linking_objects.append((obj_role, obj.filepath))

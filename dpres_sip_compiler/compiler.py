@@ -57,7 +57,7 @@ class SipCompiler:
         """
         print("Creating technical metadata for %d file(s)."
               "" % (len(self.sip_meta.premis_objects)))
-        event_datetime = datetime.datetime.now().isoformat()
+        event_datetime = datetime.datetime.now(datetime.timezone.utc).isoformat()
         self._set_bit_level_for_objects()
         for obj in self.sip_meta.objects:
             file_format = (obj.format_name, obj.format_version)

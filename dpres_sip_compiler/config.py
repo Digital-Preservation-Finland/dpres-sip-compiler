@@ -21,7 +21,7 @@ def get_default_temp_path():
     """
     return os.path.join(
         os.getcwd(),
-        datetime.datetime.now().strftime("%Y-%m-%dT%H-%M-%S"))
+        datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H-%M-%S"))
 
 
 # pylint: disable=too-few-public-methods

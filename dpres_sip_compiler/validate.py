@@ -65,7 +65,7 @@ def scrape_files(path, config):
         results = {
             "path": ensure_text(scraper.filename),
             "filename": ensure_text(os.path.basename(scraper.filename)),
-            "timestamp": datetime.datetime.now().isoformat(),
+            "timestamp": datetime.datetime.now(datetime.timezone.utc).isoformat(),
             "MIME type": ensure_text(scraper.mimetype),
             "version": ensure_text(scraper.version),
             "metadata": scraper.streams,

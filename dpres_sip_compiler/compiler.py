@@ -159,11 +159,15 @@ class SipCompiler:
                     create_agent_file="siptools-tmp-%s-agent-file"
                                       "" % event.identifier)
             linking_objects = []
+            linking_representations = []
             for link in self.sip_meta.premis_linkings[
                     event.identifier].object_links:
                 if (link["linking_object"] not in
                         self.sip_meta.premis_objects.keys()):
-                    linking_objects.append((link["object_role"], ""))
+                    linking_representations.append(
+                        ("UUID",
+                         link["linking_object"],
+                         link["object_role"]))
                 else:
                     obj, obj_role = (self.sip_meta.premis_objects[
                                      link["linking_object"]],
@@ -183,7 +187,8 @@ class SipCompiler:
                 event_outcome_detail=event.event_outcome_detail,
                 create_agent_file="siptools-tmp-%s-agent-file"
                                   "" % event.identifier,
-                add_object_links=True)
+                add_object_links=True,
+                linked_object_ids=linking_representations)
         print("Provenance metadata created for %d event(s)."
               "" % (len(self.sip_meta.premis_events)))
 

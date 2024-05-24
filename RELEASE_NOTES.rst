@@ -4,7 +4,8 @@ Release notes
 Unreleased
 ----------
 
-- Update deprecated timezone calls
+    * Link representation objects to events on a PREMIS level
+    * Update deprecated timezone calls
 
 Version 0.17
 ------------

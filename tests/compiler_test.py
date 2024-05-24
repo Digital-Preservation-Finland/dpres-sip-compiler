@@ -223,11 +223,11 @@ def test_normalization_events(tmpdir, prepare_workspace):
                 './/premis:linkingObjectIdentifier \
                 [premis:linkingObjectRole="source"]',
                 namespaces=NAMESPACES)
-            if sources:
-                assert len(sources) == 1
-                assert sources[0].xpath(
-                    './/premis:linkingObjectIdentifierValue',
-                    namespaces=NAMESPACES)[0].text == "tunniste-12"
+            assert len(sources) == 1
+            assert sources[0].xpath(
+                './/premis:linkingObjectIdentifierValue',
+                namespaces=NAMESPACES)[0].text in ["tunniste-12",
+                                                   "tunniste-13"]
 
             migrated_file_objs = event.xpath(
                 './/premis:linkingObjectIdentifier \

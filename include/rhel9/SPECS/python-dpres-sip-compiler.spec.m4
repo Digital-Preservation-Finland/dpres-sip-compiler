@@ -43,6 +43,8 @@ Requires:  %{py3_dist audiomd}
 Requires:  %{py3_dist videomd}
 Requires:  %{py3_dist ffmpeg-python}
 Requires:  %{py3_dist siptools}
+Requires:  %{py3_dist dpres-mets-builder}
+Requires:  %{py3_dist dpres-siptools-ng}
 Requires:  python3-file-scraper-full
 %description -n python3-dpres-sip-compiler %_description
 

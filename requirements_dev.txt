@@ -19,3 +19,5 @@ git+https://gitlab.ci.csc.fi/dpres/ffmpeg-python.git#egg=ffmpeg_python
 git+https://gitlab.ci.csc.fi/dpres/fido.git@develop#egg=opf_fido
 git+https://gitlab.ci.csc.fi/dpres/file-scraper.git@develop#egg=file_scraper
 git+https://gitlab.ci.csc.fi/dpres/dpres-siptools.git@develop#egg=siptools
+git+https://gitlab.ci.csc.fi/dpres/dpres-mets-builder.git@develop#egg=dpres_mets_builder
+git+https://gitlab.ci.csc.fi/dpres/dpres-siptools-ng.git@develop#egg=dpres_siptools_ng

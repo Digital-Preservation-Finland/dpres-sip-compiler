@@ -16,3 +16,5 @@ git+https://github.com/Digital-Preservation-Finland/ffmpeg-python.git#egg=ffmpeg
 git+https://github.com/Digital-Preservation-Finland/fido.git#egg=opf_fido
 git+https://github.com/Digital-Preservation-Finland/file-scraper.git#egg=file-scraper
 git+https://github.com/Digital-Preservation-Finland/dpres-siptools.git#egg=siptools
+git+https://github.com/Digital-Preservation-Finland/dpres-mets-builder.git#egg=dpres_mets_builder
+git+https://github.com/Digital-Preservation-Finland/dpres-siptools-ng.git#egg=dpres_siptools_ng

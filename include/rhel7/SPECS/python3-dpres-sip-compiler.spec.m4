@@ -19,6 +19,7 @@ Source0:        %{file_prefix}-v%{file_version}%{?file_release_tag}-%{file_build
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildArch:      noarch
 Requires:       python3 python36-click python3-dpres-siptools
+Requires:       python3-dpres-mets-builder python3-dpres-siptools-ng
 BuildRequires:  python3-setuptools python3-file-scraper-full openssl-devel
 
 %description

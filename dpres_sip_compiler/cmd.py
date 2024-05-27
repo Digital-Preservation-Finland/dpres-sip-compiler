@@ -7,6 +7,7 @@ import click
 from dpres_sip_compiler.config import (get_default_config_path,
                                        get_default_temp_path)
 from dpres_sip_compiler.compiler import compile_sip, clean_temp_files
+from dpres_sip_compiler.compiler_ng import ng_compile_sip
 from dpres_sip_compiler.validate import count_files, scrape_files
 from dpres_sip_compiler.config import Config
 
@@ -48,6 +49,25 @@ def compile_command(source_path, tar_file, temp_path, config, validation):
     SOURCE-PATH: Source path of the files to be packaged.
     """
     compile_sip(source_path, tar_file, temp_path, config, validation)
+
+
+@cli.command(
+    name="compile-ng",
+)
+@click.argument('source-path', type=click.Path(exists=True, file_okay=False,
+                                               dir_okay=True))
+@click.argument('descriptive-metadata-path',
+                type=click.Path(exists=True, file_okay=True,
+                                dir_okay=False))
+def compile_ng_command(source_path, descriptive_metadata_path):
+    """
+    Compile Submission Information Package.
+
+    SOURCE-PATH: Source path of the files to be packaged.
+
+    DESCRIPTIVE-METADATA-PATH: Path to the descriptive metadata file.
+    """
+    ng_compile_sip(source_path, descriptive_metadata_path)
 
 
 @cli.command(

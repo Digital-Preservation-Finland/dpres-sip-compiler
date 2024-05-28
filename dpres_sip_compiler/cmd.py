@@ -59,7 +59,14 @@ def compile_command(source_path, tar_file, temp_path, config, validation):
 @click.argument('descriptive-metadata-path',
                 type=click.Path(exists=True, file_okay=True,
                                 dir_okay=False))
-def compile_ng_command(source_path, descriptive_metadata_path):
+@click.option(
+    "--config", type=click.Path(exists=True, file_okay=True,
+                                dir_okay=False),
+    metavar="<FILE>",
+    help="Path of the configuration file. Defaults to: "
+         "%s" % get_default_config_path(),
+    default=get_default_config_path())
+def compile_ng_command(source_path, descriptive_metadata_path, config):
     """
     Compile Submission Information Package.
 
@@ -67,7 +74,7 @@ def compile_ng_command(source_path, descriptive_metadata_path):
 
     DESCRIPTIVE-METADATA-PATH: Path to the descriptive metadata file.
     """
-    ng_compile_sip(source_path, descriptive_metadata_path)
+    ng_compile_sip(source_path, descriptive_metadata_path, config)
 
 
 @cli.command(

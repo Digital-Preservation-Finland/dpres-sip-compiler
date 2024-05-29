@@ -60,7 +60,7 @@ class SipCompiler:
         self.descriptive_metadata = ImportedMetadata(
             data_path=self.descriptive_metadata_path,
             metadata_type="descriptive",
-            metadata_format=self.config.desc_metadata_type,
+            metadata_format=self.config.desc_metadata_format,
             format_version=self.config.desc_metadata_version)
 
     def _compile_structural_map(self):

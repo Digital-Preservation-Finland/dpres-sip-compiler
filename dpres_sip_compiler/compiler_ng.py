@@ -12,17 +12,15 @@ from dpres_sip_compiler.adaptor_list import ADAPTOR_NG_DICT
 from dpres_sip_compiler.config import Config, get_default_config_path
 
 
-OUTPUT_SIP_PATH = "workspace/example-manual-sip.tar"
-
-
 class SipCompiler:
     """Class to compile SIP."""
 
     def __init__(self, source_path, descriptive_metadata_path,
-                 config, sip_meta):
+                 config, tar_file, sip_meta):
         self.source_path = source_path
         self.descriptive_metadata_path = descriptive_metadata_path
         self.config = config
+        self.tar_file = tar_file
         self.sip_meta = sip_meta
         self.mets = None
         self.digital_objects = []
@@ -76,7 +74,7 @@ class SipCompiler:
         """Turn the METS object into a SIP."""
         sip = SIP(mets=self.mets)
         sip.finalize(
-            output_filepath=OUTPUT_SIP_PATH,
+            output_filepath=self.tar_file,
             sign_key_filepath=self.config.sign_key
         )
 
@@ -91,7 +89,8 @@ class SipCompiler:
         self._finalize_sip()
 
 
-def ng_compile_sip(source_path, descriptive_metadata_path, conf_file=None):
+def ng_compile_sip(source_path, descriptive_metadata_path, conf_file=None,
+                   tar_file=None):
     """Compile SIP."""
     if conf_file is None:
         conf_file = get_default_config_path()
@@ -99,9 +98,13 @@ def ng_compile_sip(source_path, descriptive_metadata_path, conf_file=None):
     config = Config()
     config.configure(conf_file)
 
+    if tar_file is None:
+        tar_file = "./example-manual-sip.tar"  # TODO:better name for tar
+
     sip_meta = build_sip_metadata(ADAPTOR_NG_DICT, source_path, config)
     compiler = SipCompiler(source_path=source_path,
                            descriptive_metadata_path=descriptive_metadata_path,
                            config=config,
+                           tar_file=tar_file,
                            sip_meta=sip_meta)
     compiler.create_sip()

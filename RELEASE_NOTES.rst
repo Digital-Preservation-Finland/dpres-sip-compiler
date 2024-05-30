@@ -1,8 +1,8 @@
 Release notes
 =============
 
-Unreleased
-----------
+Version 0.18
+------------
 
     * Link representation objects to events on a PREMIS level
     * Update deprecated timezone calls
@@ -14,7 +14,7 @@ Version 0.17
      in Music Archive Adaptor.
 
 Version 0.16
-----------
+------------
 
    * Handle normalization and migration events with correct linking in
      Music Archive Adaptor.

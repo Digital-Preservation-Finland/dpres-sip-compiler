@@ -1,4 +1,4 @@
-"""Example code for manual SIP creation."""
+"""Compile SIP using dpres-siptools-ng."""
 
 import os
 from mets_builder import METS, MetsProfile, StructuralMap
@@ -14,7 +14,7 @@ from dpres_sip_compiler.config import Config, get_default_config_path
 
 class SipCompiler:
     """Class to compile SIP."""
-
+    # pylint: disable=too-many-arguments
     def __init__(self, source_path, descriptive_metadata_path,
                  config, tar_file, sip_meta):
         self.source_path = source_path
@@ -53,7 +53,7 @@ class SipCompiler:
 
     def _import_descriptive_metadata(self):
         """Import descriptive metadata from input descriptive metadata
-        path (this one is in Dublin Core format).
+        path.
         """
         self.descriptive_metadata = ImportedMetadata(
             data_path=self.descriptive_metadata_path,
@@ -80,7 +80,6 @@ class SipCompiler:
 
     def create_sip(self):
         """Create SIP."""
-
         self._initialize_mets()
         self._create_technical_metadata()
         self._import_descriptive_metadata()

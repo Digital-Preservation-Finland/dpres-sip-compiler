@@ -72,6 +72,7 @@ class SipCompiler:
 
     def _finalize_sip(self):
         """Turn the METS object into a SIP."""
+
         sip = SIP(mets=self.mets)
         sip.finalize(
             output_filepath=self.tar_file,
@@ -98,7 +99,7 @@ def ng_compile_sip(source_path, descriptive_metadata_path, conf_file=None,
     config.configure(conf_file)
 
     if tar_file is None:
-        tar_file = "./example-manual-sip.tar"  # TODO:better name for tar
+        tar_file = "./manual-sip.tar"  # TODO:better name for tar?
 
     sip_meta = build_sip_metadata(ADAPTOR_NG_DICT, source_path, config)
     compiler = SipCompiler(source_path=source_path,

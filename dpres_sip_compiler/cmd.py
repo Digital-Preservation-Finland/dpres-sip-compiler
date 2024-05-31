@@ -81,7 +81,7 @@ def compile_ng_command(source_path, descriptive_metadata_path, config,
 
     DESCRIPTIVE-METADATA-PATH: Path to the descriptive metadata file.
     """
-    ng_compile_sip(source_path, descriptive_metadata_path, config=config,
+    ng_compile_sip(source_path, descriptive_metadata_path, conf_file=config,
                    tar_file=tar_file)
 
 

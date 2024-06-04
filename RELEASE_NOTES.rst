@@ -1,6 +1,11 @@
 Release notes
 =============
 
+Unreleased
+------------
+
+    * Add functionality to use dpres-siptools-ng for SIP compilation in a basic use case.
+
 Version 0.18
 ------------
 

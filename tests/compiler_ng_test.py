@@ -10,8 +10,8 @@ def test_ng_compile_sip(tmpdir, pick_files_tar):
     tar_file = os.path.join(str(tmpdir), "test_sip.tar")
     ng_compile_sip("tests/data/compiler_ng/files",
                    "tests/data/compiler_ng/desc_dc_metadata.xml",
-                   conf_file="tests/data/compiler_ng/generic.conf",
-                   tar_file=tar_file)
+                   tar_file=tar_file,
+                   conf_file="tests/data/compiler_ng/generic.conf")
     assert os.path.isfile(tar_file)
     tar_list = pick_files_tar(tar_file)
     assert "mets.xml" in tar_list

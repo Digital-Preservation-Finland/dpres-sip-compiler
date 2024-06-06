@@ -41,9 +41,6 @@ class SipCompiler:
     def _create_technical_metadata(self):
         """Create digital objects and add metadata to them."""
         for obj in self.sip_meta.objects:
-            print()
-            print(obj.filepath)
-            print()
             digital_object = SIPDigitalObject(
                 source_filepath=obj.filepath,
                 sip_filepath=os.path.relpath(obj.filepath, self.source_path)
@@ -87,19 +84,18 @@ class SipCompiler:
         self._compile_structural_map()
         self.mets.generate_file_references()
         self._finalize_sip()
+        print(f"Compilation finished. The SIP is signed and packaged to: "
+              f"{self.tar_file}.")
 
 
-def ng_compile_sip(source_path, descriptive_metadata_path, conf_file=None,
-                   tar_file=None):
+def ng_compile_sip(source_path, descriptive_metadata_path, tar_file,
+                   conf_file=None):
     """Compile SIP."""
     if conf_file is None:
         conf_file = get_default_config_path()
 
     config = Config()
     config.configure(conf_file)
-
-    if tar_file is None:
-        tar_file = "./manual-sip.tar"  # TODO:better name for tar?
 
     sip_meta = build_sip_metadata(ADAPTOR_NG_DICT, source_path, config)
     compiler = SipCompiler(source_path=source_path,

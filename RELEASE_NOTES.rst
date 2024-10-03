@@ -1,6 +1,11 @@
 Release notes
 =============
 
+Version 0.20
+------------
+
+    * Update the compile-ng command to work with the published stable version of siptools-ng
+
 Version 0.19
 ------------
 

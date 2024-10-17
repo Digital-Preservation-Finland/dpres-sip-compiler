@@ -1,5 +1,5 @@
 
-module dpres_sip_compiler_custom_policy 1.0;
+module dpres-sip-compiler-selinux 1.0;
 
 require {
 	type chkpwd_t;

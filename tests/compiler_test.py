@@ -374,7 +374,7 @@ def test_compile_sip(tmpdir, prepare_workspace, pick_files_tar):
     assert len(mets_xml.xpath(".//mets:digiprovMD//premis:event",
                               namespaces=NAMESPACES)) == 12
     assert len(mets_xml.xpath(".//mets:digiprovMD//premis:agent",
-                              namespaces=NAMESPACES)) == 16
+                              namespaces=NAMESPACES)) == 18
     assert len(mets_xml.xpath(".//mets:file",
                               namespaces=NAMESPACES)) == 4
     assert len(mets_xml.xpath(".//mets:structMap",

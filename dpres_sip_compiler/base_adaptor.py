@@ -81,7 +81,7 @@ class SipMetadata:
         pass
 
     # pylint: disable=unused-argument
-    def descriptive_files(self, desc_path, config):
+    def descriptive_files(self):
         """
         Iterator for descriptive metadata files.
         Implemented in adaptors.
@@ -93,7 +93,7 @@ class SipMetadata:
         yield
 
     # pylint: disable=unused-argument
-    def desc_root_remove(self, config):
+    def desc_root_remove(self):
         """
         Resolve whether descriptive metadata root should be removed.
         Implemented in adaptors.

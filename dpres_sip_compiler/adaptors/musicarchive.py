@@ -13,6 +13,15 @@ from dpres_sip_compiler.base_adaptor import (
     SipMetadata, PremisObject, PremisEvent, PremisAgent,
     PremisLinking)
 
+PREMIS_ADDRESS = "info:lc/xmlns/premis-v2"
+EVENT_DIGEST = "message digest calculation"
+EVENT_CHANGE = "filename change"
+EVENT_CREATION = "information package creation"
+EVENT_MODIFICATION = "modification"
+EVENT_META_MODIFICATION = "metadata modification"
+EVENT_NORMALIZATION = "normalization"
+EVENT_MIGRATION = "migration"
+
 
 def read_csv_file(filename):
     """
@@ -89,7 +98,7 @@ class SipMetadataMusicArchive(SipMetadata):
             r_object.find_target_path(source_path)
             self.add_digiprov_representation_object(r_object)
 
-    def descriptive_files(self, desc_path, config):
+    def descriptive_files(self, desc_path=None, config=None):
         """
         Iterator for descriptive metadata files.
 
@@ -102,7 +111,7 @@ class SipMetadataMusicArchive(SipMetadata):
                     not filepath.startswith("."):
                 yield os.path.join(desc_path, filepath)
 
-    def desc_root_remove(self, config):
+    def desc_root_remove(self, config=None):
         """
         Resolve whether descriptive metadata root should be removed.
         :config: Additional needed configuration
@@ -156,7 +165,7 @@ class SipMetadataMusicArchive(SipMetadata):
             # Check if there already are multiple IDs in the object
             if len(xml_object.xpath(
                     "./premis:objectIdentifier",
-                    namespaces={'premis': 'info:lc/xmlns/premis-v2'})) > 1:
+                    namespaces={'premis': PREMIS_ADDRESS})) > 1:
                 continue
 
             (_, id_value) = premis.parse_identifier_type_value(xml_object)
@@ -179,7 +188,7 @@ def handle_html_files(mets, source_path):
     """
     format_elems = mets.xpath(
         ".//premis:format[contains(.//premis:formatName, 'text/html')]",
-        namespaces={'premis': 'info:lc/xmlns/premis-v2'})
+        namespaces={'premis': PREMIS_ADDRESS})
     if not format_elems:
         return mets
 
@@ -223,12 +232,12 @@ def set_format_plaintext(format_element, new_value):
     """
     format_name_element = format_element.xpath(
         ".//premis:formatName",
-        namespaces={'premis': 'info:lc/xmlns/premis-v2'})
+        namespaces={'premis': PREMIS_ADDRESS})
     format_name_element[0].text = new_value
 
     format_version_element = format_element.xpath(
         ".//premis:formatVersion",
-        namespaces={'premis': 'info:lc/xmlns/premis-v2'})
+        namespaces={'premis': PREMIS_ADDRESS})
     if format_version_element:
         format_version_element[0].getparent().remove(format_version_element[0])
 
@@ -286,6 +295,9 @@ class PremisEventMusicArchive(PremisEvent):
                    "pon-korvattu-nimi", "objekti-nimi", "sip-tunniste",
                    "event-selite"]
 
+    time_format = "%Y-%m-%d %H:%M:%S"
+    time_format_2 = "%Y-%m-%dT%H:%M:%S"
+
     def __init__(self, csv_row):
         """Initialize.
         :csv_row: One row from a CSV file.
@@ -293,14 +305,14 @@ class PremisEventMusicArchive(PremisEvent):
         self._detail_info = []
 
         start_time = datetime.datetime.strptime(
-            csv_row["event-aika-alku"], "%Y-%m-%d %H:%M:%S"
-            ).strftime("%Y-%m-%dT%H:%M:%S")
+            csv_row["event-aika-alku"], self.time_format
+            ).strftime(self.time_format_2)
         end_time = None
         if csv_row["event-aika-loppu"].lower() != "null" and \
                 csv_row["event-aika-loppu"] != csv_row["event-aika-alku"]:
             end_time = datetime.datetime.strptime(
-                csv_row["event-aika-loppu"], "%Y-%m-%d %H:%M:%S"
-                ).strftime("%Y-%m-%dT%H:%M:%S")
+                csv_row["event-aika-loppu"], self.time_format
+                ).strftime(self.time_format_2)
 
         event_datetime = start_time
         if end_time is not None:
@@ -333,27 +345,27 @@ class PremisEventMusicArchive(PremisEvent):
     @property
     def event_detail(self):
         """Event detail"""
-        if self.event_type == "message digest calculation":
+        if self.event_type == EVENT_DIGEST:
             return "Checksum calculation for digital objects."
 
-        if self.event_type == "filename change":
+        if self.event_type == EVENT_CHANGE:
             return "Filename change."
 
-        if self.event_type == "information package creation":
+        if self.event_type == EVENT_CREATION:
             return "Creation of submission information package."
 
-        if self.event_type == "modification":
+        if self.event_type == EVENT_MODIFICATION:
             return "Modification of digital object."
 
-        if self.event_type == "metadata modification":
+        if self.event_type == EVENT_META_MODIFICATION:
             return "Modification of metadata."
 
-        if self.event_type == "normalization":
+        if self.event_type == EVENT_NORMALIZATION:
             return "Normalization of digital object in an unsupported file " \
                 "format to a sustainable format for digital preservation, " \
                 "replacing the source object."
 
-        if self.event_type == "migration":
+        if self.event_type == EVENT_MIGRATION:
             return "Migration of digital object to another file format, " \
                 "replacing the source object."
 
@@ -370,21 +382,21 @@ class PremisEventMusicArchive(PremisEvent):
         if self.event_outcome != "success":
             return "%sEvent failed." % out
 
-        if self.event_type == "message digest calculation":
+        if self.event_type == EVENT_DIGEST:
             # The same algorithm exists in all elements of details
             out = "%sChecksum calculated with algorithm %s " \
                   "resulted the following checksums:" \
                   "" % (out, self._detail_info[0]["tiiviste-tyyppi"])
             for info in self._detail_info:
                 checksum_time = datetime.datetime.strptime(
-                    info["tiiviste-aika"], "%Y-%m-%d %H:%M:%S"
-                    ).strftime("%Y-%m-%dT%H:%M:%S")
+                        info["tiiviste-aika"], self.time_format
+                    ).strftime(self.time_format_2)
                 out = "%s\n%s: %s (timestamp: %s)" \
                       "" % (out, info["objekti-nimi"],
                             info["tiiviste"], checksum_time)
             return out
 
-        if self.event_type == "filename change":
+        if self.event_type == EVENT_CHANGE:
             # There's only one element in details
             return "%sFilename changed.\nOld filename: %s\n" \
                    "New filename: %s\n" \
@@ -392,22 +404,22 @@ class PremisEventMusicArchive(PremisEvent):
                          self._detail_info[0]["pon-korvattu-nimi"],
                          self._detail_info[0]["objekti-nimi"])
 
-        if self.event_type == "information package creation":
+        if self.event_type == EVENT_CREATION:
             # There's only one element in details
             return "%sSubmission information package created as: " \
                    "%s" % (out, self._detail_info[0]["sip-tunniste"])
 
-        if self.event_type in ["modification"]:
+        if self.event_type in [EVENT_MODIFICATION]:
             return "%sObject has been modified." % out
 
-        if self.event_type in ["metadata modification"]:
+        if self.event_type in [EVENT_META_MODIFICATION]:
             return "%sMetadata has been modified." % out
 
-        if self.event_type == "normalization":
+        if self.event_type == EVENT_NORMALIZATION:
             return "%sFile format has been normalized. Outcome object " \
                 "has been created as a result." % out
 
-        if self.event_type == "migration":
+        if self.event_type == EVENT_MIGRATION:
             return "%sFile format has been migrated. Outcome object has " \
                 "been created as a result." % out
 
@@ -457,9 +469,10 @@ class PremisLinkingMusicArchive(PremisLinking):
         :identifier: PREMIS Object identifier
         :object_role: Object role in event.
         """
-        if self._event_type == "information package creation":
+        if self._event_type == EVENT_CREATION:
             return
         # TODO: this is a placeholder value until the real status is known
+        # (KDKPAS-3492)
         if self.counterpart_obj_status == "xxx":
             super().add_object_link(self.counterpart_obj_uuid, "source")
         super().add_object_link(identifier, object_role)

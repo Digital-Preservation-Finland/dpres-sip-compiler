@@ -1,6 +1,11 @@
 Release notes
 =============
 
+Version X.XX
+------------
+
+    * Clean up Makefile's install command from unnecessary parts.
+
 Version 0.20
 ------------
 

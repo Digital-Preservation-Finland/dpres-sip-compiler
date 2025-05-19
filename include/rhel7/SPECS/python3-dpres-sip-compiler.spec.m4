@@ -32,7 +32,7 @@ Submission Information Package (SIP) Compiler for Tailored Usage.
 
 %install
 rm -rf $RPM_BUILD_ROOT
-make install3 PREFIX="%{_prefix}" ROOT="%{buildroot}"
+make install PREFIX="%{_prefix}" ROOT="%{buildroot}"
 
 # Rename executables to prevent naming collision with Python 2 RPM
 mv %{buildroot}%{_bindir}/sip-compiler %{buildroot}%{_bindir}/sip-compiler-3

@@ -295,8 +295,8 @@ class PremisEventMusicArchive(PremisEvent):
                    "pon-korvattu-nimi", "objekti-nimi", "sip-tunniste",
                    "event-selite"]
 
-    time_format = "%Y-%m-%d %H:%M:%S"
-    time_format_2 = "%Y-%m-%dT%H:%M:%S"
+    time_parse_format = "%Y-%m-%d %H:%M:%S"
+    time_output_format = "%Y-%m-%dT%H:%M:%S"
 
     def __init__(self, csv_row):
         """Initialize.
@@ -305,14 +305,14 @@ class PremisEventMusicArchive(PremisEvent):
         self._detail_info = []
 
         start_time = datetime.datetime.strptime(
-            csv_row["event-aika-alku"], self.time_format
-            ).strftime(self.time_format_2)
+            csv_row["event-aika-alku"], self.time_parse_format
+            ).strftime(self.time_output_format)
         end_time = None
         if csv_row["event-aika-loppu"].lower() != "null" and \
                 csv_row["event-aika-loppu"] != csv_row["event-aika-alku"]:
             end_time = datetime.datetime.strptime(
-                csv_row["event-aika-loppu"], self.time_format
-                ).strftime(self.time_format_2)
+                csv_row["event-aika-loppu"], self.time_parse_format
+                ).strftime(self.time_output_format)
 
         event_datetime = start_time
         if end_time is not None:
@@ -389,8 +389,8 @@ class PremisEventMusicArchive(PremisEvent):
                   "" % (out, self._detail_info[0]["tiiviste-tyyppi"])
             for info in self._detail_info:
                 checksum_time = datetime.datetime.strptime(
-                        info["tiiviste-aika"], self.time_format
-                    ).strftime(self.time_format_2)
+                        info["tiiviste-aika"], self.time_parse_format
+                    ).strftime(self.time_output_format)
                 out = "%s\n%s: %s (timestamp: %s)" \
                       "" % (out, info["objekti-nimi"],
                             info["tiiviste"], checksum_time)

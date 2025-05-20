@@ -102,10 +102,8 @@ class SipCompiler:
         """
         for link in self.sip_meta.premis_linkings.values():
             for obj_link in link.object_links:
-                if (obj_link["linking_object"] not in
+                if (obj_link["linking_object"] in
                         self.sip_meta.premis_objects.keys()):
-                    pass  # no linking_object
-                else:
                     obj, obj_role = (self.sip_meta.premis_objects[
                                      obj_link["linking_object"]],
                                      obj_link["object_role"])

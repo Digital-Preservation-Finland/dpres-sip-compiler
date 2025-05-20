@@ -138,15 +138,6 @@ class SipCompiler:
                          sep=streams[0]["separator"],
                          quot=streams[0]["quotechar"])
 
-    def _import_representation_objects(self):
-        for obj_list in self.sip_meta.premis_digiprov_representations.values():
-            for obj in obj_list:
-                import_representation_object(self.temp_path,
-                                             obj.object_identifier_value,
-                                             obj.alt_identifier_value,
-                                             obj.original_name,
-                                             obj.filepath)
-
     def _create_provenance_metadata(self):
         """Create provenance metadata.
         """
@@ -198,7 +189,14 @@ class SipCompiler:
                 linked_object_ids=linking_representations)
         print("Provenance metadata created for %d event(s)."
               "" % (len(self.sip_meta.premis_events)))
-        self._import_representation_objects()
+
+        for obj_list in self.sip_meta.premis_digiprov_representations.values():
+            for obj in obj_list:
+                import_representation_object(self.temp_path,
+                                             obj.object_identifier_value,
+                                             obj.alt_identifier_value,
+                                             obj.original_name,
+                                             obj.filepath)
 
     def _import_descriptive_metadata(self):
         """Import descriptive metadata

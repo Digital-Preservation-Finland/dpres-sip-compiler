@@ -86,8 +86,6 @@ class SipMetadata:
         Iterator for descriptive metadata files.
         Implemented in adaptors.
 
-        :desc_path: Path to descriptive metadata files
-        :config: Additional needed configuration
         :returns: Descriptive metadata file
         """
         yield
@@ -98,7 +96,6 @@ class SipMetadata:
         Resolve whether descriptive metadata root should be removed.
         Implemented in adaptors.
 
-        :config: Additional needed configuration
         :returns: True/False
         """
         return False

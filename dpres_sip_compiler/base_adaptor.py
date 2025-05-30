@@ -3,6 +3,10 @@ Base adaptor for handling PREMIS metadata in packaging.
 
 Adaptors can overwrite the required methods and properties as needed.
 """
+import os
+from collections.abc import Iterator
+from dpres_sip_compiler.config import Config
+from file_scraper.scraper import Scraper
 
 
 def build_sip_metadata(adaptor_dict, source_path, config):
@@ -32,177 +36,6 @@ def sip_metadata_class(adaptor_dict, config):
             "in configuration file?")
 
     return adaptor_dict[config.adaptor]
-
-
-def add_premis(premis_elem, premis_dict):
-    """
-    Add PREMIS metadata object to a dict.
-    Do not add if already exists.
-
-    :premis_elem: PREMIS Element to be added to a dict
-    :premis_dict: PREMIS dict
-    """
-    if premis_elem.identifier in premis_dict:
-        return
-    premis_dict[premis_elem.identifier] = premis_elem
-
-
-class SipMetadata:
-    """
-    Metadata handler for a SIP to be compiled.
-    Can be overwritten with metadata type specific adaptors.
-
-    Attributes:
-        objid: METS objid
-        premis_objects: Dictionary of PREMIS Objects
-        premis_events: Dictionary of PREMIS Events
-        premis_agents: Dictionary of PREMIS Agents
-        premis_linkings: Dictionary of Linkings inside PREMIS
-        premis_digiprov_representations: Dictionary of PREMIS
-            Representations as digiprov MD
-    """
-
-    # pylint: disable=no-self-use
-
-    def __init__(self):
-        """
-        Initialize SIP PREMIS handler.
-        """
-        self.objid = None
-        self.premis_objects = {}
-        self.premis_events = {}
-        self.premis_agents = {}
-        self.premis_linkings = {}
-        self.premis_digiprov_representations = {}
-
-    def populate(self, source_path, config):
-        """Create metadata objects based on source path.
-        """
-        pass
-
-    # pylint: disable=unused-argument
-    def descriptive_files(self):
-        """
-        Iterator for descriptive metadata files.
-        Implemented in adaptors.
-
-        :returns: Descriptive metadata file
-        """
-        yield
-
-    # pylint: disable=unused-argument
-    def desc_root_remove(self):
-        """
-        Resolve whether descriptive metadata root should be removed.
-        Implemented in adaptors.
-
-        :returns: True/False
-        """
-        return False
-
-    @staticmethod
-    def exclude_files(config):
-        """
-        Exclude files from Submission Information Package.
-        Implemented in adaptors.
-
-        :config: Additional needed configuration
-        :returns: Patterns for metadata files to be excluded.
-        """
-        return ()
-
-    def post_tasks(self, workspace, source_path):
-        """
-        Post tasks to workspace not supported by dpres-siptools.
-
-        :workspace: Workspace path
-        :source_path: Source path of files to be packaged
-        """
-        pass
-
-    def add_object(self, p_object):
-        """Add PREMIS Object.
-        :p_object: PREMIS Object
-        """
-        add_premis(p_object, self.premis_objects)
-
-    def add_event(self, p_event):
-        """Add PREMIS Event.
-        :p_event: PREMIS Event
-        """
-        add_premis(p_event, self.premis_events)
-
-    def add_agent(self, p_agent):
-        """Add PREMIS Agent.
-        :p_agent: PREMIS Agent
-        """
-        add_premis(p_agent, self.premis_agents)
-
-    def add_linking(self, p_linking, object_id, object_role,
-                    agent_id, agent_role):
-        """
-        Create PREMIS linkings between events and objects/agents.
-
-        The links are appended to a dict structure: A key in a link is an
-        event identifier, and the corresponding value contains identifiers of
-        the PREMIS objects and agents, which are related to the event.
-
-        This method adds linkings between a PREMIS event, and a PREMIS object
-        and agent. More objects/agent can be added with multiple calls: If
-        the key (i.e. event identifier) exists already, the method appends
-        the given PREMIS object and agent linkings along with the existing
-        ones.
-
-        :p_linking: Linking object
-        :object_id: PREMIS Object ID
-        :object_role: PREMIS Object role in event
-        :agent_id: PREMIS Agent ID
-        :agent_role: Role of the PREMIS Agent in linking
-        """
-        add_premis(p_linking, self.premis_linkings)
-        self.premis_linkings[p_linking.identifier].add_object_link(
-            object_id, object_role)
-        self.premis_linkings[p_linking.identifier].add_agent_link(
-            agent_id, agent_role)
-
-    def add_digiprov_representation_object(self, p_object):
-        """
-        Add PREMIS representation object to a dict.
-
-        :p_object: PREMIS representation object
-        """
-        if p_object.identifier not in self.premis_digiprov_representations:
-            self.premis_digiprov_representations[p_object.identifier] = []
-        self.premis_digiprov_representations[p_object.identifier].append(
-                p_object)
-
-    @property
-    def objects(self):
-        """Iterate PREMIS Objects.
-        :returns: PREMIS Object
-        """
-        yield from self.premis_objects.values()
-
-    @property
-    def events(self):
-        """Iterate PREMIS Events.
-        :returns: PREMIS Event
-        """
-        yield from self.premis_events.values()
-
-    @property
-    def agents(self):
-        """Iterate PREMIS Agents.
-        :returns: PREMIS Agent
-        """
-        yield from self.premis_agents.values()
-
-    @property
-    def linkings(self):
-        """Iterate PREMIS Linkings.
-        :returns: PREMIS Linking
-        """
-        yield from self.premis_linkings.values()
 
 
 class PremisObject:
@@ -365,7 +198,7 @@ class PremisLinking:
         """
         self.identifier = None  # Identifier of the linking
         self.object_links = []  # List of object IDs
-        self.agent_links = []   # List of agent IDs and roles
+        self.agent_links = []  # List of agent IDs and roles
 
     def add_object_link(self, identifier, object_role):
         """Add object and its role to linking, if it does not exist.
@@ -394,3 +227,230 @@ class PremisLinking:
                 return
         self.agent_links.append({"linking_agent": identifier,
                                  "agent_role": agent_role})
+
+
+class SipMetadata:
+    """
+    Metadata handler for a SIP to be compiled.
+    Can be overwritten with metadata type specific adaptors.
+
+    Attributes:
+        objid: METS objid
+        premis_objects: Dictionary of PREMIS Objects
+        premis_events: Dictionary of PREMIS Events
+        premis_agents: Dictionary of PREMIS Agents
+        premis_linkings: Dictionary of Linkings inside PREMIS
+        premis_digiprov_representations: Dictionary of PREMIS
+            Representations as digiprov MD
+    """
+
+    # pylint: disable=no-self-use
+
+    def __init__(self):
+        """
+        Initialize SIP PREMIS handler.
+        """
+        self.content_id = None
+        self.objid = None
+        self.premis_objects = {}
+        self.premis_object_alt_ids = {}
+        self.premis_events = {}
+        self.premis_agents = {}
+        self.premis_linkings = {}
+        self.premis_digiprov_representations = {}
+        # To store scraper result.
+        self.scraper_results = {}
+
+    def populate(self, source_path, config):
+        """Create metadata objects based on source path.
+        """
+        pass
+
+    # pylint: disable=unused-argument
+    def descriptive_files(
+        self, desc_path: str, config: Config
+    ) -> Iterator[str]:
+        """
+        Iterator for descriptive metadata files.
+        Implemented in adaptors otherwise return empty iterator.
+
+        :param desc_path: Path to descriptive metadata files
+        :param config: Additional needed configuration
+        :returns: Iterator
+        """
+        yield from ()
+
+    # pylint: disable=unused-argument
+    def desc_root_remove(self, config):
+        """
+        Resolve whether descriptive metadata root should be removed.
+        Implemented in adaptors.
+
+        :config: Additional needed configuration
+        :returns: True/False
+        """
+        return False
+
+    @staticmethod
+    def exclude_files(config):
+        """
+        Exclude files from Submission Information Package.
+        Implemented in adaptors.
+
+        :config: Additional needed configuration
+        :returns: Patterns for metadata files to be excluded.
+        """
+        return ()
+
+    def scrape_objects(self, source_path: str, validation: bool) -> None:
+        """To scrape objects and store their scraper results.
+
+        :param source_path: Source path for the objects.
+        :param validation: Whether to enable well_formed check or not.
+        """
+        for obj_identifier, obj in self.premis_objects.items():
+            scraper = Scraper(
+                filename=os.path.join(source_path, obj.filepath),
+                mimetype=obj.format_name,
+                version=obj.format_version,
+            )
+            scraper.scrape(check_wellformed=validation)
+            scraper_result = {
+                "streams": scraper.streams,
+                "info": scraper.info,
+                "mimetype": scraper.mimetype,
+                "version": scraper.version,
+                "checksum": scraper.checksum().lower(),
+                "grade": scraper.grade(),
+            }
+            self.scraper_results[obj_identifier] = scraper_result
+
+    def post_tasks(self, workspace, source_path):
+        """
+        Post tasks to workspace not supported by dpres-siptools.
+
+        :workspace: Workspace path
+        :source_path: Source path of files to be packaged
+        """
+        pass
+
+    def add_object(self, p_object: PremisObject) -> None:
+        """Add PREMIS Object. Do not add if already exists.
+
+        :param p_object: PREMIS Object
+        """
+        if p_object.identifier not in self.premis_objects:
+            self.premis_objects[p_object.identifier] = p_object
+
+    def add_object_alt_id(
+        self,
+        obj_identifier: str,
+        alt_identifier_type: str,
+        alt_identifier: str,
+    ) -> None:
+        """Add additional unique alternative ID for the object.
+
+        :param obj_identifier: Main identifier of the object.
+        :param alt_identifier_type: Alternative identifier type for the object.
+        :param alt_identifier: Alternative identifier for the object.
+        """
+        if obj_identifier not in self.premis_object_alt_ids:
+            self.premis_object_alt_ids[obj_identifier] = []
+        new_alt = {
+            "alt_identifier_type": alt_identifier_type,
+            "alt_identifier": alt_identifier,
+        }
+        if new_alt not in self.premis_object_alt_ids[obj_identifier]:
+            self.premis_object_alt_ids[obj_identifier].append(new_alt)
+
+    def add_event(self, p_event: PremisEvent) -> None:
+        """Add PREMIS Event. Do not add if already exists.
+
+        :param p_event: PREMIS Event
+        """
+        if p_event.identifier not in self.premis_events:
+            self.premis_events[p_event.identifier] = p_event
+
+    def add_agent(self, p_agent: PremisAgent) -> None:
+        """Add PREMIS Agent. Do not add if already exists.
+
+        :param p_agent: PREMIS Agent
+        """
+        if p_agent.identifier not in self.premis_agents:
+            self.premis_agents[p_agent.identifier] = p_agent
+
+    def add_linking(
+        self,
+        p_linking: PremisLinking,
+        object_id: str,
+        object_role: str,
+        agent_id: str,
+        agent_role: str,
+    ) -> None:
+        """
+        Create PREMIS linkings between events and objects/agents.
+
+        The links are appended to a dict structure: A key in a link is an
+        event identifier, and the corresponding value contains identifiers of
+        the PREMIS objects and agents, which are related to the event.
+
+        This method adds linkings between a PREMIS event, and a PREMIS object
+        and agent. More objects/agent can be added with multiple calls: If
+        the key (i.e. event identifier) exists already, the method appends
+        the given PREMIS object and agent linkings along with the existing
+        ones.
+
+        :param p_linking: Linking object
+        :param object_id: PREMIS Object ID
+        :param object_role: PREMIS Object role in event
+        :param agent_id: PREMIS Agent ID
+        :param agent_role: Role of the PREMIS Agent in linking
+        """
+        if p_linking.identifier not in self.premis_linkings:
+            self.premis_linkings[p_linking.identifier] = p_linking
+
+        self.premis_linkings[p_linking.identifier].add_object_link(
+            object_id, object_role
+        )
+        self.premis_linkings[p_linking.identifier].add_agent_link(
+            agent_id, agent_role
+        )
+
+    def add_digiprov_representation_object(self, p_object):
+        """
+        Add PREMIS representation object to a dict.
+
+        :p_object: PREMIS representation object
+        """
+        if p_object.identifier not in self.premis_digiprov_representations:
+            self.premis_digiprov_representations[p_object.identifier] = []
+        self.premis_digiprov_representations[p_object.identifier].append(
+            p_object)
+
+    @property
+    def objects(self):
+        """Iterate PREMIS Objects.
+        :returns: PREMIS Object
+        """
+        yield from self.premis_objects.values()
+
+    @property
+    def events(self):
+        """Iterate PREMIS Events.
+        :returns: PREMIS Event
+        """
+        yield from self.premis_events.values()
+
+    @property
+    def agents(self):
+        """Iterate PREMIS Agents.
+        :returns: PREMIS Agent
+        """
+        yield from self.premis_agents.values()
+
+    @property
+    def linkings(self):
+        """Iterate PREMIS Linkings.
+        :returns: PREMIS Linking
+        """
+        yield from self.premis_linkings.values()

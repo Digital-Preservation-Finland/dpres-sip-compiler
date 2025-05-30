@@ -21,8 +21,7 @@ def test_populate():
     """Test that CSV is populated.
     """
     sip_meta = SipMetadataMusicArchive()
-    config = Config()
-    config.configure("tests/data/musicarchive/config.conf")
+    config = Config(conf_file="tests/data/musicarchive/config.conf")
     sip_meta.populate("tests/data/musicarchive/source1", config)
     assert len(sip_meta.premis_objects) == 4
     assert len(sip_meta.premis_events) == 7
@@ -35,8 +34,7 @@ def test_populate_deprecatedsum():
     Test that PREMIS object is not created for old checksum, but the event is.
     """
     sip_meta = SipMetadataMusicArchive()
-    config = Config()
-    config.configure("tests/data/musicarchive/config.conf")
+    config = Config(conf_file="tests/data/musicarchive/config.conf")
     sip_meta.populate("tests/data/musicarchive/source2", config)
 
     assert sip_meta.premis_objects[
@@ -54,8 +52,7 @@ def test_descriptive_files():
     """Check that descriptive metadata files are found.
     """
     sip_meta = SipMetadataMusicArchive()
-    config = Config()
-    config.configure("tests/data/musicarchive/config.conf")
+    config = Config(conf_file="tests/data/musicarchive/config.conf")
     desc_files = []
     for desc in sip_meta.descriptive_files(
             "tests/data/musicarchive/source1", config):
@@ -106,8 +103,7 @@ def test_alt_identifier(tmpdir):
     with open(mets_file, 'w') as outfile:
         outfile.write(xml_original)
     sip_meta = SipMetadataMusicArchive()
-    config = Config()
-    config.configure("tests/data/musicarchive/config.conf")
+    config = Config(conf_file="tests/data/musicarchive/config.conf")
     sip_meta.populate("tests/data/musicarchive/source2", config)
     sip_meta.post_tasks(str(tmpdir), "tests/data/musicarchive/source2")
     mets_xml = lxml.etree.parse(mets_file).getroot()
@@ -328,8 +324,6 @@ def test_skip_hidden(tmpdir, pick_files_tar):
     Test that we do not pick hidden files in SIP compilation
     in Music Archive adaptor.
     """
-    config = Config()
-    config.configure("tests/data/musicarchive/config.conf")
 
     source_path = os.path.join(str(tmpdir), "source1")
     shutil.copytree("tests/data/musicarchive/source1", source_path)

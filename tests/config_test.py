@@ -6,8 +6,7 @@ from dpres_sip_compiler.config import Config
 def test_configure():
     """Test that configuration file is loaded as properties.
     """
-    config = Config()
-    config.configure("tests/data/musicarchive/config.conf")
+    config = Config(conf_file="tests/data/musicarchive/config.conf")
     assert config.name == "Archive X"
     assert config.contract == "urn:uuid:474418c5-79a6-4e86-bfc8-5aed0a3337d7"
     assert config.sign_key == "tests/data/sign.crt"

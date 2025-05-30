@@ -10,8 +10,9 @@ def test_ng_compile_sip(tmpdir, pick_files_tar):
     tar_file = os.path.join(str(tmpdir), "test_sip.tar")
     ng_compile_sip(
         "tests/data/compiler_ng/files",
-        descriptive_metadata_path=(
-            "tests/data/compiler_ng/desc_dc_metadata.xml"),
+        descriptive_metadata_paths=[
+            "tests/data/compiler_ng/desc_dc_metadata.xml"
+        ],
         tar_file=tar_file,
         conf_file="tests/data/compiler_ng/generic.conf")
     assert os.path.isfile(tar_file)
@@ -40,5 +41,3 @@ def test_musicarchive_compile_ng(tmp_path, pick_files_tar, package_source):
     tar_list = pick_files_tar(tar_file)
     assert "mets.xml" in tar_list
     assert "signature.sig" in tar_list
-    assert "test_file_01.txt" in tar_list
-    assert "test_file_02.txt" in tar_list

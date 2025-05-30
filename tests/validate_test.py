@@ -9,8 +9,7 @@ def test_iterate_files(tmpdir):
     """
     Test that file exclusion feature works in file iteration.
     """
-    config = Config()
-    config.configure("tests/data/musicarchive/config.conf")
+    config = Config(conf_file="tests/data/musicarchive/config.conf")
 
     count = 0
     count_real = 0
@@ -31,8 +30,7 @@ def test_iterate_files(tmpdir):
 
 def test_scrape_files():
     """Tests the scrape_files function."""
-    config = Config()
-    config.configure("tests/data/musicarchive/config.conf")
+    config = Config(conf_file="tests/data/musicarchive/config.conf")
     for file_dict in scrape_files('tests/data/musicarchive/source1/audio',
                                   config):
         assert file_dict['well-formed']
@@ -46,7 +44,6 @@ def test_scrape_files():
 
 def test_count_files():
     """Tests the count_files function."""
-    config = Config()
-    config.configure("tests/data/musicarchive/config.conf")
+    config = Config(conf_file="tests/data/musicarchive/config.conf")
     # In the used configuration, we skip files named as *___metadata.{csv,xml}
     assert count_files('tests/data/musicarchive', config) == 14

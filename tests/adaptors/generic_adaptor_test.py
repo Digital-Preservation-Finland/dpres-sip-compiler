@@ -13,8 +13,8 @@ def test_populate():
     assert len(testclass.premis_objects) == 2
 
     filepaths = get_premis_objects_filepaths(testclass.premis_objects)
-    assert 'tests/data/compiler_ng/files/test_file_01.txt' in filepaths
-    assert 'tests/data/compiler_ng/files/test_file_02.txt' in filepaths
+    assert 'test_file_01.txt' in filepaths
+    assert 'test_file_02.txt' in filepaths
 
 
 def get_premis_objects_filepaths(premis_objects):

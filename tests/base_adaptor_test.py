@@ -11,8 +11,7 @@ from dpres_sip_compiler.config import Config
 def test_build_sip_meta():
     """Test that the class is selected based on configuration.
     """
-    config = Config()
-    config.configure("tests/data/musicarchive/config.conf")
+    config = Config(conf_file="tests/data/musicarchive/config.conf")
     sip_meta = build_sip_metadata(
         ADAPTOR_DICT, "tests/data/musicarchive/source1", config)
     assert sip_meta.__class__.__name__ == "SipMetadataMusicArchive"

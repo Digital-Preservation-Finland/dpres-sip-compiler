@@ -22,5 +22,6 @@ class GenericFolderStructure(SipMetadata):
                 "object_identifier_value": str(uuid4())
             }
             p_object = PremisObject(metadata=metadata)
-            p_object.filepath = filepath
+            # Use relative path for the objects
+            p_object.filepath = os.path.relpath(filepath, source_path)
             self.add_object(p_object)

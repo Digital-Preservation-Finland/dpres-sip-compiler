@@ -3,6 +3,7 @@ Command line interface
 """
 import json
 import os
+
 import click
 from dpres_sip_compiler.config import (get_default_config_path,
                                        get_default_temp_path)
@@ -59,7 +60,9 @@ def compile_command(source_path, tar_file, temp_path, config, validation):
                                 dir_okay=True))
 @click.argument('descriptive-metadata-path',
                 type=click.Path(exists=True, file_okay=True,
-                                dir_okay=False))
+                                dir_okay=False),
+                required=False,
+                nargs=-1)
 @click.option("--tar-file",
               type=click.Path(exists=False),
               metavar="<FILE>",
@@ -72,17 +75,23 @@ def compile_command(source_path, tar_file, temp_path, config, validation):
               help="Path of the configuration file. Defaults to: "
                    "%s" % get_default_config_path(),
               default=get_default_config_path())
+@click.option("--validation/--no-validation", default=True,
+              help="Validation / No validation of the files during "
+                   "compilation. Defaults to validation with compilation.")
 def compile_ng_command(source_path, descriptive_metadata_path, tar_file,
-                       config):
+                       config, validation):
     """
     Compile Submission Information Package.
 
     SOURCE-PATH: Source path of the files to be packaged.
 
-    DESCRIPTIVE-METADATA-PATH: Path to the descriptive metadata file.
+    DESCRIPTIVE-METADATA-PATH: Zero or more file paths to descriptive metadata.
     """
-    ng_compile_sip(source_path, descriptive_metadata_path, tar_file,
-                   conf_file=config)
+    ng_compile_sip(source_path,
+                   tar_file,
+                   descriptive_metadata_paths=list(descriptive_metadata_path),
+                   conf_file=config,
+                   validation=validation)
 
 
 @cli.command(
@@ -137,8 +146,7 @@ def validate(path, valid_output, invalid_output, summary, conf_file, stdout):
 
     PATH: Path to the files to be scraped and validated.
     """
-    config = Config()
-    config.configure(conf_file)
+    config = Config(conf_file=conf_file)
     length = count_files(path, config)
     click.echo('Found %s files.' % length)
     valid_files_count = 0

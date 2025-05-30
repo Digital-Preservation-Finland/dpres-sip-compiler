@@ -8,6 +8,7 @@ import csv
 import premis
 import mets as metslib
 from file_scraper.scraper import Scraper
+from file_scraper.defaults import UNAP
 from xml_helpers import utils as xml_utils
 from dpres_sip_compiler.base_adaptor import (
     SipMetadata, PremisObject, PremisEvent, PremisAgent,
@@ -67,6 +68,7 @@ class SipMetadataMusicArchive(SipMetadata):
             raise OSError("CSV metadata file was not found!")
 
         self.objid = os.path.split(filename)[1].replace(config.csv_ending, "")
+        self.content_id = self.objid
 
         for csv_row in read_csv_file(filename):
             self.add_premis_metadata(csv_row, source_path, config)
@@ -83,6 +85,12 @@ class SipMetadataMusicArchive(SipMetadata):
                 config.used_checksum.lower() and p_object.digest_valid:
             p_object.find_path(source_path)
             self.add_object(p_object)
+            if p_object.alt_identifier_type and p_object.alt_identifier_value:
+                self.add_object_alt_id(
+                    obj_identifier=p_object.identifier,
+                    alt_identifier_type=p_object.alt_identifier_type,
+                    alt_identifier=p_object.alt_identifier_value,
+                )
         p_event = PremisEventMusicArchive(csv_row)
         self.add_event(p_event)
         self.premis_events[p_event.identifier].add_detail_info(
@@ -97,6 +105,12 @@ class SipMetadataMusicArchive(SipMetadata):
             r_object = PremisRepresentationMusicArchive(csv_row)
             r_object.find_target_path(source_path)
             self.add_digiprov_representation_object(r_object)
+            if r_object.alt_identifier_type and r_object.alt_identifier_value:
+                self.add_object_alt_id(
+                    obj_identifier=r_object.identifier,
+                    alt_identifier_type=r_object.alt_identifier_type,
+                    alt_identifier=r_object.alt_identifier_value,
+                )
 
     def descriptive_files(self, desc_path=None, config=None):
         """
@@ -130,6 +144,44 @@ class SipMetadataMusicArchive(SipMetadata):
         return ("*%s" % config.meta_ending,
                 "*%s" % config.csv_ending,
                 ".[!/]*", "*/.[!/]*")  # Exclude all hidden files/directories
+
+    def scrape_objects(self, source_path: str, validation: bool) -> None:
+        """To scrape objects and store their scraper results.
+
+        :param source_path: Source path for the objects.
+        :param validation: Whether to enable well_formed check or not.
+        """
+        for obj_identifier, obj in self.premis_objects.items():
+            scraper = Scraper(
+                filename=os.path.join(source_path, obj.filepath),
+                mimetype=obj.format_name,
+                version=obj.format_version,
+            )
+            scraper.scrape(check_wellformed=validation)
+            # Special case for musicarchive
+            if scraper.mimetype == "text/html":
+                if validation is False:
+                    # If validation was disabled, we'll enable for this
+                    # special case handling.
+                    scraper = Scraper(
+                        filename=os.path.join(source_path, obj.filepath),
+                        mimetype=obj.format_name,
+                        version=obj.format_version,
+                    )
+                    scraper.scrape(check_wellformed=True)
+                if scraper.well_formed is False:
+                    scraper.mimetype = "text/plain; alt-format=text/html"
+                    scraper.version = UNAP
+
+            scraper_result = {
+                "streams": scraper.streams,
+                "info": scraper.info,
+                "mimetype": scraper.mimetype,
+                "version": scraper.version,
+                "checksum": scraper.checksum().lower(),
+                "grade": scraper.grade(),
+            }
+            self.scraper_results[obj_identifier] = scraper_result
 
     def post_tasks(self, workspace, source_path):
 

@@ -46,8 +46,7 @@ def prepare_workspace():
         :returns: Source path, TAR file path, temporary path and configuration
         """
         source_path = os.path.join("tests/data/musicarchive", source)
-        config = Config()
-        config.configure("tests/data/musicarchive/config.conf")
+        config = Config(conf_file="tests/data/musicarchive/config.conf")
         tar_file = os.path.join(str(tmp_path), "sip.tar")
         return (source_path, tar_file, str(tmp_path), config)
 

@@ -11,5 +11,6 @@ ADAPTOR_DICT = {
 }
 
 ADAPTOR_NG_DICT = {
-    "generic": GenericFolderStructure
+    "generic": GenericFolderStructure,
+    "musicarchive": SipMetadataMusicArchive
 }

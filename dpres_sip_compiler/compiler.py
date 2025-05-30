@@ -330,8 +330,7 @@ def compile_sip(source_path, tar_file=None, temp_path=None, conf_file=None,
         os.makedirs(temp_path)
         temp_path_created = True
 
-    config = Config()
-    config.configure(conf_file)
+    config = Config(conf_file=conf_file)
 
     sip_meta = build_sip_metadata(ADAPTOR_DICT, source_path, config)
     compiler = SipCompiler(source_path=source_path,

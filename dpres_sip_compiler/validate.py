@@ -63,8 +63,8 @@ def scrape_files(path, config):
         scraper.scrape(check_wellformed=True)
 
         results = {
-            "path": ensure_text(scraper.filename),
-            "filename": ensure_text(os.path.basename(scraper.filename)),
+            "path": str(scraper.filename),
+            "filename": os.path.basename(str(scraper.filename)),
             "timestamp": datetime.datetime.now(
                 datetime.timezone.utc).isoformat(),
             "MIME type": ensure_text(scraper.mimetype),

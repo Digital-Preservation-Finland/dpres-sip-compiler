@@ -32,12 +32,27 @@ def test_musicarchive_compile_ng(tmp_path, pick_files_tar, package_source):
     musicarchive_path = "tests/data/musicarchive"
     conf_path = f"{musicarchive_path}/config.conf"
     tar_file = tmp_path / "test_sip.tar"
+    tmp_tar_dir = tmp_path / "extracted_tar_contents"
     ng_compile_sip(
         source_path=f"{musicarchive_path}/{package_source}",
         tar_file=str(tar_file),
         conf_file=conf_path,
     )
     assert os.path.isfile(tar_file)
-    tar_list = pick_files_tar(tar_file)
+    tar_list = pick_files_tar(
+        tar_file, target=tmp_tar_dir, extract_list=["mets.xml"]
+    )
     assert "mets.xml" in tar_list
     assert "signature.sig" in tar_list
+    if package_source == "migration_test_files":
+        with open(tmp_tar_dir / "mets.xml", encoding="UTF-8") as outfile:
+            xml_content = outfile.read()
+        # Source file used for conversion must not have
+        # "fi-dpres-bit-level-file-format-with-recommended" defined.
+        conversion_source_file_xml = (
+            'USE="fi-dpres-bit-level-file-format-with-recommended">'
+            '<mets:FLocat xmlns:xlink="http://www.w3.org/1999/xlink" '
+            'LOCTYPE="URL" '
+            'xlink:href="file:///files/test_file_original_03.txt"'
+        )
+        assert conversion_source_file_xml not in xml_content

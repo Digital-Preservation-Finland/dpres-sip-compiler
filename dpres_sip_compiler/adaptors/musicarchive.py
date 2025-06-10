@@ -13,15 +13,17 @@ from xml_helpers import utils as xml_utils
 from dpres_sip_compiler.base_adaptor import (
     SipMetadata, PremisObject, PremisEvent, PremisAgent,
     PremisLinking)
-
-PREMIS_ADDRESS = "info:lc/xmlns/premis-v2"
-EVENT_DIGEST = "message digest calculation"
-EVENT_CHANGE = "filename change"
-EVENT_CREATION = "information package creation"
-EVENT_MODIFICATION = "modification"
-EVENT_META_MODIFICATION = "metadata modification"
-EVENT_NORMALIZATION = "normalization"
-EVENT_MIGRATION = "migration"
+from dpres_sip_compiler.constants import (
+    EVENT_DIGEST,
+    EVENT_CHANGE,
+    EVENT_CONVERSION,
+    EVENT_CREATION,
+    EVENT_MODIFICATION,
+    EVENT_META_MODIFICATION,
+    EVENT_NORMALIZATION,
+    EVENT_MIGRATION,
+    PREMIS_ADDRESS,
+)
 
 
 def read_csv_file(filename):
@@ -413,16 +415,27 @@ class PremisEventMusicArchive(PremisEvent):
             return "Modification of metadata."
 
         if self.event_type == EVENT_NORMALIZATION:
-            return "Normalization of digital object in an unsupported file " \
-                "format to a sustainable format for digital preservation, " \
+            return (
+                "Normalization of digital object in an unsupported file "
+                "format to a sustainable format for digital preservation, "
                 "replacing the source object."
+            )
 
         if self.event_type == EVENT_MIGRATION:
-            return "Migration of digital object to another file format, " \
+            return (
+                "Migration of digital object to another file format, "
                 "replacing the source object."
+            )
+
+        if self.event_type == EVENT_CONVERSION:
+            return (
+                "Conversion of digital object to another file format, "
+                "creating a new derivative version of the source object."
+            )
 
         raise NotImplementedError(
-            "Not implemented event type '%s'." % (self.event_type))
+            f"Not implemented event type '{self.event_type}'."
+        )
 
     @property
     def event_outcome_detail(self):
@@ -474,6 +487,12 @@ class PremisEventMusicArchive(PremisEvent):
         if self.event_type == EVENT_MIGRATION:
             return "%sFile format has been migrated. Outcome object has " \
                 "been created as a result." % out
+
+        if self.event_type == EVENT_CONVERSION:
+            return (
+                f"{out}File format has been converted. "
+                "Outcome object has been created as a result."
+            )
 
         raise NotImplementedError(
             "Not implemented event type '%s'." % (self.event_type))

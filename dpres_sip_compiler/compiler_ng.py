@@ -17,6 +17,7 @@ from file_scraper.defaults import BIT_LEVEL_WITH_RECOMMENDED
 from dpres_sip_compiler.base_adaptor import build_sip_metadata
 from dpres_sip_compiler.adaptor_list import ADAPTOR_NG_DICT
 from dpres_sip_compiler.config import Config, get_default_config_path
+from dpres_sip_compiler.constants import EVENT_MIGRATION, EVENT_NORMALIZATION
 
 OUTCOME = "outcome"
 SOURCE = "source"
@@ -180,9 +181,13 @@ class SipCompiler:
                     )
                     if obj_role not in [SOURCE, OUTCOME]:
                         obj_role = TARGET
-                    if obj_role == SOURCE:
+                    if obj_role == SOURCE and event.event_type in [
+                        EVENT_MIGRATION,
+                        EVENT_NORMALIZATION,
+                    ]:
                         # Objects being in normalization or migration
-                        # will have bit_level enforced
+                        # will have bit_level enforced. Conversions are
+                        # exempt from this logic.
                         self.digital_objects[
                             object_link["linking_object"]
                         ].digital_object.use = BIT_LEVEL_WITH_RECOMMENDED

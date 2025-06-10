@@ -1,0 +1,11 @@
+"""Constants module."""
+
+PREMIS_ADDRESS = "info:lc/xmlns/premis-v2"
+EVENT_DIGEST = "message digest calculation"
+EVENT_CHANGE = "filename change"
+EVENT_CONVERSION = "conversion"
+EVENT_CREATION = "information package creation"
+EVENT_MODIFICATION = "modification"
+EVENT_META_MODIFICATION = "metadata modification"
+EVENT_NORMALIZATION = "normalization"
+EVENT_MIGRATION = "migration"

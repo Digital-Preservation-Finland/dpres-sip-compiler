@@ -6,6 +6,7 @@ Version X.XX
 
     * Clean up Makefile's install command from unnecessary parts.
     * Support Musicarchive adapter usage in compile-ng.
+    * Support conversion events in compile-ng.
 
 Version 0.20
 ------------

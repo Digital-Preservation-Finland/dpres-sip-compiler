@@ -257,6 +257,10 @@ class SipMetadata:
         self.premis_events = {}
         self.premis_agents = {}
         self.premis_linkings = {}
+        # To store possible object representations, may include
+        # redundant information, but the information has to
+        # be available for lookup when generation digiprov information
+        # and actual object file is missing.
         self.premis_digiprov_representations = {}
         # To store scraper result.
         self.scraper_results = {}

@@ -103,7 +103,8 @@ class SipMetadataMusicArchive(SipMetadata):
                          object_role=csv_row["poo-sip-obj-x-rooli-selite"],
                          agent_id="agent-"+csv_row["agent-id"],
                          agent_role=csv_row["agent-rooli"])
-        if csv_row["poo-vastinpari-obj-status"] == "xxx":
+        # -1 and -3 are the two legitimate values for representation object.
+        if csv_row["poo-vastinpari-obj-status"] in ["-1", "-3"]:
             r_object = PremisRepresentationMusicArchive(csv_row)
             r_object.find_target_path(source_path)
             self.add_digiprov_representation_object(r_object)
@@ -542,9 +543,8 @@ class PremisLinkingMusicArchive(PremisLinking):
         """
         if self._event_type == EVENT_CREATION:
             return
-        # TODO: this is a placeholder value until the real status is known
-        # (KDKPAS-3492)
-        if self.counterpart_obj_status == "xxx":
+        # -1 and -3 are the two legitimate values.
+        if self.counterpart_obj_status in ["-1", "-3"]:
             super().add_object_link(self.counterpart_obj_uuid, "source")
         super().add_object_link(identifier, object_role)
 

@@ -5,8 +5,9 @@ Version X.XX
 ------------
 
     * Clean up Makefile's install command from unnecessary parts.
-    * Support Musicarchive adapter usage in compile-ng.
+    * Support Musicarchive adaptor usage in compile-ng.
     * Support conversion events in compile-ng.
+    * Change Musicarchive adaptor's placeholder "xxx" value for "-1" and "-3" that is used for object linking.
 
 Version 0.20
 ------------

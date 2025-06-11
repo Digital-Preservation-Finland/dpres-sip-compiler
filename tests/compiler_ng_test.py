@@ -2,7 +2,127 @@
 """
 import os
 import pytest
+from lxml import etree
+from file_scraper.defaults import BIT_LEVEL_WITH_RECOMMENDED
 from dpres_sip_compiler.compiler_ng import ng_compile_sip
+from dpres_sip_compiler.constants import FILE_USE_IGNORE_VALIDATION
+
+_NAMESPACES = {
+    "mets": "http://www.loc.gov/METS/",
+    "premis": "info:lc/xmlns/premis-v2",
+    "xlink": "http://www.w3.org/1999/xlink",
+}
+
+
+def _assert_html_content(mets_filepath: str) -> None:
+    """Shorthand function to validate the mets content of accepted html
+    test package for musicarchive.
+
+    :param mets_filepath: Path to the mets.xml file.
+    """
+    # premis:objectCharacteristics
+    xml_tree = etree.parse(mets_filepath)
+    format_name_element = xml_tree.xpath(
+        (
+            "./mets:amdSec/mets:techMD/mets:mdWrap/mets:xmlData/premis:object"
+            '/premis:originalName[text()="invalid_html.html"]'
+            "/preceding-sibling::premis:objectCharacteristics"
+            "/premis:format/premis:formatDesignation/premis:formatName"
+        ),
+        namespaces=_NAMESPACES,
+    )[0]
+    assert (
+        format_name_element.text
+        == "text/plain; alt-format=text/html; charset=UTF-8"
+    )
+
+
+def _assert_migration_content(mets_filepath: str) -> None:
+    """Shorthand function to validate the mets content of migration test
+    package for musicarchive.
+
+    :param mets_filepath: Path to the mets.xml file.
+    """
+    xml_tree = etree.parse(mets_filepath)
+
+    # Files that should not have "USE" attribute, because they are
+    # supported and have no issues during file-scraping
+    no_use_files = [
+        # Conversion outcome
+        "test_file_converted_01.txt",
+        # Migration outcome
+        "test_file_migrated_01.txt",
+        # Migration outcome
+        "test_file_migrated_02.txt",
+        # Normalized outcome
+        "test_file_normalized_01.txt",
+        # Normalized outcome
+        "test_file_normalized_02.txt",
+    ]
+    for no_use_file in no_use_files:
+        no_use_file_elem = xml_tree.xpath(
+            (
+                "./mets:fileSec/mets:fileGrp/mets:file["
+                ".//mets:FLocat["
+                f'@xlink:href="file:///files/{no_use_file}"]]'
+            ),
+            namespaces=_NAMESPACES,
+        )[0]
+        assert no_use_file_elem.attrib.get("USE") is None
+
+    # Files that are not supported used as source for migration and
+    # normalization should use "USE" with
+    # "fi-dpres-bit-level-file-format-with-recommended"
+    bit_level_files = [
+        # Migration source
+        "test_file_original_01.atlproj",
+        # Normalization source
+        "test_file_original_02.atlproj",
+    ]
+    for bit_level_file in bit_level_files:
+        bit_level_file_elem = xml_tree.xpath(
+            (
+                "./mets:fileSec/mets:fileGrp/mets:file["
+                ".//mets:FLocat["
+                f'@xlink:href="file:///files/{bit_level_file}"]]'
+            ),
+            namespaces=_NAMESPACES,
+        )[0]
+        assert (
+            bit_level_file_elem.attrib.get("USE")
+            == BIT_LEVEL_WITH_RECOMMENDED
+        )
+
+    # Musicarchive's converted source should always ignore validation
+    # errors with "USE" and "fi-dpres-ignore-validation-errors"
+    source_used_for_converted_file_elem = xml_tree.xpath(
+        (
+            "./mets:fileSec/mets:fileGrp/mets:file["
+            ".//mets:FLocat["
+            '@xlink:href="file:///files/test_file_original_03.txt"]]'
+        ),
+        namespaces=_NAMESPACES,
+    )[0]
+    assert (
+        source_used_for_converted_file_elem.attrib.get("USE")
+        == FILE_USE_IGNORE_VALIDATION
+    )
+
+    # Files that are supported, but outright broken, thus used as
+    # migration or normalization source and use "USE" with
+    # "fi-dpres-ignore-validation-errors"
+    broken_source_file_elem = xml_tree.xpath(
+        (
+            "./mets:fileSec/mets:fileGrp/mets:file["
+            ".//mets:FLocat["
+            '@xlink:href="file:///files/test_file_original_04.xml"]]'
+        ),
+        namespaces=_NAMESPACES,
+    )[0]
+    assert (
+        broken_source_file_elem.attrib.get("USE")
+        == FILE_USE_IGNORE_VALIDATION
+    )
 
 
 def test_ng_compile_sip(tmpdir, pick_files_tar):
@@ -44,15 +164,7 @@ def test_musicarchive_compile_ng(tmp_path, pick_files_tar, package_source):
     )
     assert "mets.xml" in tar_list
     assert "signature.sig" in tar_list
-    if package_source == "migration_test_files":
-        with open(tmp_tar_dir / "mets.xml", encoding="UTF-8") as outfile:
-            xml_content = outfile.read()
-        # Source file used for conversion must not have
-        # "fi-dpres-bit-level-file-format-with-recommended" defined.
-        conversion_source_file_xml = (
-            'USE="fi-dpres-bit-level-file-format-with-recommended">'
-            '<mets:FLocat xmlns:xlink="http://www.w3.org/1999/xlink" '
-            'LOCTYPE="URL" '
-            'xlink:href="file:///files/test_file_original_03.txt"'
-        )
-        assert conversion_source_file_xml not in xml_content
+    if package_source == "accepted_html_files":
+        _assert_html_content(mets_filepath=str(tmp_tar_dir / "mets.xml"))
+    elif package_source == "migration_test_files":
+        _assert_migration_content(mets_filepath=str(tmp_tar_dir / "mets.xml"))

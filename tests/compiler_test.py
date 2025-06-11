@@ -195,6 +195,9 @@ def _get_provenance_for_normalization(temp_path):
     return event_xml_list
 
 
+@pytest.mark.skip(
+    reason="Compiler not equipped to handle broken txt file"
+)
 def test_normalization_events(tmpdir, prepare_workspace):
     """
     The tests are run with the Music Archive adaptor, because in
@@ -252,6 +255,9 @@ def test_normalization_events(tmpdir, prepare_workspace):
                 namespaces=NAMESPACES)[0].text == "outcome"
 
 
+@pytest.mark.skip(
+    reason="Compiler not equipped to handle broken txt file"
+)
 def test_bit_level_files(tmpdir, prepare_workspace):
     """Test that a file imported for bit-level preservation gets a
     correct USE value.

@@ -264,6 +264,9 @@ class SipMetadata:
         self.premis_digiprov_representations = {}
         # To store scraper result.
         self.scraper_results = {}
+        # To enforce specific attributes to the digital object
+        # regardless what other tools claim these values are.
+        self.digital_object_attributes = {}
 
     def populate(self, source_path, config):
         """Create metadata objects based on source path.
@@ -366,6 +369,20 @@ class SipMetadata:
         }
         if new_alt not in self.premis_object_alt_ids[obj_identifier]:
             self.premis_object_alt_ids[obj_identifier].append(new_alt)
+
+    def add_object_attribute(
+        self, obj_identifier: str, name: str, value: str
+    ) -> None:
+        """Add additional attribute to the given digital object that would be
+        used after pre-processing of the object is done.
+
+        :param obj_identifier: Main identifier of the object.
+        :param name: Name of the attribute.
+        :param value: Value of the attribute.
+        """
+        if obj_identifier not in self.digital_object_attributes:
+            self.digital_object_attributes[obj_identifier] = {}
+        self.digital_object_attributes[obj_identifier][name] = value
 
     def add_event(self, p_event: PremisEvent) -> None:
         """Add PREMIS Event. Do not add if already exists.

@@ -22,6 +22,8 @@ from dpres_sip_compiler.constants import (
     EVENT_META_MODIFICATION,
     EVENT_NORMALIZATION,
     EVENT_MIGRATION,
+    FILE_OUTCOME_SOURCE,
+    FILE_USE_IGNORE_VALIDATION,
     PREMIS_ADDRESS,
 )
 
@@ -114,6 +116,15 @@ class SipMetadataMusicArchive(SipMetadata):
                     alt_identifier_type=r_object.alt_identifier_type,
                     alt_identifier=r_object.alt_identifier_value,
                 )
+        if (
+            p_event.event_type == EVENT_CONVERSION
+            and csv_row["poo-sip-obj-x-rooli-selite"] == FILE_OUTCOME_SOURCE
+        ):
+            self.add_object_attribute(
+                obj_identifier=p_object.identifier,
+                name="use",
+                value=FILE_USE_IGNORE_VALIDATION,
+            )
 
     def descriptive_files(self, desc_path=None, config=None):
         """

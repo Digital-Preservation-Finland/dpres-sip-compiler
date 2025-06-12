@@ -9,3 +9,6 @@ EVENT_MODIFICATION = "modification"
 EVENT_META_MODIFICATION = "metadata modification"
 EVENT_NORMALIZATION = "normalization"
 EVENT_MIGRATION = "migration"
+
+FILE_OUTCOME_SOURCE = "source"
+FILE_USE_IGNORE_VALIDATION = "fi-dpres-ignore-validation-errors"

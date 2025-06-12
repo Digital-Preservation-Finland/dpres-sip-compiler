@@ -12,12 +12,20 @@ from mets_builder.metadata import (
 
 from siptools_ng.sip import SIP
 from siptools_ng.file import File
-from file_scraper.defaults import BIT_LEVEL_WITH_RECOMMENDED
+from file_scraper.defaults import (
+    ACCEPTABLE,
+    BIT_LEVEL_WITH_RECOMMENDED,
+    RECOMMENDED,
+)
 
 from dpres_sip_compiler.base_adaptor import build_sip_metadata
 from dpres_sip_compiler.adaptor_list import ADAPTOR_NG_DICT
 from dpres_sip_compiler.config import Config, get_default_config_path
-from dpres_sip_compiler.constants import EVENT_MIGRATION, EVENT_NORMALIZATION
+from dpres_sip_compiler.constants import (
+    EVENT_MIGRATION,
+    EVENT_NORMALIZATION,
+    FILE_USE_IGNORE_VALIDATION,
+)
 
 OUTCOME = "outcome"
 SOURCE = "source"
@@ -110,6 +118,28 @@ class SipCompiler:
             validation=self.validation,
         )
 
+    def _update_source_object_use(self, obj_id: str) -> None:
+        """Update source digital objects USE value. This is only
+        done for the objects that have normalization or migration events.
+
+        By default, objects being in normalization or migration
+        will have bit_level enforced, unless their grade was deemed
+        acceptable or recommended.
+
+        :param obj_id: Object identifier to have their USE value updated to.
+        """
+        if self.sip_meta.scraper_results[obj_id]["grade"] in (
+            ACCEPTABLE,
+            RECOMMENDED,
+        ):
+            self.digital_objects[obj_id].digital_object.use = (
+                FILE_USE_IGNORE_VALIDATION
+            )
+        else:
+            self.digital_objects[obj_id].digital_object.use = (
+                BIT_LEVEL_WITH_RECOMMENDED
+            )
+
     def _initialize_mets(self):
         """Initialize dpres-mets-builder METS object with your
         information.
@@ -181,16 +211,17 @@ class SipCompiler:
                     )
                     if obj_role not in [SOURCE, OUTCOME]:
                         obj_role = TARGET
+
+                    # Objects being in normalization or migration
+                    # will have bit_level enforced. Conversions are
+                    # exempt from this logic.
                     if obj_role == SOURCE and event.event_type in [
                         EVENT_MIGRATION,
                         EVENT_NORMALIZATION,
                     ]:
-                        # Objects being in normalization or migration
-                        # will have bit_level enforced. Conversions are
-                        # exempt from this logic.
-                        self.digital_objects[
-                            object_link["linking_object"]
-                        ].digital_object.use = BIT_LEVEL_WITH_RECOMMENDED
+                        self._update_source_object_use(
+                            obj_id=object_link["linking_object"]
+                        )
                     self.digital_objects[
                         object_link["linking_object"]
                     ].add_metadata([event_metadata])
@@ -217,6 +248,22 @@ class SipCompiler:
                         identifier_type=alt_id["alt_identifier_type"],
                         identifier=alt_id["alt_identifier"],
                     )
+            except KeyError:
+                pass
+
+    def _override_object_attributes(self) -> None:
+        """Will override digital object's attributes with pre-given
+        value.
+        """
+        for (
+            obj_id,
+            obj_attributes,
+        ) in self.sip_meta.digital_object_attributes.items():
+            # We currently only support "use" overriding.
+            try:
+                self.digital_objects[obj_id].digital_object.use = (
+                    obj_attributes["use"]
+                )
             except KeyError:
                 pass
 
@@ -264,6 +311,7 @@ class SipCompiler:
         self._create_technical_metadata()
         self._create_provenance_metadata()
         self._setup_alternative_object_ids()
+        self._override_object_attributes()
         self._import_descriptive_metadata()
         self._finalize_sip()
         print(f"Compilation finished. The SIP is signed and packaged to: "

@@ -8,6 +8,7 @@ Version X.XX
     * Support Musicarchive adaptor usage in compile-ng.
     * Support conversion events in compile-ng.
     * Change Musicarchive adaptor's placeholder "xxx" value for "-1" and "-3" that is used for object linking.
+    * Add additional logic how digital object's USE attribute is assigned
 
 Version 0.20
 ------------

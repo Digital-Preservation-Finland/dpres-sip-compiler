@@ -118,7 +118,7 @@ def _assert_migration_content(mets_filepath: str) -> None:
         (
             "./mets:fileSec/mets:fileGrp/mets:file["
             ".//mets:FLocat["
-            '@xlink:href="file:///files/test_file_original_04.xml"]]'
+            '@xlink:href="file:///files/test_file_original_04.jpg"]]'
         ),
         namespaces=_NAMESPACES,
     )[0]

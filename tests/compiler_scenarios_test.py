@@ -1,10 +1,14 @@
-"""Test SIP compilation with compiler-ng.
+"""Test Compiler scenarios - migration and normalization use cases.
 """
 import os
 import pytest
-from lxml import etree
+from pathlib import Path
+
+import lxml.etree as etree
 from file_scraper.defaults import BIT_LEVEL_WITH_RECOMMENDED
-from dpres_sip_compiler.compiler_ng import ng_compile_sip
+
+from dpres_sip_compiler.compiler import compile_sip
+from dpres_sip_compiler.config import Config
 from dpres_sip_compiler.constants import FILE_USE_IGNORE_VALIDATION
 
 _NAMESPACES = {
@@ -125,16 +129,17 @@ def _assert_migration_content(mets_filepath: str) -> None:
     )
 
 
-def test_ng_compile_sip(tmpdir, pick_files_tar):
+@pytest.mark.external_tools
+def test_compile_sip(tmpdir, pick_files_tar):
     """Test sip compilation."""
     tar_file = os.path.join(str(tmpdir), "test_sip.tar")
-    ng_compile_sip(
-        "tests/data/compiler_ng/files",
+    compile_sip(
+        source_path="tests/data/compiler_ng/files",
+        tar_file=tar_file,
+        conf_file="tests/data/compiler_ng/generic.conf",
         descriptive_metadata_paths=[
             "tests/data/compiler_ng/desc_dc_metadata.xml"
-        ],
-        tar_file=tar_file,
-        conf_file="tests/data/compiler_ng/generic.conf")
+        ])
     assert os.path.isfile(tar_file)
     tar_list = pick_files_tar(tar_file)
     assert "mets.xml" in tar_list
@@ -143,28 +148,38 @@ def test_ng_compile_sip(tmpdir, pick_files_tar):
     assert "test_file_02.txt" in tar_list
 
 
+@pytest.mark.external_tools
 @pytest.mark.parametrize(
     "package_source",
     ["accepted_html_files", "source1", "migration_test_files"],
 )
-def test_musicarchive_compile_ng(tmp_path, pick_files_tar, package_source):
+def test_musicarchive_compile(tmp_path, pick_files_tar, package_source):
     """Test sip compilation for music archives."""
     musicarchive_path = "tests/data/musicarchive"
     conf_path = f"{musicarchive_path}/config.conf"
     tar_file = tmp_path / "test_sip.tar"
     tmp_tar_dir = tmp_path / "extracted_tar_contents"
-    ng_compile_sip(
+    compile_sip(
         source_path=f"{musicarchive_path}/{package_source}",
         tar_file=str(tar_file),
         conf_file=conf_path,
     )
-    assert os.path.isfile(tar_file)
-    tar_list = pick_files_tar(
-        tar_file, target=tmp_tar_dir, extract_list=["mets.xml"]
-    )
+
+    assert tar_file.exists()
+    tar_list = pick_files_tar(str(tar_file))
     assert "mets.xml" in tar_list
     assert "signature.sig" in tar_list
+
+    # Extract tar and validate content based on package type
+    import tarfile
+    with tarfile.open(tar_file, "r") as tar:
+        tar.extractall(tmp_tar_dir)
+
+    mets_filepath = tmp_tar_dir / "mets.xml"
+    assert mets_filepath.exists()
+
     if package_source == "accepted_html_files":
-        _assert_html_content(mets_filepath=str(tmp_tar_dir / "mets.xml"))
+        _assert_html_content(str(mets_filepath))
     elif package_source == "migration_test_files":
-        _assert_migration_content(mets_filepath=str(tmp_tar_dir / "mets.xml"))
+        _assert_migration_content(str(mets_filepath))
+

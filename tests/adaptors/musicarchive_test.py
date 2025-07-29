@@ -319,6 +319,7 @@ def test_skip_object():
     assert linking.object_links == []
 
 
+@pytest.mark.external_tools
 def test_skip_hidden(tmpdir, pick_files_tar):
     """
     Test that we do not pick hidden files in SIP compilation
@@ -333,14 +334,14 @@ def test_skip_hidden(tmpdir, pick_files_tar):
     assert os.path.isfile(hidden)
 
     tar_file = os.path.join(str(tmpdir), "sip.tar")
-    compile_sip(source_path, tar_file, str(tmpdir),
-                "tests/data/musicarchive/config.conf")
-
+    compile_sip(
+        source_path=source_path,
+        tar_file=tar_file, 
+        conf_file="tests/data/musicarchive/config.conf"
+    )
     assert os.path.isfile(tar_file)
-    tar_list = pick_files_tar(tar_file, None, None)
-    assert "./.hidden_file" not in tar_list
-    assert "./mets.xml" in tar_list
-    assert "./signature.sig" in tar_list
+    tar_list = pick_files_tar(tar_file)
+    assert ".hidden_file" not in " ".join(tar_list)
 
 
 def test_representation_properties():

@@ -18,3 +18,4 @@ git+https://github.com/Digital-Preservation-Finland/file-scraper.git#egg=file-sc
 git+https://github.com/Digital-Preservation-Finland/dpres-siptools.git#egg=siptools
 git+https://github.com/Digital-Preservation-Finland/dpres-mets-builder.git#egg=dpres_mets_builder
 git+https://github.com/Digital-Preservation-Finland/dpres-siptools-ng.git#egg=dpres_siptools_ng
+git+https://github.com/Digital-Preservation-Finland/dpx-validator.git

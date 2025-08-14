@@ -101,24 +101,34 @@ class SipCompiler:
 
         # Check if premis_representation_objects exists before accessing it
         if hasattr(self.sip_meta, 'premis_representation_objects'):
-            representation_object = self.sip_meta.premis_representation_objects[
-                object_id
-            ]
-            object_metadata = TechnicalRepresentationObjectMetadata(
-                object_identifier_type=representation_object.object_identifier_type,
-                object_identifier=representation_object.object_identifier_value,
+            representation_object = (
+                self.sip_meta.premis_representation_objects[object_id]
             )
-            
+            object_metadata = TechnicalRepresentationObjectMetadata(
+                object_identifier_type=(
+                    representation_object.object_identifier_type
+                ),
+                object_identifier=(
+                    representation_object.object_identifier_value
+                ),
+            )
+
             # Create the related object metadata
             related_object_metadata = TechnicalRepresentationObjectMetadata(
-                object_identifier_type=representation_object.related_object_identifier_type,
-                object_identifier=representation_object.related_object_identifier_value,
+                object_identifier_type=(
+                    representation_object.related_object_identifier_type
+                ),
+                object_identifier=(
+                    representation_object.related_object_identifier_value
+                ),
             )
-            
+
             object_metadata.add_relationship(
                 technical_object_metadata=related_object_metadata,
                 relationship_type=representation_object.relationship_type,
-                relationship_subtype=representation_object.relationship_subtype,
+                relationship_subtype=(
+                    representation_object.relationship_subtype
+                ),
             )
 
             try:
@@ -133,12 +143,11 @@ class SipCompiler:
             self.representative_objects[object_id] = object_metadata
             return object_metadata
         else:
-            # Create a basic representation object if the attribute doesn't exist
             object_metadata = TechnicalRepresentationObjectMetadata(
                 object_identifier_type="UUID",
                 object_identifier=object_id,
             )
-            
+
             self.representative_objects[object_id] = object_metadata
             return object_metadata
 

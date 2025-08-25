@@ -9,7 +9,6 @@ import premis
 import mets as metslib
 from file_scraper.scraper import Scraper
 from file_scraper.defaults import UNAP
-from xml_helpers import utils as xml_utils
 from dpres_sip_compiler.base_adaptor import (
     SipMetadata, PremisObject, PremisEvent, PremisAgent,
     PremisLinking)
@@ -196,27 +195,6 @@ class SipMetadataMusicArchive(SipMetadata):
                 "grade": scraper.grade(),
             }
             self.scraper_results[obj_identifier] = scraper_result
-
-    def post_tasks(self, workspace, source_path):
-
-        """
-        Post tasks to workspace not supported by dpres-siptools.
-
-        Open and write METS file here, because in this adaptor the possible
-        future tasks are assumend to be related to METS.
-
-        :workspace: Workspace path
-        :source_path: Source path of files to be packaged
-        """
-        mets_file = os.path.join(workspace, "mets.xml")
-        mets = xml_utils.readfile(mets_file)
-
-        # Post tasks for the METS file
-        mets = self._append_alternative_ids(mets)
-        mets = handle_html_files(mets, source_path)
-
-        with open(mets_file, 'wb+') as outfile:
-            outfile.write(xml_utils.serialize(mets.getroot()))
 
     def _append_alternative_ids(self, mets):
         """

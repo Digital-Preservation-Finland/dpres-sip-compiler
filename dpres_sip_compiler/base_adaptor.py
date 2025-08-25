@@ -332,15 +332,6 @@ class SipMetadata:
             }
             self.scraper_results[obj_identifier] = scraper_result
 
-    def post_tasks(self, workspace, source_path):
-        """
-        Post tasks to workspace not supported by dpres-siptools.
-
-        :workspace: Workspace path
-        :source_path: Source path of files to be packaged
-        """
-        pass
-
     def add_object(self, p_object: PremisObject) -> None:
         """Add PREMIS Object. Do not add if already exists.
 

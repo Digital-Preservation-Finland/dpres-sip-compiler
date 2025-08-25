@@ -1,22 +1,12 @@
 SIP Compiler
 ============
 
-This is a tool which combines the commands of Pre-Ingest Tool according to
-given structured metadata and creates an OAIS Submission Information Package
-with a low number of commands. The tool can be extended with new adaptors,
-where different types of metadata are normalized and then given to the
-Pre-Ingest Tool.
+This is a tool which utilizes the Pre-Ingest Library according to given structured metadata and creates an OAIS Submission Information Package with a low number of commands. The tool can be extended with new adaptors, where different types of metadata are normalized and then given to the Pre-Ingest Library.
 
-This tool helps especially smaller use cases in manual workflows, where
-the content and metadata is gathered in some agreed way, and then
-packaged and transferred to DPS.
+This tool helps especially smaller use cases in manual workflows, where the content and metadata is gathered in some agreed way, and then packaged and transferred to DPS.
 
-For more information about Pre-Ingest Tool, see:
-https://github.com/Digital-Preservation-Finland/dpres-siptools
-
-This tool is currently a work-in-progress project, and therefore
-the possible command line interface updates may be incompatible with the
-previous versions.
+For more information about Pre-Ingest Library, see:
+https://github.com/Digital-Preservation-Finland/dpres-siptools-ng
 
 Requirements
 ------------
@@ -66,39 +56,19 @@ Usage: Compile content
 
 Compile a given content by using the following command::
 
-    sip-compiler compile <path-to-content>
+    sip-compiler compile <source-path> [<descriptive-metadata-path>...]
 
 The following options can be used:
 
    * ``--tar-file <FILE>`` - Output tar file. If not given, the tar file will be
      in the current working path and it's name is based on the SIP identifier.
-   * ``--temp-path <PATH>`` - Path for temporary files. If not given, the temporary
-     path will be a timestamp path in current working directory.
    * ``--config <FILE>`` - Configuration file. If not given, the default config location
      is used.
    * ``--validation`` or ``--no-validation`` - Define whether validation is used
      during compilation. Validation is used by default.
 
 The software creates a TAR file, which can be submitted to the Digital Preservation
-Service. The path to temporary files is deleted if it was created during the process
-and no files remain in it after cleaning.
-
-Usage: Clean temporary files
-----------------------------
-
-The software raises an exception and stops packaging immediately, if a problem
-occurs. In such case, there may be some temporary files left in the path for
-temporary files. These files are automatically removed if trying again with the
-same temporary path. The temporary files can also be deleted with the following
-command::
-
-    sip-compiler clean <path-to-temp-files>
-
-The following options can be used:
-
-   * ``--delete-path`` If used and the path is empty, it will be deleted.
-
-This also removes possible ``mets.xml`` and ``signature.sig``.
+Service.
 
 Usage: Validate files separately
 --------------------------------

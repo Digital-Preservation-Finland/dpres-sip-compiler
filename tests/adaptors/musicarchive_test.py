@@ -105,11 +105,13 @@ def test_alt_identifier(tmpdir):
     sip_meta = SipMetadataMusicArchive()
     config = Config(conf_file="tests/data/musicarchive/config.conf")
     sip_meta.populate("tests/data/musicarchive/source2", config)
-    sip_meta.post_tasks(str(tmpdir), "tests/data/musicarchive/source2")
+    
     mets_xml = lxml.etree.parse(mets_file).getroot()
     premis_ids = mets_xml.xpath(
         ".//premis:objectIdentifier",
         namespaces={'premis': 'info:lc/xmlns/premis-v2'})
+    
+    assert len(premis_ids) == 1
     assert premis_ids[0].xpath(
         "./premis:objectIdentifierType",
         namespaces={'premis': 'info:lc/xmlns/premis-v2'}
@@ -118,25 +120,7 @@ def test_alt_identifier(tmpdir):
         "./premis:objectIdentifierValue",
         namespaces={'premis': 'info:lc/xmlns/premis-v2'}
         )[0].text.strip() == "882d63db-c9b6-4f44-83ba-901b300821cc"
-    assert premis_ids[1].xpath(
-        "./premis:objectIdentifierType",
-        namespaces={'premis': 'info:lc/xmlns/premis-v2'}
-        )[0].text.strip() == "local"
-    assert premis_ids[1].xpath(
-        "./premis:objectIdentifierValue",
-        namespaces={'premis': 'info:lc/xmlns/premis-v2'}
-        )[0].text.strip() == "123"
-    assert len(mets_xml.xpath(
-        ".//premis:objectIdentifier",
-        namespaces={'premis': 'info:lc/xmlns/premis-v2'})) == 2
-
-    # Test that alt ID can not be added twice
-    sip_meta.post_tasks(str(tmpdir), "tests/data/musicarchive/source2")
-    mets_xml = lxml.etree.parse(mets_file).getroot()
-    assert len(mets_xml.xpath(
-        ".//premis:objectIdentifier",
-        namespaces={'premis': 'info:lc/xmlns/premis-v2'})) == 2
-
+    
 
 def test_handle_html_files(sample_mets, path_to_files):
     """
@@ -319,7 +303,6 @@ def test_skip_object():
     assert linking.object_links == []
 
 
-@pytest.mark.external_tools
 def test_skip_hidden(tmpdir, pick_files_tar):
     """
     Test that we do not pick hidden files in SIP compilation

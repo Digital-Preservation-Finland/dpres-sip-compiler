@@ -94,39 +94,44 @@ def validate(path, valid_output, invalid_output, summary, conf_file, stdout):
     config = Config(conf_file=conf_file)
 
     click.echo('Starting file validation...')
-    click.echo('Total number of files: %d.' % count_files(path, config))
+    total_files = count_files(path, config)
+    click.echo('Total number of files: %d.' % total_files)
 
     invalid_files_count = 0
     valid_files_count = 0
 
-    for file_info in scrape_files(path, config):
-        if stdout:
-            click.echo(json.dumps(file_info))
+    with click.progressbar(scrape_files(path, config),
+                           length=total_files,
+                           label='Validating files') as file_iterator:
+        for file_info in file_iterator:
+            if stdout:
+                click.echo(json.dumps(file_info))
 
-        if file_info['well-formed'] and file_info['grade'] != 'unacceptable':
-            output = valid_output
-            valid_files_count += 1
-        else:
-            output = invalid_output
-            invalid_files_count += 1
-        with open(output, 'a') as outfile:
-            json.dump(file_info, outfile)
-            outfile.write('\n')
-        if summary:
-            # Create summary information and write to own output
-            summary_info = {
-                'path': file_info['path'],
-                'filename': file_info['filename'],
-                'timestamp': file_info['timestamp'],
-                'MIME type': file_info['MIME type'],
-                'version': file_info['version'],
-                'grade': file_info['grade'],
-                'well-formed': file_info['well-formed']
-            }
-            sum_output = '{}_summary{}'.format(*os.path.splitext(output))
-            with open(sum_output, 'a') as outfile:
-                json.dump(summary_info, outfile)
+            if file_info['well-formed'] and file_info['grade'] != \
+                    'unacceptable':
+                output = valid_output
+                valid_files_count += 1
+            else:
+                output = invalid_output
+                invalid_files_count += 1
+            with open(output, 'a') as outfile:
+                json.dump(file_info, outfile)
                 outfile.write('\n')
+            if summary:
+                # Create summary information and write to own output
+                summary_info = {
+                    'path': file_info['path'],
+                    'filename': file_info['filename'],
+                    'timestamp': file_info['timestamp'],
+                    'MIME type': file_info['MIME type'],
+                    'version': file_info['version'],
+                    'grade': file_info['grade'],
+                    'well-formed': file_info['well-formed']
+                }
+                sum_output = '{}_summary{}'.format(*os.path.splitext(output))
+                with open(sum_output, 'a') as outfile:
+                    json.dump(summary_info, outfile)
+                    outfile.write('\n')
 
     click.echo('Validation finished!')
     click.echo(

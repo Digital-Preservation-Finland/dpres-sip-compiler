@@ -129,7 +129,6 @@ def _assert_migration_content(mets_filepath: str) -> None:
     )
 
 
-@pytest.mark.external_tools
 def test_compile_sip(tmpdir, pick_files_tar):
     """Test sip compilation."""
     tar_file = os.path.join(str(tmpdir), "test_sip.tar")
@@ -148,7 +147,6 @@ def test_compile_sip(tmpdir, pick_files_tar):
     assert "test_file_02.txt" in tar_list
 
 
-@pytest.mark.external_tools
 @pytest.mark.parametrize(
     "package_source",
     ["accepted_html_files", "source1", "migration_test_files"],

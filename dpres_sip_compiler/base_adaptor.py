@@ -287,17 +287,6 @@ class SipMetadata:
         """
         yield from ()
 
-    # pylint: disable=unused-argument
-    def desc_root_remove(self, config):
-        """
-        Resolve whether descriptive metadata root should be removed.
-        Implemented in adaptors.
-
-        :config: Additional needed configuration
-        :returns: True/False
-        """
-        return False
-
     @staticmethod
     def exclude_files(config):
         """

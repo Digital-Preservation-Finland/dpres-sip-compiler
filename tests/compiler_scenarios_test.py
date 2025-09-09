@@ -7,7 +7,7 @@ from typing import Any, Callable
 import pytest
 from lxml import etree
 from file_scraper.defaults import BIT_LEVEL_WITH_RECOMMENDED
-from dpres_sip_compiler.compiler_ng import ng_compile_sip
+from dpres_sip_compiler.compiler import compile_sip
 from dpres_sip_compiler.constants import FILE_USE_IGNORE_VALIDATION
 
 _NAMESPACES = {
@@ -128,11 +128,11 @@ def _assert_migration_content(mets_filepath: str) -> None:
     )
 
 
-def test_ng_compile_sip(tmpdir: Any, pick_files_tar: Callable[[str], list[str]]) -> None:
+def test_compile_sip(tmpdir: Any, pick_files_tar: Callable[[str], list[str]]) -> None:
     """Test sip compilation."""
     tar_file = os.path.join(str(tmpdir), "test_sip.tar")
-    ng_compile_sip(
-        "tests/data/compiler_ng/files",
+    compile_sip(
+        source_path="tests/data/compiler_ng/files",
         descriptive_metadata_paths=[
             "tests/data/compiler_ng/desc_dc_metadata.xml"
         ],
@@ -150,13 +150,13 @@ def test_ng_compile_sip(tmpdir: Any, pick_files_tar: Callable[[str], list[str]])
     "package_source",
     ["accepted_html_files", "source1", "migration_test_files"],
 )
-def test_musicarchive_compile_ng(tmp_path: Any, pick_files_tar: Callable[[str, Any, list[str]], list[str]], package_source: str) -> None:
+def test_musicarchive_compile(tmp_path: Any, pick_files_tar: Callable[[str, Any, list[str]], list[str]], package_source: str) -> None:
     """Test sip compilation for music archives."""
     musicarchive_path = "tests/data/musicarchive"
     conf_path = f"{musicarchive_path}/config.conf"
     tar_file = tmp_path / "test_sip.tar"
     tmp_tar_dir = tmp_path / "extracted_tar_contents"
-    ng_compile_sip(
+    compile_sip(
         source_path=f"{musicarchive_path}/{package_source}",
         tar_file=str(tar_file),
         conf_file=conf_path,

@@ -69,12 +69,6 @@ class Config:
             _desc_metadata_version = _DEFAULT_DESC_METADATA_VERSION
         self.desc_metadata_version = _desc_metadata_version
 
-        # If root element of description is to be removed
-        try:
-            self.desc_root_remove = self._conf["script"]["desc_root_remove"]
-        except KeyError:
-            self.desc_root_remove = False
-
         # The selected checksum in PREMIS Objects
         try:
             self.used_checksum = self._conf["script"]["used_checksum"]

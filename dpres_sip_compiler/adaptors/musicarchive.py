@@ -138,14 +138,6 @@ class SipMetadataMusicArchive(SipMetadata):
                     not filepath.startswith("."):
                 yield os.path.join(desc_path, filepath)
 
-    def desc_root_remove(self, config=None):
-        """
-        Resolve whether descriptive metadata root should be removed.
-        :config: Additional needed configuration
-        :returns: True/False
-        """
-        return config.desc_root_remove.lower() == "true"
-
     @staticmethod
     def exclude_files(config):
         """

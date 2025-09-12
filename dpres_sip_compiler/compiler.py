@@ -158,27 +158,64 @@ class SipCompiler:
             validation=self.validation,
         )
 
-    def _update_source_object_use(self, obj_id: str) -> None:
-        """Update source digital objects USE value. This is only
-        done for the objects that have normalization or migration events.
+    def _update_file_use_attributes(self):
+        """Update USE attribute for source files in
+        migration/normalization events.
 
-        By default, objects being in normalization or migration
-        will have bit_level enforced, unless their grade was deemed
-        acceptable or recommended.
-
-        :param obj_id: Object identifier to have their USE value updated to.
+        For source files in migration/normalization events:
+        - ACCEPTABLE/RECOMMENDED grades: Marked as FILE_USE_IGNORE_VALIDATION
+          (broken files that need content metadata skipped)
+        - Other grades (UNACCEPTABLE, etc.): Marked as
+          BIT_LEVEL_WITH_RECOMMENDED (bit-level preservation)
         """
-        if self.sip_meta.scraper_results[obj_id]["grade"] in (
-            ACCEPTABLE,
-            RECOMMENDED,
-        ):
-            self.digital_objects[obj_id].digital_object.use = (
-                FILE_USE_IGNORE_VALIDATION
-            )
-        else:
-            self.digital_objects[obj_id].digital_object.use = (
-                BIT_LEVEL_WITH_RECOMMENDED
-            )
+        for obj_identifier, obj in self.sip_meta.premis_objects.items():
+            if (
+                obj_identifier in self.sip_meta.digital_object_attributes
+                and self.sip_meta.digital_object_attributes[
+                    obj_identifier
+                ].get("use")
+                == FILE_USE_IGNORE_VALIDATION
+            ):
+                continue
+
+            if self._is_source_file_in_migration_normalization(obj_identifier):
+                grade = self.sip_meta.scraper_results[obj_identifier]["grade"]
+                if grade in (ACCEPTABLE, RECOMMENDED):
+                    self.sip_meta.add_object_attribute(
+                        obj_identifier=obj_identifier,
+                        name="use",
+                        value=FILE_USE_IGNORE_VALIDATION,
+                    )
+                else:
+                    self.sip_meta.add_object_attribute(
+                        obj_identifier=obj_identifier,
+                        name="use",
+                        value=BIT_LEVEL_WITH_RECOMMENDED,
+                    )
+
+    def _is_source_file_in_migration_normalization(
+        self, obj_identifier: str
+    ) -> bool:
+        """Check if file is a source file in migration or normalization events.
+
+        :param obj_identifier: Identifier of the digital object to check
+        :returns: True if the file is a source file in any migration or
+                  normalization event, False otherwise
+        """
+        for event in self.sip_meta.events:
+            if event.event_type in [EVENT_MIGRATION, EVENT_NORMALIZATION]:
+                try:
+                    for object_link in self.sip_meta.premis_linkings[
+                        event.identifier
+                    ].object_links:
+                        if (
+                            object_link["linking_object"] == obj_identifier
+                            and object_link["object_role"] == SOURCE
+                        ):
+                            return True
+                except KeyError:
+                    continue
+        return False
 
     def _initialize_mets(self) -> None:
         """Initialize dpres-mets-builder METS object with your
@@ -200,6 +237,20 @@ class SipCompiler:
                 path=os.path.join(self.source_path, obj.filepath),
                 digital_object_path=obj.filepath,
             )
+
+            skip_content_metadata = False
+            if (
+                obj_identifier in self.sip_meta.digital_object_attributes
+                and "use" in self.sip_meta.digital_object_attributes[
+                    obj_identifier
+                ]
+                and self.sip_meta.digital_object_attributes[obj_identifier][
+                    "use"
+                ]
+                == FILE_USE_IGNORE_VALIDATION
+            ):
+                skip_content_metadata = True
+
             digital_object.generate_technical_metadata(
                 checksum=obj.message_digest,
                 checksum_algorithm=obj.message_digest_algorithm,
@@ -207,6 +258,7 @@ class SipCompiler:
                 object_identifier_type=obj.object_identifier_type,
                 original_name=obj.original_name,
                 scraper_result=self.sip_meta.scraper_results[obj_identifier],
+                skip_content_specific_metadata=skip_content_metadata,
             )
             self.digital_objects[obj_identifier] = digital_object
 
@@ -247,21 +299,13 @@ class SipCompiler:
                 obj_role = object_link["object_role"]
                 try:
                     object_metadata = _get_technical_file_object_metadata(
-                        obj=self.digital_objects[object_link["linking_object"]]
+                        obj=self.digital_objects[
+                            object_link["linking_object"]
+                        ]
                     )
                     if obj_role not in [SOURCE, OUTCOME]:
                         obj_role = TARGET
 
-                    # Objects being in normalization or migration
-                    # will have bit_level enforced. Conversions are
-                    # exempt from this logic.
-                    if obj_role == SOURCE and event.event_type in [
-                        EVENT_MIGRATION,
-                        EVENT_NORMALIZATION,
-                    ]:
-                        self._update_source_object_use(
-                            obj_id=object_link["linking_object"]
-                        )
                     self.digital_objects[
                         object_link["linking_object"]
                     ].add_metadata([event_metadata])
@@ -348,6 +392,7 @@ class SipCompiler:
         """Create SIP."""
         self._scrape_objects()
         self._initialize_mets()
+        self._update_file_use_attributes()
         self._create_technical_metadata()
         self._create_provenance_metadata()
         self._setup_alternative_object_ids()

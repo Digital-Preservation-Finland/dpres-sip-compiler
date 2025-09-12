@@ -7,7 +7,7 @@ from typing import Any, Callable
 import pytest
 from lxml import etree
 from file_scraper.defaults import BIT_LEVEL_WITH_RECOMMENDED
-from dpres_sip_compiler.compiler import compile_sip
+from dpres_sip_compiler.compiler import compile_sip 
 from dpres_sip_compiler.constants import FILE_USE_IGNORE_VALIDATION
 
 _NAMESPACES = {
@@ -137,7 +137,9 @@ def test_compile_sip(tmpdir: Any, pick_files_tar: Callable[[str], list[str]]) ->
             "tests/data/compiler_ng/desc_dc_metadata.xml"
         ],
         tar_file=tar_file,
-        conf_file="tests/data/compiler_ng/generic.conf")
+        conf_file="tests/data/compiler_ng/generic.conf",
+        validation=False
+    )
     assert os.path.isfile(tar_file)
     tar_list = pick_files_tar(tar_file)
     assert "mets.xml" in tar_list
@@ -160,6 +162,8 @@ def test_musicarchive_compile(tmp_path: Any, pick_files_tar: Callable[[str, Any,
         source_path=f"{musicarchive_path}/{package_source}",
         tar_file=str(tar_file),
         conf_file=conf_path,
+        descriptive_metadata_paths=None,
+        validation=False
     )
     assert os.path.isfile(tar_file)
     tar_list = pick_files_tar(

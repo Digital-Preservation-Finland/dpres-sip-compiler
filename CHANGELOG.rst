@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog <https://keepachangelog.com/en/1.0.0/>`_,
 and this project adheres to `Semantic Versioning <https://semver.org/spec/v2.0.0.html>`_.
 
+2.0.0 - 2025-09-12
+------------------
+
+Added
+^^^^^
+
+- Replace backend tool dpres-siptools with dpres-siptools-ng and dpres-mets-builder for SIP creation in all adaptors
+- Remove the compile-ng command as the compile command now uses the new backend tools
+- Remove the clean command as temporary files are not created anymore
+- Add option to include several descriptive metadata paths to the compile command
+- Remove option temp-path from the compile command
+- Remove configuration parameter desc_root_remove
+
 1.0.0 - 2025-07-25
 ------------------
 

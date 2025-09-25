@@ -6,9 +6,11 @@ import os
 from typing import Any, Callable
 import pytest
 from lxml import etree
-from file_scraper.defaults import BIT_LEVEL_WITH_RECOMMENDED
-from dpres_sip_compiler.compiler import compile_sip 
-from dpres_sip_compiler.constants import FILE_USE_IGNORE_VALIDATION
+from dpres_sip_compiler.compiler import compile_sip
+from dpres_sip_compiler.constants import (
+    FILE_USE_IGNORE_VALIDATION,
+    FILE_USE_NO_VALIDATION
+)
 
 _NAMESPACES = {
     "mets": "http://www.loc.gov/METS/",
@@ -75,7 +77,7 @@ def _assert_migration_content(mets_filepath: str) -> None:
 
     # Files that are not supported used as source for migration and
     # normalization should use "USE" with
-    # "fi-dpres-bit-level-file-format-with-recommended"
+    # "fi-dpres-no-file-format-validation"
     bit_level_files = [
         # Migration source
         "test_file_original_01.atlproj",
@@ -93,7 +95,7 @@ def _assert_migration_content(mets_filepath: str) -> None:
         )[0]
         assert (
             bit_level_file_elem.attrib.get("USE")
-            == BIT_LEVEL_WITH_RECOMMENDED
+            == FILE_USE_NO_VALIDATION
         )
 
     # Musicarchive's converted source should always ignore validation
@@ -128,7 +130,8 @@ def _assert_migration_content(mets_filepath: str) -> None:
     )
 
 
-def test_compile_sip(tmpdir: Any, pick_files_tar: Callable[[str], list[str]]) -> None:
+def test_compile_sip(tmpdir: Any,
+                     pick_files_tar: Callable[[str], list[str]]) -> None:
     """Test sip compilation."""
     tar_file = os.path.join(str(tmpdir), "test_sip.tar")
     compile_sip(
@@ -152,7 +155,10 @@ def test_compile_sip(tmpdir: Any, pick_files_tar: Callable[[str], list[str]]) ->
     "package_source",
     ["accepted_html_files", "source1", "migration_test_files"],
 )
-def test_musicarchive_compile(tmp_path: Any, pick_files_tar: Callable[[str, Any, list[str]], list[str]], package_source: str) -> None:
+def test_musicarchive_compile(
+        tmp_path: Any,
+        pick_files_tar: Callable[[str, Any, list[str]], list[str]],
+        package_source: str) -> None:
     """Test sip compilation for music archives."""
     musicarchive_path = "tests/data/musicarchive"
     conf_path = f"{musicarchive_path}/config.conf"

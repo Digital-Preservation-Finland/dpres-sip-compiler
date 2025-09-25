@@ -12,3 +12,4 @@ EVENT_MIGRATION = "migration"
 
 FILE_OUTCOME_SOURCE = "source"
 FILE_USE_IGNORE_VALIDATION = "fi-dpres-ignore-validation-errors"
+FILE_USE_NO_VALIDATION = "fi-dpres-no-file-format-validation"

@@ -15,7 +15,6 @@ from siptools_ng.sip import SIP
 from siptools_ng.file import File
 from file_scraper.defaults import (
     ACCEPTABLE,
-    BIT_LEVEL_WITH_RECOMMENDED,
     RECOMMENDED,
 )
 
@@ -26,6 +25,7 @@ from dpres_sip_compiler.constants import (
     EVENT_MIGRATION,
     EVENT_NORMALIZATION,
     FILE_USE_IGNORE_VALIDATION,
+    FILE_USE_NO_VALIDATION
 )
 
 OUTCOME = "outcome"
@@ -166,7 +166,7 @@ class SipCompiler:
         - ACCEPTABLE/RECOMMENDED grades: Marked as FILE_USE_IGNORE_VALIDATION
           (broken files that need content metadata skipped)
         - Other grades (UNACCEPTABLE, etc.): Marked as
-          BIT_LEVEL_WITH_RECOMMENDED (bit-level preservation)
+          FILE_USE_NO_VALIDATION (bit-level preservation)
         """
         for obj_identifier, obj in self.sip_meta.premis_objects.items():
             if (
@@ -190,7 +190,7 @@ class SipCompiler:
                     self.sip_meta.add_object_attribute(
                         obj_identifier=obj_identifier,
                         name="use",
-                        value=BIT_LEVEL_WITH_RECOMMENDED,
+                        value=FILE_USE_NO_VALIDATION,
                     )
 
     def _is_source_file_in_migration_normalization(

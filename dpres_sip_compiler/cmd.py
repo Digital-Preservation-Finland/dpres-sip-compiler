@@ -9,6 +9,7 @@ from dpres_sip_compiler.config import get_default_config_path
 from dpres_sip_compiler.compiler import compile_sip
 from dpres_sip_compiler.validate import count_files, scrape_files
 from dpres_sip_compiler.config import Config
+from file_scraper.defaults import UNACCEPTABLE
 
 
 @click.group()
@@ -108,7 +109,7 @@ def validate(path, valid_output, invalid_output, summary, conf_file, stdout):
                 click.echo(json.dumps(file_info))
 
             if file_info['well-formed'] and file_info['grade'] != \
-                    'unacceptable':
+                    UNACCEPTABLE:
                 output = valid_output
                 valid_files_count += 1
             else:

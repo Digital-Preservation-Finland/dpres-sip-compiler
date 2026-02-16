@@ -55,7 +55,7 @@ def test_descriptive_files():
     config = Config(conf_file="tests/data/musicarchive/config.conf")
     desc_files = []
     for desc in sip_meta.descriptive_files(
-            "tests/data/musicarchive/source1", config):
+            ["tests/data/musicarchive/source1"], config):
         desc_files.append(desc)
     assert set(desc_files) == {
         "tests/data/musicarchive/source1/test1___metadata.xml",

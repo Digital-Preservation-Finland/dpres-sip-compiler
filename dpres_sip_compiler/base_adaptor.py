@@ -5,11 +5,16 @@ Adaptors can overwrite the required methods and properties as needed.
 """
 import os
 from collections.abc import Iterator
-from dpres_sip_compiler.config import Config
+from typing import List, Optional
 from file_scraper.scraper import Scraper
+from dpres_sip_compiler.config import Config
 
 
-def build_sip_metadata(adaptor_dict, source_path, config):
+def build_sip_metadata(adaptor_dict: dict,
+                       source_path: str,
+                       config: Config,
+                       content_id: Optional[str] = None,
+                       sip_id: Optional[str] = None):
     """
     Build metadata object based on given class.
     :adaptor_dict: Dict of adaptor names and corresponding SIP metadata
@@ -20,6 +25,12 @@ def build_sip_metadata(adaptor_dict, source_path, config):
     """
     sip_meta = sip_metadata_class(adaptor_dict, config)()
     sip_meta.populate(source_path, config)
+
+    if content_id:
+        sip_meta.content_id = content_id
+    if sip_id:
+        sip_meta.objid = sip_id
+
     return sip_meta
 
 
@@ -275,13 +286,31 @@ class SipMetadata:
 
     # pylint: disable=unused-argument
     def descriptive_files(
-        self, desc_path: str, config: Config
+            self,
+            desc_paths: List[str],
+            config: Config,
     ) -> Iterator[str]:
         """
         Iterator for descriptive metadata files.
         Implemented in adaptors otherwise return empty iterator.
 
-        :param desc_path: Path to descriptive metadata files
+        :param desc_paths: A list of descriptive metadata paths
+        :param config: Additional needed configuration
+        :returns: Iterator
+        """
+        yield from ()
+
+    def descriptive_strings(
+            self,
+            desc_paths: List[str],
+            config: Config
+    ) -> Iterator[str]:
+        """
+        Iterator for descriptive metadata as strings.
+        Implemented in adaptors otherwise return empty iterator.
+
+        :param desc_paths: A list of descriptive metadata paths
+            containing metadata strings
         :param config: Additional needed configuration
         :returns: Iterator
         """

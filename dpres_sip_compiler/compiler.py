@@ -355,18 +355,36 @@ class SipCompiler:
         """Import descriptive metadata from input descriptive metadata
         path.
         """
-        metadata_paths = (
-            list(
-                self.sip_meta.descriptive_files(
-                    desc_path=self.source_path, config=self.config
-                )
+        desc_paths = self.descriptive_metadata_paths
+        if not self.descriptive_metadata_paths:
+            desc_paths = [self.source_path]
+
+        metadata_paths = list(
+            self.sip_meta.descriptive_files(
+                desc_paths=desc_paths,
+                config=self.config
             )
-            + self.descriptive_metadata_paths
         )
         for metadata_path in metadata_paths:
             self.descriptive_metadata.append(
                 ImportedMetadata(
                     data_path=metadata_path,
+                    metadata_type="descriptive",
+                    metadata_format=self.config.desc_metadata_format,
+                    format_version=self.config.desc_metadata_version,
+                )
+            )
+
+        metadata_strings = list(
+            self.sip_meta.descriptive_strings(
+                desc_paths=desc_paths,
+                config=self.config
+            )
+        )
+        for metadata_string in metadata_strings:
+            self.descriptive_metadata.append(
+                ImportedMetadata(
+                    data_string=metadata_string,
                     metadata_type="descriptive",
                     metadata_format=self.config.desc_metadata_format,
                     format_version=self.config.desc_metadata_version,
@@ -407,6 +425,8 @@ def compile_sip(
     source_path: str,
     tar_file: str,
     descriptive_metadata_paths: Optional[List[str]] = None,
+    content_id: Optional[str] = None,
+    sip_id: Optional[str] = None,
     conf_file: Optional[str] = None,
     validation: bool = True,
 ) -> None:
@@ -427,7 +447,12 @@ def compile_sip(
 
     config = Config(conf_file=conf_file)
 
-    sip_meta = build_sip_metadata(ADAPTOR_DICT, source_path, config)
+    sip_meta = build_sip_metadata(
+        ADAPTOR_DICT,
+        source_path,
+        config,
+        content_id,
+        sip_id)
     compiler = SipCompiler(
         source_path=source_path,
         descriptive_metadata_paths=descriptive_metadata_paths,

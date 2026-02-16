@@ -28,6 +28,15 @@ def cli():
                                 dir_okay=False),
                 required=False,
                 nargs=-1)
+@click.option("--content-id",
+              type=str,
+              required=False,
+              help="The identifier of the content")
+@click.option("--sip-id",
+              type=str,
+              required=False,
+              help="The unique identifier of the submission information "
+                   "package")
 @click.option("--tar-file",
               type=click.Path(exists=False),
               metavar="<FILE>",
@@ -43,8 +52,8 @@ def cli():
 @click.option("--validation/--no-validation", default=True,
               help="Validation / No validation of the files during "
                    "compilation. Defaults to validation with compilation.")
-def compile_command(source_path, descriptive_metadata_path, tar_file,
-                    config, validation):
+def compile_command(source_path, descriptive_metadata_path, content_id, sip_id,
+                    tar_file, config, validation):
     """
     Compile Submission Information Package.
 
@@ -55,6 +64,8 @@ def compile_command(source_path, descriptive_metadata_path, tar_file,
     compile_sip(source_path,
                 tar_file,
                 descriptive_metadata_paths=list(descriptive_metadata_path),
+                content_id=content_id,
+                sip_id=sip_id,
                 conf_file=config,
                 validation=validation)
 

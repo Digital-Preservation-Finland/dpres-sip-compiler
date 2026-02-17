@@ -7,9 +7,6 @@ import os
 import shutil
 import pytest
 from dpres_sip_compiler.config import get_default_config_path
-from dpres_sip_compiler.adaptor_list import ADAPTOR_DICT
-from dpres_sip_compiler.base_adaptor import build_sip_metadata
-from dpres_sip_compiler.compiler import SipCompiler
 
 
 def test_compile(tmpdir, run_cli, prepare_workspace, pick_files_tar):
@@ -44,6 +41,26 @@ def test_default_config(tmpdir, run_cli, prepare_workspace, pick_files_tar):
     assert "signature.sig" in tar_list
 
 
+def test_compile_options(tmpdir, run_cli, prepare_workspace, pick_files_tar):
+    """Test compile command using available options.
+    """
+    (source_path, tar_file, _, _) = prepare_workspace(tmpdir)
+    result = run_cli(
+        ["compile",
+         "--content-id", "Test",
+         "--sip-id", "Test01",
+         "--tar-file", tar_file,
+         "--config", "tests/data/compiler_ng/generic.conf",
+         "--no-validation",
+         source_path,
+         "tests/data/compiler_ng/desc_dc_metadata.xml"])
+    assert result.exit_code == 0
+
+    tar_list = pick_files_tar(tar_file)
+    assert "mets.xml" in tar_list
+    assert "signature.sig" in tar_list
+
+
 @pytest.mark.parametrize(('summary'), [
     (False),
     (True)
@@ -69,12 +86,12 @@ def test_validate(run_cli, tmpdir, summary):
     supported_files_count = 0
     unsupported_files_count = 0
 
-    with open(valid_output) as infile:
+    with open(valid_output, encoding="utf-8") as infile:
         for line in infile:
             assert json.loads(line)['well-formed']
             supported_files_count += 1
 
-    with open(invalid_output) as infile:
+    with open(invalid_output, encoding="utf-8") as infile:
         for line in infile:
             assert not json.loads(line)['well-formed']
             unsupported_files_count += 1

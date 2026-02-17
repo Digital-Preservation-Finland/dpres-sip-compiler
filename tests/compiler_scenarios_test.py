@@ -130,16 +130,21 @@ def _assert_migration_content(mets_filepath: str) -> None:
     )
 
 
-def _assert_lido_content(mets_filepath: str) -> None:
+def _assert_postalmuseum_mets_content(
+        mets_filepath: str, content_id: str, sip_id: str) -> None:
     """Shorthand function to validate the mets content of accepted
     test package for postal museum.
 
-    Th METS should contain two dmdSec sections containing LIDO
+    The METS should contain two dmdSec sections containing LIDO
     metadata.
 
     :param mets_filepath: Path to the mets.xml file.
     """
     xml_tree = etree.parse(mets_filepath)
+    root = xml_tree.getroot()
+    fi_ns = 'http://digitalpreservation.fi/schemas/mets/fi-extensions'
+    assert root.get(f'{{{fi_ns}}}CONTENTID') == content_id
+    assert root.get('OBJID') == sip_id
     mdwrap_elements = xml_tree.xpath(
         (
             './mets:dmdSec/mets:mdWrap[@MDTYPE="LIDO"]'
@@ -221,12 +226,16 @@ def test_postalmuseum_compile(
     conf_path = f"{postalmuseum_path}/postalmuseum.conf"
     tar_file = tmp_path / "test_sip.tar"
     tmp_tar_dir = tmp_path / "extracted_tar_contents"
+    content_id = "Test1"
+    sip_id = "Test-001"
     compile_sip(
         source_path=f"{postalmuseum_path}/files",
         tar_file=str(tar_file),
         conf_file=conf_path,
         descriptive_metadata_paths=[
             f"{postalmuseum_path}/lido_example_multiple_lidowraps.lido"],
+        content_id=content_id,
+        sip_id=sip_id,
         validation=False
     )
     assert os.path.isfile(tar_file)
@@ -237,4 +246,7 @@ def test_postalmuseum_compile(
     assert "signature.sig" in tar_list
     assert "test_file_01.txt" in tar_list
     assert "test_file_02.txt" in tar_list
-    _assert_lido_content(mets_filepath=str(tmp_tar_dir / "mets.xml"))
+    _assert_postalmuseum_mets_content(
+        mets_filepath=str(tmp_tar_dir / "mets.xml"),
+        content_id=content_id,
+        sip_id=sip_id)

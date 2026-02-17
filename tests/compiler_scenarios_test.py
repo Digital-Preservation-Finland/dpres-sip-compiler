@@ -130,6 +130,36 @@ def _assert_migration_content(mets_filepath: str) -> None:
     )
 
 
+def _assert_lido_content(mets_filepath: str) -> None:
+    """Shorthand function to validate the mets content of accepted
+    test package for postal museum.
+
+    Th METS should contain two dmdSec sections containing LIDO
+    metadata.
+
+    :param mets_filepath: Path to the mets.xml file.
+    """
+    xml_tree = etree.parse(mets_filepath)
+    mdwrap_elements = xml_tree.xpath(
+        (
+            './mets:dmdSec/mets:mdWrap[@MDTYPE="LIDO"]'
+        ),
+        namespaces=_NAMESPACES,
+    )
+    assert len(mdwrap_elements) == 2
+    for mdwrap_element in mdwrap_elements:
+        assert mdwrap_element.get('MDTYPEVERSION') == '1.1'
+        xmldata_elem = mdwrap_element.xpath(
+            (
+                './mets:xmlData'
+            ),
+            namespaces=_NAMESPACES
+        )[0]
+        assert len(xmldata_elem) == 1
+        for child_elem in xmldata_elem:
+            assert child_elem.tag == '{http://www.lido-schema.org}lidoWrap'
+
+
 def test_compile_sip(tmpdir: Any,
                      pick_files_tar: Callable[[str], list[str]]) -> None:
     """Test sip compilation."""
@@ -181,3 +211,30 @@ def test_musicarchive_compile(
         _assert_html_content(mets_filepath=str(tmp_tar_dir / "mets.xml"))
     elif package_source == "migration_test_files":
         _assert_migration_content(mets_filepath=str(tmp_tar_dir / "mets.xml"))
+
+
+def test_postalmuseum_compile(
+        tmp_path: Any,
+        pick_files_tar: Callable[[str, Any, list[str]], list[str]]) -> None:
+    """Test sip compilation for postal museum."""
+    postalmuseum_path = "tests/data/postalmuseum"
+    conf_path = f"{postalmuseum_path}/postalmuseum.conf"
+    tar_file = tmp_path / "test_sip.tar"
+    tmp_tar_dir = tmp_path / "extracted_tar_contents"
+    compile_sip(
+        source_path=f"{postalmuseum_path}/files",
+        tar_file=str(tar_file),
+        conf_file=conf_path,
+        descriptive_metadata_paths=[
+            f"{postalmuseum_path}/lido_example_multiple_lidowraps.lido"],
+        validation=False
+    )
+    assert os.path.isfile(tar_file)
+    tar_list = pick_files_tar(
+        tar_file, target=tmp_tar_dir, extract_list=["mets.xml"]
+    )
+    assert "mets.xml" in tar_list
+    assert "signature.sig" in tar_list
+    assert "test_file_01.txt" in tar_list
+    assert "test_file_02.txt" in tar_list
+    _assert_lido_content(mets_filepath=str(tmp_tar_dir / "mets.xml"))

@@ -7,7 +7,6 @@ import datetime
 import csv
 import premis
 import mets as metslib
-import xml_helpers.utils as h
 from file_scraper.scraper import Scraper
 from file_scraper.defaults import UNAP
 from dpres_sip_compiler.base_adaptor import (

@@ -5,6 +5,7 @@ from collections.abc import Iterator
 from typing import List, Optional
 from uuid import uuid4
 import xml_helpers.utils as h
+import lxml.etree as ET
 from dpres_sip_compiler.base_adaptor import SipMetadata, PremisObject
 from dpres_sip_compiler.config import Config
 
@@ -36,14 +37,27 @@ class SipMetadataPostalMuseum(SipMetadata):
         config: Optional[Config] = None
     ) -> Iterator[str]:
         """
-        Iterator for descriptive metadata. Returns metadata sections
-        from XML files' root element as serialized XML.
+        Iterator for descriptive metadata. Returns root sections
+        from XML files (containing multiple root elements) as serialized
+        LIDO XML.
 
         :param desc_paths: Path to descriptive metadata files
         :param config: Additional needed configuration
         :returns: Iterator
         """
         for metadata_path in desc_paths:
-            root = h.readfile(metadata_path).getroot()
-            for elem in root:
-                yield h.serialize(elem)
+
+            with open(metadata_path, 'rt', encoding='utf-8') as infile:
+                textdata = infile.read()
+
+            # Split text to individual lidoWrap elements to be able
+            # to parse and serialize them as XML
+            for lidowrap in textdata.split('<lido:lidoWrap'):
+
+                # Skip leading XML declaration
+                xml_declaration = '<?xml version="1.0" encoding="UTF-8"?>'
+                if lidowrap == xml_declaration:
+                    continue
+
+                lidowrap_elem = '<lido:lidoWrap' + lidowrap
+                yield h.serialize(ET.fromstring(lidowrap_elem))

@@ -50,10 +50,10 @@ def test_compile_options(tmpdir, run_cli, prepare_workspace, pick_files_tar):
          "--content-id", "Test",
          "--sip-id", "Test01",
          "--tar-file", tar_file,
-         "--config", "tests/data/compiler_ng/generic.conf",
+         "--config", "tests/data/generic/generic.conf",
          "--no-validation",
          source_path,
-         "tests/data/compiler_ng/desc_dc_metadata.xml"])
+         "tests/data/generic/desc_dc_metadata.xml"])
     assert result.exit_code == 0
 
     tar_list = pick_files_tar(tar_file)

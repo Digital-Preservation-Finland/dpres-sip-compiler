@@ -8,8 +8,8 @@ def test_populate():
     Test that the method collects all the filepaths in a given directory.
     """
     testclass = GenericFolderStructure()
-    testclass.populate("tests/data/compiler_ng/files",
-                       "tests/data/compiler_ng/generic.conf")
+    testclass.populate("tests/data/generic/files",
+                       "tests/data/generic/generic.conf")
     assert len(testclass.premis_objects) == 2
 
     filepaths = get_premis_objects_filepaths(testclass.premis_objects)

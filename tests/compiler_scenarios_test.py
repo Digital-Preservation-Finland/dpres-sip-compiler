@@ -170,12 +170,12 @@ def test_compile_sip(tmpdir: Any,
     """Test sip compilation."""
     tar_file = os.path.join(str(tmpdir), "test_sip.tar")
     compile_sip(
-        source_path="tests/data/compiler_ng/files",
+        source_path="tests/data/generic/files",
         descriptive_metadata_paths=[
-            "tests/data/compiler_ng/desc_dc_metadata.xml"
+            "tests/data/generic/desc_dc_metadata.xml"
         ],
         tar_file=tar_file,
-        conf_file="tests/data/compiler_ng/generic.conf",
+        conf_file="tests/data/generic/generic.conf",
         validation=False
     )
     assert os.path.isfile(tar_file)

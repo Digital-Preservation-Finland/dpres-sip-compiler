@@ -284,37 +284,22 @@ class SipMetadata:
         """
         pass
 
-    # pylint: disable=unused-argument
-    def descriptive_files(
+    def descriptive_metadata_sources(
             self,
             desc_paths: List[str],
             config: Config,
-    ) -> Iterator[str]:
+    ) -> Iterator[tuple[str, str]]:
         """
-        Iterator for descriptive metadata files.
+        Iterator for descriptive metadata sources.
         Implemented in adaptors otherwise return empty iterator.
 
         :param desc_paths: A list of descriptive metadata paths
         :param config: Additional needed configuration
-        :returns: Iterator
+        :returns: Iterator with tuple of descriptive metadata format and
+            file
         """
-        yield from ()
-
-    def descriptive_strings(
-            self,
-            desc_paths: List[str],
-            config: Config
-    ) -> Iterator[str]:
-        """
-        Iterator for descriptive metadata as strings.
-        Implemented in adaptors otherwise return empty iterator.
-
-        :param desc_paths: A list of descriptive metadata paths
-            containing metadata strings
-        :param config: Additional needed configuration
-        :returns: Iterator
-        """
-        yield from ()
+        for metadata_path in desc_paths:
+            yield ('datafile', metadata_path)
 
     @staticmethod
     def exclude_files(config):

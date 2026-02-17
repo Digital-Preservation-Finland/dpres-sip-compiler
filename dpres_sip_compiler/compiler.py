@@ -356,40 +356,37 @@ class SipCompiler:
         path.
         """
         desc_paths = self.descriptive_metadata_paths
+        # Use source path if descriptive_metadata_paths are not given
         if not self.descriptive_metadata_paths:
             desc_paths = [self.source_path]
 
-        metadata_paths = list(
-            self.sip_meta.descriptive_files(
+        desc_metadata = list(
+            self.sip_meta.descriptive_metadata_sources(
                 desc_paths=desc_paths,
                 config=self.config
             )
         )
-        for metadata_path in metadata_paths:
-            self.descriptive_metadata.append(
-                ImportedMetadata(
-                    data_path=metadata_path,
-                    metadata_type="descriptive",
-                    metadata_format=self.config.desc_metadata_format,
-                    format_version=self.config.desc_metadata_version,
-                )
-            )
 
-        metadata_strings = list(
-            self.sip_meta.descriptive_strings(
-                desc_paths=desc_paths,
-                config=self.config
-            )
-        )
-        for metadata_string in metadata_strings:
-            self.descriptive_metadata.append(
-                ImportedMetadata(
-                    data_string=metadata_string,
-                    metadata_type="descriptive",
-                    metadata_format=self.config.desc_metadata_format,
-                    format_version=self.config.desc_metadata_version,
+        # Metadata can be either in files or as strings
+        for (metadata_format, metadata_source) in desc_metadata:
+            if metadata_format == 'datafile':
+                self.descriptive_metadata.append(
+                    ImportedMetadata(
+                        data_path=metadata_source,
+                        metadata_type="descriptive",
+                        metadata_format=self.config.desc_metadata_format,
+                        format_version=self.config.desc_metadata_version,
+                    )
                 )
-            )
+            else:
+                self.descriptive_metadata.append(
+                    ImportedMetadata(
+                        data_string=metadata_source,
+                        metadata_type="descriptive",
+                        metadata_format=self.config.desc_metadata_format,
+                        format_version=self.config.desc_metadata_version,
+                    )
+                )
 
     def _finalize_sip(self) -> None:
         """Turn the METS object into a SIP."""

@@ -33,7 +33,10 @@ def test_descriptive_strings():
     The XML file contains two descriptive sections.
     """
     testclass = SipMetadataPostalMuseum()
-    desc_strings = list(testclass.descriptive_strings(
-        ["tests/data/postalmuseum/lido_example_multiple_lidowraps.lido"],
-        "tests/data/generic/postalmuseum.conf"))
+    desc_strings = []
+    for (dataformat, desc) in testclass.descriptive_metadata_sources(
+            ["tests/data/postalmuseum/lido_example_multiple_lidowraps.lido"],
+            "tests/data/generic/postalmuseum.conf"):
+        assert dataformat == 'datastring'
+        desc_strings.append(desc)
     assert len(desc_strings) == 2

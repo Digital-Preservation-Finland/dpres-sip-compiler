@@ -25,15 +25,3 @@ class GenericFolderStructure(SipMetadata):
             # Use relative path for the objects
             p_object.filepath = os.path.relpath(filepath, source_path)
             self.add_object(p_object)
-
-    def descriptive_files(self,
-                          desc_paths=None,
-                          config=None):
-        """
-        Iterator for descriptive metadata files.
-
-        :desc_paths: List of descriptive metadata files
-        :config: Additional needed configuration
-        :returns: Descriptive metadata file
-        """
-        yield from desc_paths

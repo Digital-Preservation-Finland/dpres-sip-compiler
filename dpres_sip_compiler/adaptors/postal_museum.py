@@ -31,11 +31,11 @@ class SipMetadataPostalMuseum(SipMetadata):
             p_object.filepath = os.path.relpath(filepath, source_path)
             self.add_object(p_object)
 
-    def descriptive_strings(
+    def descriptive_metadata_sources(
         self,
         desc_paths: List[str],
         config: Optional[Config] = None
-    ) -> Iterator[str]:
+    ) -> Iterator[tuple[str, str]]:
         """
         Iterator for descriptive metadata. Returns root sections
         from XML files (containing multiple root elements) as serialized
@@ -43,7 +43,8 @@ class SipMetadataPostalMuseum(SipMetadata):
 
         :param desc_paths: Path to descriptive metadata files
         :param config: Additional needed configuration
-        :returns: Iterator
+        :returns: Iterator with tuple of descriptive metadata type and
+            string
         """
         for metadata_path in desc_paths:
 
@@ -60,4 +61,4 @@ class SipMetadataPostalMuseum(SipMetadata):
                     continue
 
                 lidowrap_elem = '<lido:lidoWrap' + lidowrap
-                yield h.serialize(ET.fromstring(lidowrap_elem))
+                yield ('datastring', h.serialize(ET.fromstring(lidowrap_elem)))

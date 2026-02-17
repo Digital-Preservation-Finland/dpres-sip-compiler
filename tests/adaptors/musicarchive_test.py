@@ -54,9 +54,10 @@ def test_descriptive_files():
     sip_meta = SipMetadataMusicArchive()
     config = Config(conf_file="tests/data/musicarchive/config.conf")
     desc_files = []
-    for desc in sip_meta.descriptive_files(
+    for (dataformat, desc) in sip_meta.descriptive_metadata_sources(
             ["tests/data/musicarchive/source1"], config):
         desc_files.append(desc)
+        assert dataformat == 'datafile'
     assert set(desc_files) == {
         "tests/data/musicarchive/source1/test1___metadata.xml",
         "tests/data/musicarchive/source1/test2___metadata.xml"}
@@ -100,17 +101,17 @@ def test_alt_identifier(tmpdir):
         </mets:xmlData></mets:mdWrap></mets:techMD></mets:amdSec>
         </mets:mets>"""
     mets_file = os.path.join(str(tmpdir), "mets.xml")
-    with open(mets_file, 'w') as outfile:
+    with open(mets_file, 'w', encoding='utf-8') as outfile:
         outfile.write(xml_original)
     sip_meta = SipMetadataMusicArchive()
     config = Config(conf_file="tests/data/musicarchive/config.conf")
     sip_meta.populate("tests/data/musicarchive/source2", config)
-    
+
     mets_xml = lxml.etree.parse(mets_file).getroot()
     premis_ids = mets_xml.xpath(
         ".//premis:objectIdentifier",
         namespaces={'premis': 'info:lc/xmlns/premis-v2'})
-    
+
     assert len(premis_ids) == 1
     assert premis_ids[0].xpath(
         "./premis:objectIdentifierType",
@@ -120,7 +121,7 @@ def test_alt_identifier(tmpdir):
         "./premis:objectIdentifierValue",
         namespaces={'premis': 'info:lc/xmlns/premis-v2'}
         )[0].text.strip() == "882d63db-c9b6-4f44-83ba-901b300821cc"
-    
+
 
 def test_handle_html_files(sample_mets, path_to_files):
     """
@@ -300,7 +301,7 @@ def test_skip_object():
     }
     linking = PremisLinkingMusicArchive(source_row)
     linking.add_object_link(1, "null")
-    assert linking.object_links == []
+    assert not linking.object_links
 
 
 def test_skip_hidden(tmpdir, pick_files_tar):
@@ -319,7 +320,7 @@ def test_skip_hidden(tmpdir, pick_files_tar):
     tar_file = os.path.join(str(tmpdir), "sip.tar")
     compile_sip(
         source_path=source_path,
-        tar_file=tar_file, 
+        tar_file=tar_file,
         conf_file="tests/data/musicarchive/config.conf"
     )
     assert os.path.isfile(tar_file)

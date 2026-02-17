@@ -131,7 +131,7 @@ class SipMetadataMusicArchive(SipMetadata):
         """
         Iterator for descriptive metadata files.
 
-        :source_meta_path: Path to descrptive metadata files
+        :desc_paths: Path to folder with descriptive metadata files
         :config: Additional needed configuration
         :returns: Descriptive metadata file
         """

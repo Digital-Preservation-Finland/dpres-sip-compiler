@@ -18,8 +18,8 @@ Content Preparation
 
 For the data of the Postal Museum, the descriptive metadata of a package
 needs to be in an XML file containing multiple LIDO metadata sections. The
-file is expected not to have a root element, but raher contain separate XML
-sections bundled together into a file.
+file is expected not to have a root element, but rather contain separate
+XML sections bundled together into a file.
 
 The content files must be prepared in a folder structure representing the
 final SIP.

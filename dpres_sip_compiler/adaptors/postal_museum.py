@@ -2,7 +2,6 @@
 import os
 import fnmatch
 from collections.abc import Iterator
-from typing import List
 from uuid import uuid4
 import xml_helpers.utils as h
 import lxml.etree as ET
@@ -13,7 +12,7 @@ from dpres_sip_compiler.config import Config
 class SipMetadataPostalMuseum(SipMetadata):
     """Class for collecting SIP metadata."""
 
-    def populate(self, source_path: str, config: Config):
+    def populate(self, source_path: str, config: Config) -> None:
         """Recursively collect all file paths from given path."""
         files = []
         files += [os.path.join(looproot, filename)
@@ -33,7 +32,7 @@ class SipMetadataPostalMuseum(SipMetadata):
 
     def descriptive_metadata_sources(
         self,
-        desc_paths: List[str],
+        desc_paths: list[str],
         config: Config,
     ) -> Iterator[tuple[str, str]]:
         """

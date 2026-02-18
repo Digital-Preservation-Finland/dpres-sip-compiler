@@ -1,7 +1,7 @@
 """Compile SIP using dpres-siptools-ng."""
 
 import os
-from typing import List, Optional, Dict
+from typing import Optional, Dict
 from mets_builder import METS, MetsProfile
 from mets_builder.metadata import (
     DigitalProvenanceAgentMetadata,
@@ -53,7 +53,7 @@ class SipCompiler:
     def __init__(
         self,
         source_path: str,
-        descriptive_metadata_paths: Optional[List[str]],
+        descriptive_metadata_paths: Optional[list[str]],
         config: Config,
         tar_file: str,
         sip_meta: SipMetadata,
@@ -75,7 +75,7 @@ class SipCompiler:
         :returns: None
         """
         self.source_path = source_path
-        self.descriptive_metadata_paths: List[str] = []
+        self.descriptive_metadata_paths: list[str] = []
         if descriptive_metadata_paths:
             self.descriptive_metadata_paths = descriptive_metadata_paths
         self.config = config
@@ -87,8 +87,8 @@ class SipCompiler:
         self.representative_objects: Dict[
             str, TechnicalRepresentationObjectMetadata
         ] = {}
-        self.event_metadata: List[DigitalProvenanceEventMetadata] = []
-        self.descriptive_metadata: List[ImportedMetadata] = []
+        self.event_metadata: list[DigitalProvenanceEventMetadata] = []
+        self.descriptive_metadata: list[ImportedMetadata] = []
 
     def _get_representation_object(
         self, object_id: str
@@ -421,7 +421,7 @@ class SipCompiler:
 def compile_sip(
     source_path: str,
     tar_file: str,
-    descriptive_metadata_paths: Optional[List[str]] = None,
+    descriptive_metadata_paths: Optional[list[str]] = None,
     content_id: Optional[str] = None,
     sip_id: Optional[str] = None,
     conf_file: Optional[str] = None,

@@ -3,9 +3,11 @@ Base adaptor for handling PREMIS metadata in packaging.
 
 Adaptors can overwrite the required methods and properties as needed.
 """
+from __future__ import annotations
+
 import os
 from collections.abc import Iterator
-from typing import List, Optional
+from typing import Optional
 from file_scraper.scraper import Scraper
 from dpres_sip_compiler.config import Config
 
@@ -14,13 +16,13 @@ def build_sip_metadata(adaptor_dict: dict,
                        source_path: str,
                        config: Config,
                        content_id: Optional[str] = None,
-                       sip_id: Optional[str] = None):
-    """
-    Build metadata object based on given class.
-    :adaptor_dict: Dict of adaptor names and corresponding SIP metadata
-                   classes.
-    :source_path: Source data path
-    :config: Basic configuration
+                       sip_id: Optional[str] = None) -> SipMetadata:
+    """Build metadata object based on given class.
+
+    :param adaptor_dict: Dict of adaptor names and corresponding SIP
+        metadata classes.
+    :param source_path: Source data path
+    :param config: Basic configuration
     :returns: SIP metadata object
     """
     sip_meta = sip_metadata_class(adaptor_dict, config)()
@@ -34,12 +36,13 @@ def build_sip_metadata(adaptor_dict: dict,
     return sip_meta
 
 
-def sip_metadata_class(adaptor_dict, config):
-    """
-    Find metadata class for SIP based on configured adaptor.
-    :adaptor_dict: Dict of adaptor names and corresponding SIP metadata
-                   classes.
-    :config: Basic configuration
+def sip_metadata_class(adaptor_dict: dict, config: Config) -> SipMetadata:
+    """Find metadata class for SIP based on configured adaptor.
+
+    :param adaptor_dict: Dict of adaptor names and corresponding SIP
+        metadata classes.
+    :param config: Basic configuration
+    :returns: SIP metadata class
     """
     if config.adaptor not in adaptor_dict:
         raise NotImplementedError(
@@ -286,7 +289,7 @@ class SipMetadata:
 
     def descriptive_metadata_sources(
             self,
-            desc_paths: List[str],
+            desc_paths: list[str],
             config: Config,
     ) -> Iterator[tuple[str, str]]:
         """

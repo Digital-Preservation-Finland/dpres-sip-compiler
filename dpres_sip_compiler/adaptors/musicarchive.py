@@ -126,21 +126,22 @@ class SipMetadataMusicArchive(SipMetadata):
             )
 
     def descriptive_metadata_sources(self,
-                                     desc_paths=None,
-                                     config=None):
+                                     desc_paths,
+                                     config):
         """
         Iterator for descriptive metadata sources.
 
         :desc_paths: Path to folder with descriptive metadata files
         :config: Additional needed configuration
-        :returns: Iterator with tuple of descriptive metadata type and
-            file
+        :returns: Iterator with tuple of descriptive metadata source
+            format and file
         """
         desc_path = desc_paths[0]
         for filepath in os.listdir(desc_path):
             if filepath.endswith(config.meta_ending) and \
                     not filepath.startswith("."):
-                yield ('datafile', os.path.join(desc_path, filepath))
+                yield (config.desc_metadata_source_format,
+                       os.path.join(desc_path, filepath))
 
     @staticmethod
     def exclude_files(config):

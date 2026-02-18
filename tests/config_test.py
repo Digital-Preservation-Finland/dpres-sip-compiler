@@ -14,3 +14,4 @@ def test_configure():
     assert config.meta_ending == "___metadata.xml"
     assert config.csv_ending == "___metadata.csv"
     assert config.used_checksum == "MD5"
+    assert config.desc_metadata_source_format == "file"

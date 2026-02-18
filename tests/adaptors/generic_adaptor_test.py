@@ -1,5 +1,6 @@
 """Test the generic adaptor."""
 from dpres_sip_compiler.adaptors.generic_adaptor import GenericFolderStructure
+from dpres_sip_compiler.config import Config
 
 
 def test_populate():
@@ -8,16 +9,16 @@ def test_populate():
     Test that the method collects all the filepaths in a given directory.
     """
     testclass = GenericFolderStructure()
-    testclass.populate("tests/data/generic/files",
-                       "tests/data/generic/generic.conf")
+    config = Config("tests/data/generic/generic.conf")
+    testclass.populate("tests/data/generic/files", config)
     assert len(testclass.premis_objects) == 2
 
-    filepaths = get_premis_objects_filepaths(testclass.premis_objects)
+    filepaths = _get_premis_objects_filepaths(testclass.premis_objects)
     assert 'test_file_01.txt' in filepaths
     assert 'test_file_02.txt' in filepaths
 
 
-def get_premis_objects_filepaths(premis_objects):
+def _get_premis_objects_filepaths(premis_objects):
     """Helper method to collect the filepaths from a dictionary of objects.
     """
     filepaths = []

@@ -369,7 +369,7 @@ class SipCompiler:
 
         # Metadata can be either in files or as strings
         for (metadata_format, metadata_source) in desc_metadata:
-            if metadata_format == 'datafile':
+            if metadata_format == 'file':
                 self.descriptive_metadata.append(
                     ImportedMetadata(
                         data_path=metadata_source,

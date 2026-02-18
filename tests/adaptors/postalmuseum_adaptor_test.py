@@ -1,5 +1,6 @@
 """Test the postalmuseum adaptor."""
 from dpres_sip_compiler.adaptors.postal_museum import SipMetadataPostalMuseum
+from dpres_sip_compiler.config import Config
 
 
 def test_populate():
@@ -8,8 +9,8 @@ def test_populate():
     Test that the method collects all the filepaths in a given directory.
     """
     testclass = SipMetadataPostalMuseum()
-    testclass.populate("tests/data/postalmuseum/files",
-                       "tests/data/generic/postalmuseum.conf")
+    config = Config(conf_file="tests/data/postalmuseum/postalmuseum.conf")
+    testclass.populate("tests/data/postalmuseum/files", config)
     assert len(testclass.premis_objects) == 2
 
     filepaths = _get_premis_objects_filepaths(testclass.premis_objects)
@@ -34,9 +35,10 @@ def test_descriptive_strings():
     """
     testclass = SipMetadataPostalMuseum()
     desc_strings = []
+    config = Config(conf_file="tests/data/postalmuseum/postalmuseum.conf")
     for (dataformat, desc) in testclass.descriptive_metadata_sources(
             ["tests/data/postalmuseum/lido_example_multiple_lidowraps.lido"],
-            "tests/data/generic/postalmuseum.conf"):
-        assert dataformat == 'datastring'
+            config):
+        assert dataformat == 'string'
         desc_strings.append(desc)
     assert len(desc_strings) == 2

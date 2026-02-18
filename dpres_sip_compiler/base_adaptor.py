@@ -291,15 +291,16 @@ class SipMetadata:
     ) -> Iterator[tuple[str, str]]:
         """
         Iterator for descriptive metadata sources.
-        Implemented in adaptors otherwise return empty iterator.
+        Yields tuples of data source format and given metadata file
+        paths.
 
         :param desc_paths: A list of descriptive metadata paths
         :param config: Additional needed configuration
-        :returns: Iterator with tuple of descriptive metadata format and
-            file
+        :returns: Iterator with tuple of descriptive metadata source
+            format and file
         """
         for metadata_path in desc_paths:
-            yield ('datafile', metadata_path)
+            yield (config.desc_metadata_source_format, metadata_path)
 
     @staticmethod
     def exclude_files(config):

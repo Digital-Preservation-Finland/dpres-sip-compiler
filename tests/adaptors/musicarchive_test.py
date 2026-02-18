@@ -57,7 +57,7 @@ def test_descriptive_files():
     for (dataformat, desc) in sip_meta.descriptive_metadata_sources(
             ["tests/data/musicarchive/source1"], config):
         desc_files.append(desc)
-        assert dataformat == 'datafile'
+        assert dataformat == 'file'
     assert set(desc_files) == {
         "tests/data/musicarchive/source1/test1___metadata.xml",
         "tests/data/musicarchive/source1/test2___metadata.xml"}

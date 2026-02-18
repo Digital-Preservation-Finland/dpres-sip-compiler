@@ -7,6 +7,7 @@ import click
 
 _DEFAULT_DESC_METADATA_FORMAT = "DC"
 _DEFAULT_DESC_METADATA_VERSION = "2008"
+_DEFAULT_DESC_METADATA_SOURCE_FORMAT = "file"
 
 
 def get_default_config_path():
@@ -28,7 +29,7 @@ def get_default_temp_path():
             datetime.timezone.utc).strftime("%Y-%m-%dT%H-%M-%S"))
 
 
-# pylint: disable=too-few-public-methods
+# pylint: disable=too-few-public-methods, too-many-instance-attributes
 class Config:
     """Basic configuration.
     """
@@ -51,6 +52,7 @@ class Config:
 
         # Which adaptor script is used.
         self.adaptor = self._conf["script"]["adaptor"]
+
         # Descriptive metadata's format
         try:
             _desc_metadata_format = self._conf["script"][
@@ -68,6 +70,15 @@ class Config:
         except KeyError:
             _desc_metadata_version = _DEFAULT_DESC_METADATA_VERSION
         self.desc_metadata_version = _desc_metadata_version
+
+        # Descriptive metadata source format (i.e. "file" or "string")
+        try:
+            _desc_metadata_source_format = self._conf["script"][
+                "desc_metadata_source_format"
+            ]
+        except KeyError:
+            _desc_metadata_source_format = _DEFAULT_DESC_METADATA_SOURCE_FORMAT
+        self.desc_metadata_source_format = _desc_metadata_source_format
 
         # The selected checksum in PREMIS Objects
         try:

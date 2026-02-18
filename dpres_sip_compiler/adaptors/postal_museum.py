@@ -2,7 +2,7 @@
 import os
 import fnmatch
 from collections.abc import Iterator
-from typing import List, Optional
+from typing import List
 from uuid import uuid4
 import xml_helpers.utils as h
 import lxml.etree as ET
@@ -34,17 +34,17 @@ class SipMetadataPostalMuseum(SipMetadata):
     def descriptive_metadata_sources(
         self,
         desc_paths: List[str],
-        config: Optional[Config] = None
+        config: Config,
     ) -> Iterator[tuple[str, str]]:
         """
-        Iterator for descriptive metadata. Returns root sections
-        from XML files (containing multiple root elements) as serialized
-        LIDO XML.
+        Iterator for descriptive metadata.
+        Parses root sections from XML files (containing multiple root
+        elements) as serialized LIDO XML.
 
         :param desc_paths: Path to descriptive metadata files
         :param config: Additional needed configuration
-        :returns: Iterator with tuple of descriptive metadata type and
-            string
+        :returns: Iterator with tuple of descriptive metadata source
+            format and string
         """
         for metadata_path in desc_paths:
 
@@ -61,4 +61,5 @@ class SipMetadataPostalMuseum(SipMetadata):
                     continue
 
                 lidowrap_elem = '<lido:lidoWrap' + lidowrap
-                yield ('datastring', h.serialize(ET.fromstring(lidowrap_elem)))
+                yield (config.desc_metadata_source_format,
+                       h.serialize(ET.fromstring(lidowrap_elem)))

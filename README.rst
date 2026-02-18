@@ -47,9 +47,8 @@ For details about adaptor specific configuration and content preparation,
 select the adaptor below:
 
    * `Music Archive Finland <./doc/musicarchive.rst>`_
-
-The tool currently supports only packaging of data of Music Archive Finland,
-with content preparation rules which have been agreed in advance.
+   * `The Finnish Postal Museum <./doc/postalmuseum.rst>`_
+   * `Generic folder based adapter <./doc/generic.rst>`_
 
 Usage: Compile content
 ----------------------
@@ -62,6 +61,8 @@ The following options can be used:
 
    * ``--tar-file <FILE>`` - Output tar file. If not given, the tar file will be
      in the current working path and it's name is based on the SIP identifier.
+   * ``--content_id <CONTENT ID>`` - A semantic ID for the contents in the SIP.
+   * ``--sip_id <SIP ID>`` - A technical ID for the the SIP, the METS OBJID.
    * ``--config <FILE>`` - Configuration file. If not given, the default config location
      is used.
    * ``--validation`` or ``--no-validation`` - Define whether validation is used

@@ -1,7 +1,7 @@
 """Compile SIP using dpres-siptools-ng."""
 
 import os
-from typing import Optional, Dict
+from typing import Optional
 from mets_builder import METS, MetsProfile
 from mets_builder.metadata import (
     DigitalProvenanceAgentMetadata,
@@ -83,8 +83,8 @@ class SipCompiler:
         self.tar_file = tar_file
         self.sip_meta = sip_meta
         self.mets: Optional[METS] = None
-        self.digital_objects: Dict[str, File] = {}
-        self.representative_objects: Dict[
+        self.digital_objects: dict[str, File] = {}
+        self.representative_objects: dict[
             str, TechnicalRepresentationObjectMetadata
         ] = {}
         self.event_metadata: list[DigitalProvenanceEventMetadata] = []

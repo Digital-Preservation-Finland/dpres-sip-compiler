@@ -12,7 +12,7 @@ Added
 ^^^^^
 
 - Options to provide SIP ID (METS OBJID) and CONTENTID to the SIP metadata
-- Adapter for the Finnish Postal Museum
+- Adaptor for the Finnish Postal Museum
 
 2.1.2 - 2025-09-29
 ------------------

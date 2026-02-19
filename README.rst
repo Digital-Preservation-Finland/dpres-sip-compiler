@@ -48,7 +48,7 @@ select the adaptor below:
 
    * `Music Archive Finland <./doc/musicarchive.rst>`_
    * `The Finnish Postal Museum <./doc/postalmuseum.rst>`_
-   * `Generic folder based adapter <./doc/generic.rst>`_
+   * `Generic folder based adaptor <./doc/generic.rst>`_
 
 Usage: Compile content
 ----------------------

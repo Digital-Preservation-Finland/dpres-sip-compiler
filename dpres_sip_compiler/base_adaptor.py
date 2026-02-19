@@ -36,7 +36,8 @@ def build_sip_metadata(adaptor_dict: dict,
     return sip_meta
 
 
-def sip_metadata_class(adaptor_dict: dict, config: Config) -> SipMetadata:
+def sip_metadata_class(adaptor_dict: dict[str, type[SipMetadata]],
+                       config: Config) -> type[SipMetadata]:
     """Find metadata class for SIP based on configured adaptor.
 
     :param adaptor_dict: Dict of adaptor names and corresponding SIP

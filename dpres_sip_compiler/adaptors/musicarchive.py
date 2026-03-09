@@ -1,47 +1,62 @@
-"""PREMIS metadata adaptor for Music Archive.
-"""
-import os
-import glob
-from io import open as io_open
-import datetime
+"""PREMIS metadata adaptor for Music Archive."""
+from __future__ import annotations
+
 import csv
-import premis
+import datetime
+import glob
+import os
+from typing import TYPE_CHECKING, Literal
+
 import mets as metslib
-from file_scraper.scraper import Scraper
+import premis
 from file_scraper.defaults import UNAP
+from file_scraper.scraper import Scraper
+
 from dpres_sip_compiler.base_adaptor import (
-    SipMetadata, PremisObject, PremisEvent, PremisAgent,
-    PremisLinking)
+    PremisAgent,
+    PremisEvent,
+    PremisLinking,
+    PremisObject,
+    SipMetadata,
+)
 from dpres_sip_compiler.constants import (
-    EVENT_DIGEST,
     EVENT_CHANGE,
     EVENT_CONVERSION,
     EVENT_CREATION,
-    EVENT_MODIFICATION,
+    EVENT_DIGEST,
     EVENT_META_MODIFICATION,
-    EVENT_NORMALIZATION,
     EVENT_MIGRATION,
+    EVENT_MODIFICATION,
+    EVENT_NORMALIZATION,
     FILE_OUTCOME_SOURCE,
     FILE_USE_IGNORE_VALIDATION,
     PREMIS_ADDRESS,
 )
 
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+    from io import TextIOWrapper
 
-def read_csv_file(filename):
+    import lxml.etree as ET
+
+    from dpres_sip_compiler.config import Config
+
+
+def read_csv_file(filename: str) -> Iterator[dict[str, str]]:
     """
     Return all rows from CSV file as one dictionary per row.
 
-    :filename: Filename to read
-    :yields: CSV rows as dictionary
+    :param filename: Filename to read
+    :returns: Iterator with CSV rows as dictionary
 
     """
-    def _open_file(filename):
+    def _open_file(filename: str) -> TextIOWrapper:
         """
         Open file in utf-8 text mode.
 
-        :filename: File to open
+        :param filename: File to open
         """
-        return io_open(filename, "rt", encoding="utf-8")
+        return open(filename, "rt", encoding="utf-8")
 
     with _open_file(filename) as infile:
         csvreader = csv.DictReader(infile, delimiter=',', quotechar='"')
@@ -53,22 +68,21 @@ class SipMetadataMusicArchive(SipMetadata):
     Music Archive specific PREMIS Metadata handler for a SIP to be compiled.
     """
 
-    def populate(self, source_path, config):
+    def populate(self, source_path: str, config: Config) -> None:
         """
         Populate a CSV file to PREMIS dicts.
         The CSV file must be in the root directory of source path as it is
         not actual digital object in the content.
 
-        :source_path: Source data path
-        :config: Basic configuration
+        :param source_path: Source data path
+        :param config: Basic configuration
         """
-
         try:
             filename = glob.glob(
                 os.path.join(
                     source_path, f"*{config.csv_ending}"))[0]
         except KeyError:
-            raise OSError("CSV metadata file was not found!")
+            raise OSError("CSV metadata file was not found!") from None
 
         self.objid = os.path.split(filename)[1].replace(config.csv_ending, "")
         self.content_id = self.objid
@@ -76,11 +90,13 @@ class SipMetadataMusicArchive(SipMetadata):
         for csv_row in read_csv_file(filename):
             self.add_premis_metadata(csv_row, source_path, config)
 
-    def add_premis_metadata(self, csv_row, source_path, config):
+    def add_premis_metadata(
+        self, csv_row: dict[str, str], source_path: str, config: Config
+    ) -> None:
         """Add premis metadata from single row of CSV metadata / dictionary
 
-        :csv_row: CSV row as dict
-        :source_path: Source data path
+        :param csv_row: CSV row as dict
+        :param source_path: Source data path
         :returns: None
         """
         p_object = PremisObjectMusicArchive(csv_row)
@@ -125,14 +141,14 @@ class SipMetadataMusicArchive(SipMetadata):
                 value=FILE_USE_IGNORE_VALIDATION,
             )
 
-    def descriptive_metadata_sources(self,
-                                     desc_paths,
-                                     config):
+    def descriptive_metadata_sources(
+        self, desc_paths: list[str], config: Config
+    ) -> Iterator[tuple[str, str]]:
         """
         Iterator for descriptive metadata sources.
 
-        :desc_paths: Path to folder with descriptive metadata files
-        :config: Additional needed configuration
+        :param desc_paths: Path to folder with descriptive metadata files
+        :param config: Additional needed configuration
         :returns: Iterator with tuple of descriptive metadata source
             format and file
         """
@@ -144,15 +160,17 @@ class SipMetadataMusicArchive(SipMetadata):
                        os.path.join(desc_path, filepath))
 
     @staticmethod
-    def exclude_files(config):
+    def exclude_files(
+        config: Config,
+    ) -> tuple[str, str, Literal[".[!/]*"], Literal["*/.[!/]*"]]:
         """
         Exclude files from Submission Information Package.
 
-        :config: Additional needed configuration
+        :param config: Additional needed configuration
         :returns: Patterns for metadata files to be excluded.
         """
-        return ("*%s" % config.meta_ending,
-                "*%s" % config.csv_ending,
+        return (f"*{config.meta_ending}",
+                f"*{config.csv_ending}",
                 ".[!/]*", "*/.[!/]*")  # Exclude all hidden files/directories
 
     def scrape_objects(self, source_path: str, validation: bool) -> None:
@@ -193,11 +211,11 @@ class SipMetadataMusicArchive(SipMetadata):
             }
             self.scraper_results[obj_identifier] = scraper_result
 
-    def _append_alternative_ids(self, mets):
+    def _append_alternative_ids(self, mets: ET._Element) -> ET._Element:
         """
         Add additional PREMIS object identifiers to METS.
 
-        :mets: METS XML root
+        :param mets: METS XML root
         """
         for xml_object in premis.iter_objects(mets):
             if premis.parse_object_type(xml_object) != "premis:file":
@@ -219,13 +237,13 @@ class SipMetadataMusicArchive(SipMetadata):
         return mets
 
 
-def handle_html_files(mets, source_path):
+def handle_html_files(mets: ET._Element, source_path: str) -> ET._Element:
     """
     Run validation on all HTML files. If the HTML file is broken, change
     the formatName to TEXT and remove formatVersion in the METS file.
 
-    :mets: METS XML root
-    :source_path: Source path of files to be packaged
+    :param mets: METS XML root
+    :param source_path: Source path of files to be packaged
     """
     format_elems = mets.xpath(
         ".//premis:format[contains(.//premis:formatName, 'text/html')]",
@@ -249,11 +267,12 @@ def handle_html_files(mets, source_path):
     return mets
 
 
-def find_path_by_techmd_id(mets, techmd_id):
+def find_path_by_techmd_id(mets: ET._Element, techmd_id: str) -> str:
     """
     Find the file path that matches the given METS TechMD ID.
-    :mets: METS XML root
-    :techmd_id: TechMD element's ID value
+
+    :param mets: METS XML root
+    :param techmd_id: TechMD element's ID value
     """
     for file_elem in metslib.parse_files(mets):
         admid_list = metslib.parse_admid(file_elem)
@@ -265,11 +284,12 @@ def find_path_by_techmd_id(mets, techmd_id):
     return file_path
 
 
-def set_format_plaintext(format_element, new_value):
+def set_format_plaintext(format_element: ET._Element, new_value: str) -> None:
     """
     Change formatName value to given value and remove formatVersion.
-    :format_element: Object. Premis format element.
-    :new_value: String. New value of formatName element.
+
+    :param format_element: Object. Premis format element.
+    :param new_value: String. New value of formatName element.
     """
     format_name_element = format_element.xpath(
         ".//premis:formatName",
@@ -284,19 +304,16 @@ def set_format_plaintext(format_element, new_value):
 
 
 class PremisObjectMusicArchive(PremisObject):
-    """
-    Music Archive specific PREMIS Object handler.
-    """
+    """Music Archive specific PREMIS Object handler."""
 
-    def __init__(self, csv_row):
+    def __init__(self, csv_row: dict[str, str]) -> None:
         """Initialize.
-        :csv_row: One row from a CSV file.
-        """
 
+        :param csv_row: One row from a CSV file.
+        """
         # We may have CSV files without the digest status information.
         # In such case, the message digest is always valid.
-        self.digest_valid = \
-            True if csv_row.get("tiiviste-status", "1") == "1" else False
+        self.digest_valid = bool(csv_row.get("tiiviste-status", "1") == "1")
         metadata = {
             "object_identifier_type": "UUID",
             "object_identifier_value": csv_row["objekti-uuid"],
@@ -309,10 +326,11 @@ class PremisObjectMusicArchive(PremisObject):
         }
         super().__init__(metadata)
 
-    def find_path(self, source_path):
+    def find_path(self, source_path: str) -> None:
         """
         Find file path to object.
-        :source_path: Source data path.
+
+        :param source_path: Source data path.
         :raises: IOError if digital object file was not found.
         """
         found = False
@@ -329,9 +347,7 @@ class PremisObjectMusicArchive(PremisObject):
 
 
 class PremisEventMusicArchive(PremisEvent):
-    """
-    Music Archive specific PREMIS Event handler.
-    """
+    """Music Archive specific PREMIS Event handler."""
     DETAIL_KEYS = ["tiiviste", "tiiviste-tyyppi", "tiiviste-aika",
                    "pon-korvattu-nimi", "objekti-nimi", "sip-tunniste",
                    "event-selite"]
@@ -339,9 +355,10 @@ class PremisEventMusicArchive(PremisEvent):
     time_parse_format = "%Y-%m-%d %H:%M:%S"
     time_output_format = "%Y-%m-%dT%H:%M:%S"
 
-    def __init__(self, csv_row):
+    def __init__(self, csv_row: dict[str, str]) -> None:
         """Initialize.
-        :csv_row: One row from a CSV file.
+
+        :param csv_row: One row from a CSV file.
         """
         self._detail_info = []
 
@@ -357,7 +374,7 @@ class PremisEventMusicArchive(PremisEvent):
 
         event_datetime = start_time
         if end_time is not None:
-            event_datetime = "{}/{}".format(start_time, end_time)
+            event_datetime = f"{start_time}/{end_time}"
 
         metadata = {
             "event_identifier_type": "local",
@@ -384,7 +401,7 @@ class PremisEventMusicArchive(PremisEvent):
             self._detail_info.append(detail)
 
     @property
-    def event_detail(self):
+    def event_detail(self) -> str:
         """Event detail"""
         if self.event_type == EVENT_DIGEST:
             return "Checksum calculation for digital objects."
@@ -425,7 +442,7 @@ class PremisEventMusicArchive(PremisEvent):
         )
 
     @property
-    def event_outcome_detail(self):
+    def event_outcome_detail(self) -> str:
         """Event outcome detail"""
         out = ""
         if self._detail_info[0]["event-selite"].lower() != "null":
@@ -461,10 +478,10 @@ class PremisEventMusicArchive(PremisEvent):
             return "%sSubmission information package created as: " \
                    "%s" % (out, self._detail_info[0]["sip-tunniste"])
 
-        if self.event_type in [EVENT_MODIFICATION]:
+        if self.event_type == EVENT_MODIFICATION:
             return "%sObject has been modified." % out
 
-        if self.event_type in [EVENT_META_MODIFICATION]:
+        if self.event_type == EVENT_META_MODIFICATION:
             return "%sMetadata has been modified." % out
 
         if self.event_type == EVENT_NORMALIZATION:
@@ -486,13 +503,12 @@ class PremisEventMusicArchive(PremisEvent):
 
 
 class PremisAgentMusicArchive(PremisAgent):
-    """
-    Music Archive specific PREMIS Agent handler.
-    """
+    """Music Archive specific PREMIS Agent handler."""
 
-    def __init__(self, csv_row):
+    def __init__(self, csv_row: dict[str, str]) -> None:
         """Initialize.
-        :csv_row: One row from a CSV file.
+
+        :param csv_row: One row from a CSV file.
         """
         metadata = {
             "agent_identifier_type": "local",
@@ -504,12 +520,12 @@ class PremisAgentMusicArchive(PremisAgent):
 
 
 class PremisLinkingMusicArchive(PremisLinking):
-    """
-    Music Archive specific PREMIS Linking handler.
-    """
-    def __init__(self, csv_row):
+    """Music Archive specific PREMIS Linking handler."""
+
+    def __init__(self, csv_row: dict[str, str]) -> None:
         """Initialize.
-        :csv_row: One row from a CSV file.
+
+        :param csv_row: One row from a CSV file.
         """
         super().__init__()
         self._event_type = csv_row["event"]
@@ -520,12 +536,13 @@ class PremisLinkingMusicArchive(PremisLinking):
         self.counterpart_obj_name = csv_row["poo-vastinpari-obj-nimi"]
         self.counterpart_obj_status = csv_row["poo-vastinpari-obj-status"]
 
-    def add_object_link(self, identifier, object_role):
+    def add_object_link(self, identifier: str, object_role: str) -> None:
         """
         Add object to linking. Skip object adding if event type is
         'information package creation'.
-        :identifier: PREMIS Object identifier
-        :object_role: Object role in event.
+
+        :param identifier: PREMIS Object identifier
+        :param object_role: Object role in event.
         """
         if self._event_type == EVENT_CREATION:
             return
@@ -537,9 +554,11 @@ class PremisLinkingMusicArchive(PremisLinking):
 
 class PremisRepresentationMusicArchive(PremisObject):
     """Music Archive specific PREMIS Representation handler."""
-    def __init__(self, csv_row):
+
+    def __init__(self, csv_row: dict[str, str]) -> None:
         """Initialize.
-        :csv_row: One row from a CSV file.
+
+        :param csv_row: One row from a CSV file.
         """
         metadata = {
             "object_identifier_type": "UUID",
@@ -552,10 +571,11 @@ class PremisRepresentationMusicArchive(PremisObject):
         }
         super().__init__(metadata)
 
-    def find_target_path(self, source_path):
+    def find_target_path(self, source_path: str) -> None:
         """
         Find file path to outcome object.
-        :source_path: Source data path.
+
+        :param source_path: Source data path.
         """
         for root, _, files in os.walk(source_path):
             if self.outcome_filename in files:

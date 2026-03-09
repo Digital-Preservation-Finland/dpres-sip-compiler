@@ -7,7 +7,6 @@ from __future__ import annotations
 
 import os
 from collections.abc import Iterator
-from typing import Optional
 from file_scraper.scraper import Scraper
 from dpres_sip_compiler.config import Config
 
@@ -15,8 +14,8 @@ from dpres_sip_compiler.config import Config
 def build_sip_metadata(adaptor_dict: dict,
                        source_path: str,
                        config: Config,
-                       content_id: Optional[str] = None,
-                       sip_id: Optional[str] = None) -> SipMetadata:
+                       content_id: str | None = None,
+                       sip_id: str | None = None) -> SipMetadata:
     """Build metadata object based on given class.
 
     :param adaptor_dict: Dict of adaptor names and corresponding SIP
@@ -123,25 +122,29 @@ class PremisEvent:
     Can be overwritten with metadata type specific adaptors.
     """
 
-    def __init__(self, metadata):
+    def __init__(self, metadata: dict[str, str]) -> None:
         """Initialize event.
-        :metadata: Metadata dict for event.
+
+        :param metadata: Metadata dict for event.
         """
         self._metadata = metadata
-        for key in ["event_identifier_type",
-                    "event_identifier_value",
-                    "event_type",
-                    "event_outcome",
-                    "event_datetime",
-                    "event_detail",
-                    "event_outcome_detail"]:
+        for key in [
+            "event_identifier_type",
+            "event_identifier_value",
+            "event_type",
+            "event_outcome",
+            "event_datetime",
+            "event_detail",
+            "event_outcome_detail",
+        ]:
             if key not in self._metadata:
                 self._metadata[key] = None
 
-    def __getattr__(self, attr):
+    def __getattr__(self, attr: str) -> str | None:
         """
         Set metadata items as properties.
-        :attr: Attribute name
+
+        :param attr: Attribute name
         :returns: Value for given attribute or None
         """
         if attr in self._metadata:
@@ -150,15 +153,14 @@ class PremisEvent:
         return None
 
     @property
-    def identifier(self):
+    def identifier(self) -> str:
         """Identifier of PREMIS Event, to be used as internal id.
         PREMIS eventIdentifierValue by default.
         """
         return self.event_identifier_value
 
-    def remove_metadata(self, metadata_key):
-        """Remove key from metadata.
-        """
+    def remove_metadata(self, metadata_key: str) -> str | None:
+        """Remove key from metadata."""
         self._metadata.pop(metadata_key, None)
 
 
@@ -167,22 +169,24 @@ class PremisAgent:
     Can be overwritten with metadata type specific adaptors.
     """
 
-    def __init__(self, metadata):
+    def __init__(self, metadata: dict[str, str]) -> None:
         """Initialize agent.
-        :metadata: Metadata dict for agent.
+        :param metadata: Metadata dict for agent.
         """
         self._metadata = metadata
-        for key in ["agent_identifier_type",
-                    "agent_identifier_value",
-                    "agent_name",
-                    "agent_type"]:
+        for key in [
+            "agent_identifier_type",
+            "agent_identifier_value",
+            "agent_name",
+            "agent_type",
+        ]:
             if key not in self._metadata:
                 self._metadata[key] = None
 
-    def __getattr__(self, attr):
+    def __getattr__(self, attr: str) -> str | None:
         """
         Set metadata items as properties.
-        :attr: Attribute name
+        :param attr: Attribute name
         :returns: Value for given attribute or None
         """
         if attr in self._metadata:
@@ -191,15 +195,14 @@ class PremisAgent:
         return None
 
     @property
-    def identifier(self):
+    def identifier(self) -> str:
         """Identifier of PREMIS Agent, to be used as internal id.
         PREMIS agentIdentifierValue by default.
         """
         return self.agent_identifier_value
 
-    def remove_metadata(self, metadata_key):
-        """Remove key from metadata.
-        """
+    def remove_metadata(self, metadata_key: str) -> None:
+        """Remove key from metadata."""
         self._metadata.pop(metadata_key, None)
 
 
@@ -209,13 +212,14 @@ class PremisLinking:
     """
 
     def __init__(self):
-        """Initialize Linking.
-        """
-        self.identifier = None  # Identifier of the linking
-        self.object_links = []  # List of object IDs
-        self.agent_links = []  # List of agent IDs and roles
+        """Initialize Linking."""
+        self.identifier: str | None = None  # Identifier of the linking
+        self.object_links: list[dict[str, str]] = []  # List of object IDs
+        self.agent_links: list[
+            dict[str, str]
+        ] = []  # List of agent IDs and roles
 
-    def add_object_link(self, identifier, object_role):
+    def add_object_link(self, identifier: str, object_role: str) -> None:
         """Add object and its role to linking, if it does not exist.
 
         :identifier: Object ID to be added.
@@ -226,10 +230,11 @@ class PremisLinking:
         for obj in self.object_links:
             if identifier == obj["linking_object"]:
                 return
-        self.object_links.append({"linking_object": identifier,
-                                  "object_role": object_role})
+        self.object_links.append(
+            {"linking_object": identifier, "object_role": object_role}
+        )
 
-    def add_agent_link(self, identifier, agent_role):
+    def add_agent_link(self, identifier: str, agent_role: str) -> None:
         """Add agent to linking, if it does not exist.
 
         :identifier: Agent ID to be added.
@@ -240,8 +245,9 @@ class PremisLinking:
         for agent in self.agent_links:
             if identifier == agent["linking_agent"]:
                 return
-        self.agent_links.append({"linking_agent": identifier,
-                                 "agent_role": agent_role})
+        self.agent_links.append(
+            {"linking_agent": identifier, "agent_role": agent_role}
+        )
 
 
 class SipMetadata:
@@ -257,21 +263,20 @@ class SipMetadata:
         premis_linkings: Dictionary of Linkings inside PREMIS
         premis_digiprov_representations: Dictionary of PREMIS
             Representations as digiprov MD
+
     """
 
     # pylint: disable=no-self-use
 
-    def __init__(self):
-        """
-        Initialize SIP PREMIS handler.
-        """
-        self.content_id = None
-        self.objid = None
-        self.premis_objects = {}
-        self.premis_object_alt_ids = {}
-        self.premis_events = {}
-        self.premis_agents = {}
-        self.premis_linkings = {}
+    def __init__(self) -> None:
+        """Initialize SIP PREMIS handler."""
+        self.content_id: str | None = None
+        self.objid: str | None = None
+        self.premis_objects: dict[str, PremisObject] = {}
+        self.premis_object_alt_ids: dict[str, list[dict[str, str]]] = {}
+        self.premis_events: dict[str, PremisEvent] = {}
+        self.premis_agents: dict[str, PremisAgent] = {}
+        self.premis_linkings: dict[str, PremisLinking] = {}
         # To store possible object representations, may include
         # redundant information, but the information has to
         # be available for lookup when generation digiprov information
@@ -307,12 +312,12 @@ class SipMetadata:
             yield (config.desc_metadata_source_format, metadata_path)
 
     @staticmethod
-    def exclude_files(config):
+    def exclude_files(config: Config) -> tuple[str, ...]:
         """
         Exclude files from Submission Information Package.
         Implemented in adaptors.
 
-        :config: Additional needed configuration
+        :param config: Additional needed configuration
         :returns: Patterns for metadata files to be excluded.
         """
         return ()
@@ -448,28 +453,28 @@ class SipMetadata:
             p_object)
 
     @property
-    def objects(self):
+    def objects(self) -> Iterator[PremisObject]:
         """Iterate PREMIS Objects.
         :returns: PREMIS Object
         """
         yield from self.premis_objects.values()
 
     @property
-    def events(self):
+    def events(self) -> Iterator[PremisEvent]:
         """Iterate PREMIS Events.
         :returns: PREMIS Event
         """
         yield from self.premis_events.values()
 
     @property
-    def agents(self):
+    def agents(self) -> Iterator[PremisAgent]:
         """Iterate PREMIS Agents.
         :returns: PREMIS Agent
         """
         yield from self.premis_agents.values()
 
     @property
-    def linkings(self):
+    def linkings(self) -> Iterator[PremisLinking]:
         """Iterate PREMIS Linkings.
         :returns: PREMIS Linking
         """

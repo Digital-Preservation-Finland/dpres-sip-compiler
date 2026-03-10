@@ -6,9 +6,16 @@ Adaptors can overwrite the required methods and properties as needed.
 from __future__ import annotations
 
 import os
-from collections.abc import Iterator
+from typing import TYPE_CHECKING, Literal, overload
+
 from file_scraper.scraper import Scraper
-from dpres_sip_compiler.config import Config
+
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+
+    from lxml import etree as ET
+
+    from dpres_sip_compiler.config import Config
 
 
 def build_sip_metadata(adaptor_dict: dict,
@@ -57,63 +64,76 @@ class PremisObject:
     Can be overwritten with metadata type specific adaptors.
     """
 
-    def __init__(self, metadata):
+    def __init__(self, metadata: dict[str, str | bool | None]) -> None:
         """Initialize object.
-        :metadata: Metadata dict for object.
+        :param metadata: Metadata dict for object.
         """
         self.filepath = None  # File path to object
         self._metadata = metadata
-        for key in ["object_identifier_type",
-                    "object_identifier_value",
-                    "original_name",
-                    "message_digest_algorithm",
-                    "message_digest",
-                    "bit_level"]:
+        for key in [
+            "object_identifier_type",
+            "object_identifier_value",
+            "original_name",
+            "message_digest_algorithm",
+            "message_digest",
+            "bit_level",
+        ]:
             if key not in self._metadata:
                 self._metadata[key] = None
         self._metadata["bit_level"] = False
 
-    def __getattr__(self, attr):
+    @overload
+    def __getattr__(self, attr: Literal["bit_level"]) -> bool: ...
+
+    @overload
+    def __getattr__(
+        self,
+        attr: Literal[
+            "object_identifier_type",
+            "object_identifier_value",
+            "original_name",
+            "message_digest_algorithm",
+            "message_digest",
+        ],
+    ) -> str | None: ...
+    @overload
+    def __getattr__(self, attr: str) -> str | bool | None: ...
+
+    def __getattr__(self, attr: str) -> str | bool | None:
         """
         Set metadata items as properties.
-        :attr: Attribute name
+        :param attr: Attribute name
         :returns: Value for given attribute or None
         """
-        if attr in self._metadata:
-            return self._metadata[attr]
-
-        return None
+        return self._metadata.get(attr)
 
     @property
-    def identifier(self):
+    def identifier(self) -> str | None:
         """Identifier of PREMIS Object, to be used as internal id.
         PREMIS objectIdentifierValue by default.
         """
         return self.object_identifier_value
 
     @property
-    def format_name(self):
-        """File format name
-        """
+    def format_name(self) -> str | None:
+        """File format name."""
         # We have to give help with CSV files.
         # Automatic identifying recognizes CSV files as text files.
-        if self.filepath.endswith(".csv"):
+        if self.filepath is not None and self.filepath.endswith(".csv"):
             return "text/csv"
         return None
 
     @property
-    def format_version(self):
-        """File format version
-        """
+    def format_version(self) -> str | None:
+        """File format version."""
         # We have to give help with CSV files.
         # Automatic identifying recognizes CSV files as text files.
-        if self.filepath.endswith(".csv"):
+        if self.filepath is not None and self.filepath.endswith(".csv"):
             return ""
         return None
 
-    def remove_metadata(self, metadata_key):
-        """Remove key from metadata.
-        """
+    def remove_metadata(self, metadata_key: str) -> None:
+        """Remove key from metadata."""
         self._metadata.pop(metadata_key, None)
 
 
@@ -122,7 +142,7 @@ class PremisEvent:
     Can be overwritten with metadata type specific adaptors.
     """
 
-    def __init__(self, metadata: dict[str, str]) -> None:
+    def __init__(self, metadata: dict[str, str | ET._Element | None]) -> None:
         """Initialize event.
 
         :param metadata: Metadata dict for event.
@@ -136,24 +156,43 @@ class PremisEvent:
             "event_datetime",
             "event_detail",
             "event_outcome_detail",
+            "event_outcome_detail_extension"
         ]:
             if key not in self._metadata:
                 self._metadata[key] = None
 
-    def __getattr__(self, attr: str) -> str | None:
+    @overload
+    def __getattr__(
+        self, attr: Literal["event_outcome_detail_extension"]
+    ) -> ET._Element | None: ...
+
+    @overload
+    def __getattr__(
+        self,
+        attr: Literal[
+            "event_identifier_type",
+            "event_identifier_value",
+            "event_type",
+            "event_outcome",
+            "event_datetime",
+            "event_detail",
+            "event_outcome_detail",
+        ],
+    ) -> str | None: ...
+    @overload
+    def __getattr__(self, attr: str) -> str | ET._Element | None: ...
+
+    def __getattr__(self, attr: str) -> str | ET._Element | None:
         """
         Set metadata items as properties.
 
         :param attr: Attribute name
         :returns: Value for given attribute or None
         """
-        if attr in self._metadata:
-            return self._metadata[attr]
-
-        return None
+        return self._metadata.get(attr)
 
     @property
-    def identifier(self) -> str:
+    def identifier(self) -> str | None:
         """Identifier of PREMIS Event, to be used as internal id.
         PREMIS eventIdentifierValue by default.
         """
@@ -169,7 +208,7 @@ class PremisAgent:
     Can be overwritten with metadata type specific adaptors.
     """
 
-    def __init__(self, metadata: dict[str, str]) -> None:
+    def __init__(self, metadata: dict[str, str | None]) -> None:
         """Initialize agent.
         :param metadata: Metadata dict for agent.
         """
@@ -195,7 +234,7 @@ class PremisAgent:
         return None
 
     @property
-    def identifier(self) -> str:
+    def identifier(self) -> str | None:
         """Identifier of PREMIS Agent, to be used as internal id.
         PREMIS agentIdentifierValue by default.
         """
@@ -289,14 +328,13 @@ class SipMetadata:
         self.digital_object_attributes = {}
 
     def populate(self, source_path, config):
-        """Create metadata objects based on source path.
-        """
+        """Create metadata objects based on source path."""
         pass
 
     def descriptive_metadata_sources(
-            self,
-            desc_paths: list[str],
-            config: Config,
+        self,
+        desc_paths: list[str],
+        config: Config,
     ) -> Iterator[tuple[str, str]]:
         """
         Iterator for descriptive metadata sources.

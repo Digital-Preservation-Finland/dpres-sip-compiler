@@ -5,12 +5,16 @@ import csv
 import datetime
 import glob
 import os
+import re
+from subprocess import run
 from typing import TYPE_CHECKING, Literal
+from uuid import uuid4
 
 import mets as metslib
 import premis
 from file_scraper.defaults import UNAP
 from file_scraper.scraper import Scraper
+from lxml import etree as ET
 
 from dpres_sip_compiler.base_adaptor import (
     PremisAgent,
@@ -24,6 +28,7 @@ from dpres_sip_compiler.constants import (
     EVENT_CONVERSION,
     EVENT_CREATION,
     EVENT_DIGEST,
+    EVENT_FORENSIC,
     EVENT_META_MODIFICATION,
     EVENT_MIGRATION,
     EVENT_MODIFICATION,
@@ -36,8 +41,6 @@ from dpres_sip_compiler.constants import (
 if TYPE_CHECKING:
     from collections.abc import Iterator
     from io import TextIOWrapper
-
-    import lxml.etree as ET
 
     from dpres_sip_compiler.config import Config
 
@@ -200,6 +203,79 @@ class SipMetadataMusicArchive(SipMetadata):
                 if scraper.well_formed is False:
                     scraper.mimetype = "text/plain; alt-format=text/html"
                     scraper.version = UNAP
+
+            if scraper.mimetype == "video/dv":
+                version_output = run(
+                    ["dvanalyzer", "--version"],
+                    text=True,
+                    capture_output=True,
+                    check=True,
+                ).stdout
+                # Version output uses the following format:
+                # "DV Analyzer v.1.4.2 by AudioVisual Preservation Solution..."
+                # This regex pattern uses a capturing group to match
+                # the pattern: "v" + dot + combination of dots and numbers
+                # ending and starting in a number:
+                match = re.search(
+                    r"\bv\.(\d+(?:\.\d+)+)\b",
+                    version_output,
+                    re.IGNORECASE,
+                )
+                version = match.group(1) if match is not None else "unknown"
+
+                analyzer_output = run(
+                    [
+                        "dvanalyzer",
+                        os.path.join(source_path, obj.filepath),
+                        "--XML",
+                        "--verbosity=5",
+                    ],
+                    capture_output=True,
+                    check=True,
+                ).stdout
+
+                event_id = str(uuid4())
+                event = PremisEvent(
+                    {
+                        "event_identifier_type": "UUID",
+                        "event_identifier_value": event_id,
+                        "event_type": EVENT_FORENSIC,
+                        "event_outcome": "success",
+                        "event_datetime": datetime.datetime.now(
+                            datetime.timezone.utc
+                        ).strftime("%Y-%m-%dT%H-%M-%S"),
+                        "event_detail": (
+                            "Analyzing DV stream frame-by-frame "
+                            "for structural errors using the DVAnalyzer "
+                            "quality control tool"
+                        ),
+                        "event_outcome_detail": "DVAnalyzer output as XML",
+                        "event_outcome_detail_extension": ET.fromstring(
+                            analyzer_output
+                        ),
+                    }
+                )
+                agent = PremisAgent(
+                    {
+                        "agent_type": "software",
+                        "agent_name": f"dvanalyzer-{version}",
+                        "agent_identifier_type": "local",
+                        "agent_identifier_value": "dvanalyzer",
+                    }
+                )
+
+                link = PremisLinking()
+                link.identifier = event_id
+
+                self.add_event(event)
+                self.add_agent(agent)
+                self.add_linking(
+                    p_linking=link,
+                    object_id=obj_identifier,
+                    object_role="target",
+                    agent_id=agent.identifier,
+                    agent_role="executing program",
+                )
 
             scraper_result = {
                 "streams": scraper.streams,
@@ -446,51 +522,62 @@ class PremisEventMusicArchive(PremisEvent):
         """Event outcome detail"""
         out = ""
         if self._detail_info[0]["event-selite"].lower() != "null":
-            out = "%s\n\n" % self._detail_info[0]["event-selite"]
+            out = "{}\n\n".format(self._detail_info[0]["event-selite"])
 
         if self.event_outcome != "success":
-            return "%sEvent failed." % out
+            return f"{out}Event failed."
 
         if self.event_type == EVENT_DIGEST:
             # The same algorithm exists in all elements of details
-            out = "%sChecksum calculated with algorithm %s " \
-                  "resulted the following checksums:" \
-                  "" % (out, self._detail_info[0]["tiiviste-tyyppi"])
+            out = (
+                "{}Checksum calculated with algorithm {} "
+                "resulted the following checksums:"
+                "".format(out, self._detail_info[0]["tiiviste-tyyppi"])
+            )
             for info in self._detail_info:
                 checksum_time = datetime.datetime.strptime(
-                        info["tiiviste-aika"], self.time_parse_format
-                    ).strftime(self.time_output_format)
-                out = "%s\n%s: %s (timestamp: %s)" \
-                      "" % (out, info["objekti-nimi"],
-                            info["tiiviste"], checksum_time)
+                    info["tiiviste-aika"], self.time_parse_format
+                ).strftime(self.time_output_format)
+                out = "{}\n{}: {} (timestamp: {})".format(
+                    out, info["objekti-nimi"], info["tiiviste"], checksum_time
+                )
             return out
 
         if self.event_type == EVENT_CHANGE:
             # There's only one element in details
-            return "%sFilename changed.\nOld filename: %s\n" \
-                   "New filename: %s\n" \
-                   "" % (out,
-                         self._detail_info[0]["pon-korvattu-nimi"],
-                         self._detail_info[0]["objekti-nimi"])
+            return (
+                "{}Filename changed.\nOld filename: {}\n"
+                "New filename: {}\n"
+                "".format(
+                    out,
+                    self._detail_info[0]["pon-korvattu-nimi"],
+                    self._detail_info[0]["objekti-nimi"],
+                )
+            )
 
         if self.event_type == EVENT_CREATION:
             # There's only one element in details
-            return "%sSubmission information package created as: " \
-                   "%s" % (out, self._detail_info[0]["sip-tunniste"])
+            return "{}Submission information package created as: {}".format(
+                out, self._detail_info[0]["sip-tunniste"]
+            )
 
         if self.event_type == EVENT_MODIFICATION:
-            return "%sObject has been modified." % out
+            return f"{out}Object has been modified."
 
         if self.event_type == EVENT_META_MODIFICATION:
-            return "%sMetadata has been modified." % out
+            return f"{out}Metadata has been modified."
 
         if self.event_type == EVENT_NORMALIZATION:
-            return "%sFile format has been normalized. Outcome object " \
-                "has been created as a result." % out
+            return (
+                f"{out}File format has been normalized. Outcome object "
+                "has been created as a result."
+            )
 
         if self.event_type == EVENT_MIGRATION:
-            return "%sFile format has been migrated. Outcome object has " \
-                "been created as a result." % out
+            return (
+                f"{out}File format has been migrated. Outcome object has "
+                "been created as a result."
+            )
 
         if self.event_type == EVENT_CONVERSION:
             return (
@@ -499,7 +586,8 @@ class PremisEventMusicArchive(PremisEvent):
             )
 
         raise NotImplementedError(
-            "Not implemented event type '%s'." % (self.event_type))
+            f"Not implemented event type '{self.event_type}'."
+        )
 
 
 class PremisAgentMusicArchive(PremisAgent):

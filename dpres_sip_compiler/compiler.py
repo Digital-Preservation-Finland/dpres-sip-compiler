@@ -272,6 +272,7 @@ class SipCompiler:
                 detail=event.event_detail,
                 outcome=event.event_outcome,
                 outcome_detail=event.event_outcome_detail,
+                outcome_detail_extension=event.event_outcome_detail_extension,
                 datetime=event.event_datetime,
                 event_identifier_type=event.event_identifier_type,
                 event_identifier=event.event_identifier_value,

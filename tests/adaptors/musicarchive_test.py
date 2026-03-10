@@ -2,19 +2,21 @@
 """
 import os
 import shutil
+
 import pytest
-import lxml
+from dpres_sip_compiler import constants
 from dpres_sip_compiler.adaptors.musicarchive import (
-    SipMetadataMusicArchive,
-    PremisObjectMusicArchive,
-    PremisEventMusicArchive,
     PremisAgentMusicArchive,
+    PremisEventMusicArchive,
     PremisLinkingMusicArchive,
+    PremisObjectMusicArchive,
     PremisRepresentationMusicArchive,
-    handle_html_files
+    SipMetadataMusicArchive,
+    handle_html_files,
 )
-from dpres_sip_compiler.config import Config
 from dpres_sip_compiler.compiler import compile_sip
+from dpres_sip_compiler.config import Config
+from lxml import etree
 
 
 def test_populate():
@@ -107,7 +109,7 @@ def test_alt_identifier(tmpdir):
     config = Config(conf_file="tests/data/musicarchive/config.conf")
     sip_meta.populate("tests/data/musicarchive/source2", config)
 
-    mets_xml = lxml.etree.parse(mets_file).getroot()
+    mets_xml = etree.parse(mets_file).getroot()
     premis_ids = mets_xml.xpath(
         ".//premis:objectIdentifier",
         namespaces={'premis': 'info:lc/xmlns/premis-v2'})
@@ -346,3 +348,38 @@ def test_representation_properties():
     assert representation.alt_identifier_value == "test_id_123"
     assert representation.object_status == "xxx"
     assert representation.outcome_filename == "test_outcome_file123.txt"
+
+
+def test_scrape_dv_file():
+    """Test the scrape_objects method with DV file"""
+    sip_meta = SipMetadataMusicArchive()
+    config = Config(conf_file="tests/data/musicarchive/config.conf")
+    sip_meta.populate("tests/data/musicarchive/source3", config)
+    sip_meta.scrape_objects("tests/data/musicarchive/source3", True)
+    events = list(sip_meta.events)
+    links = list(sip_meta.linkings)
+    assert any(
+        event.event_type == constants.EVENT_FORENSIC
+        for event in events
+    )
+    assert any(
+        b'<event type="info" event_id="RAB">repeating arbitrary bit</event>'
+        in etree.tostring(event.event_outcome_detail_extension)
+        for event in list(sip_meta.events)
+        if event.event_outcome_detail_extension is not None
+    )
+    assert any(
+        (
+            any(
+                obj["linking_object"] == "882d63db-c9b6-4f44-83ba-901b300821cc"
+                and obj["object_role"] == "target"
+                for obj in link.object_links
+            )
+            and any(
+                agt["linking_agent"] == "dvanalyzer"
+                and agt["agent_role"] == "executing program"
+                for agt in link.agent_links
+            )
+        )
+        for link in links
+    )

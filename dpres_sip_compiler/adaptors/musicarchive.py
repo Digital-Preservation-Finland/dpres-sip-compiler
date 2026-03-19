@@ -189,8 +189,10 @@ class SipMetadataMusicArchive(SipMetadata):
                 version=obj.format_version,
             )
             scraper.scrape(check_wellformed=validation)
+            mimetype = scraper.mimetype
+            version = scraper.version
             # Special case for musicarchive
-            if scraper.mimetype == "text/html":
+            if mimetype == "text/html":
                 if validation is False:
                     # If validation was disabled, we'll enable for this
                     # special case handling.
@@ -201,10 +203,10 @@ class SipMetadataMusicArchive(SipMetadata):
                     )
                     scraper.scrape(check_wellformed=True)
                 if scraper.well_formed is False:
-                    scraper.mimetype = "text/plain; alt-format=text/html"
-                    scraper.version = UNAP
+                    mimetype = "text/plain; alt-format=text/html"
+                    version = UNAP
 
-            if scraper.mimetype == "video/dv":
+            if mimetype == "video/dv":
                 version_output = run(
                     ["dvanalyzer", "--version"],
                     text=True,
@@ -221,7 +223,9 @@ class SipMetadataMusicArchive(SipMetadata):
                     version_output,
                     re.IGNORECASE,
                 )
-                version = match.group(1) if match is not None else "unknown"
+                analyzer_version = (
+                    match.group(1) if match is not None else "unknown"
+                )
 
                 analyzer_output = run(
                     [
@@ -258,7 +262,7 @@ class SipMetadataMusicArchive(SipMetadata):
                 agent = PremisAgent(
                     {
                         "agent_type": "software",
-                        "agent_name": f"dvanalyzer-{version}",
+                        "agent_name": f"dvanalyzer-{analyzer_version}",
                         "agent_identifier_type": "local",
                         "agent_identifier_value": "dvanalyzer",
                     }
@@ -280,8 +284,8 @@ class SipMetadataMusicArchive(SipMetadata):
             scraper_result = {
                 "streams": scraper.streams,
                 "info": scraper.info,
-                "mimetype": scraper.mimetype,
-                "version": scraper.version,
+                "mimetype": mimetype,
+                "version": version,
                 "checksum": scraper.checksum().lower(),
                 "grade": scraper.grade(),
             }

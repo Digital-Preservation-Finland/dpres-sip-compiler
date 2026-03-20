@@ -247,7 +247,7 @@ class SipMetadataMusicArchive(SipMetadata):
                         "event_outcome": "success",
                         "event_datetime": datetime.datetime.now(
                             datetime.timezone.utc
-                        ).strftime("%Y-%m-%dT%H-%M-%S"),
+                        ).isoformat(),
                         "event_detail": (
                             "Analyzing DV stream frame-by-frame "
                             "for structural errors using the DVAnalyzer "

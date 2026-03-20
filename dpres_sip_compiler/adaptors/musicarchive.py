@@ -5,7 +5,6 @@ import csv
 import datetime
 import glob
 import os
-import re
 from subprocess import run
 from typing import TYPE_CHECKING, Literal
 from uuid import uuid4
@@ -207,26 +206,6 @@ class SipMetadataMusicArchive(SipMetadata):
                     version = UNAP
 
             if mimetype == "video/dv":
-                version_output = run(
-                    ["dvanalyzer", "--version"],
-                    text=True,
-                    capture_output=True,
-                    check=True,
-                ).stdout
-                # Version output uses the following format:
-                # "DV Analyzer v.1.4.2 by AudioVisual Preservation Solution..."
-                # This regex pattern uses a capturing group to match
-                # the pattern: "v" + dot + combination of dots and numbers
-                # ending and starting in a number:
-                match = re.search(
-                    r"\bv\.(\d+(?:\.\d+)+)\b",
-                    version_output,
-                    re.IGNORECASE,
-                )
-                analyzer_version = (
-                    match.group(1) if match is not None else "unknown"
-                )
-
                 analyzer_output = run(
                     [
                         "dvanalyzer",
@@ -237,6 +216,7 @@ class SipMetadataMusicArchive(SipMetadata):
                     capture_output=True,
                     check=True,
                 ).stdout
+                element = ET.fromstring(analyzer_output)
 
                 event_id = str(uuid4())
                 event = PremisEvent(
@@ -254,25 +234,28 @@ class SipMetadataMusicArchive(SipMetadata):
                             "quality control tool"
                         ),
                         "event_outcome_detail": "DVAnalyzer output as XML",
-                        "event_outcome_detail_extension": ET.fromstring(
-                            analyzer_output
-                        ),
+                        "event_outcome_detail_extension": element,
                     }
                 )
-                agent = PremisAgent(
-                    {
-                        "agent_type": "software",
-                        "agent_name": f"dvanalyzer-{analyzer_version}",
-                        "agent_identifier_type": "local",
-                        "agent_identifier_value": "dvanalyzer",
-                    }
-                )
+
+                if "dvanalyzer" not in self.premis_agents:
+                    analyzer_version = element.xpath("//version/text()")[0]
+                    agent = PremisAgent(
+                        {
+                            "agent_type": "software",
+                            "agent_name": f"dvanalyzer-{analyzer_version}",
+                            "agent_identifier_type": "local",
+                            "agent_identifier_value": "dvanalyzer",
+                        }
+                    )
+                    self.add_agent(agent)
+                else:
+                    agent = self.premis_agents["dvanalyzer"]
 
                 link = PremisLinking()
                 link.identifier = event_id
 
                 self.add_event(event)
-                self.add_agent(agent)
                 self.add_linking(
                     p_linking=link,
                     object_id=obj_identifier,

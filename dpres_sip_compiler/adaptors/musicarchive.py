@@ -33,7 +33,7 @@ from dpres_sip_compiler.constants import (
     EVENT_MODIFICATION,
     EVENT_NORMALIZATION,
     FILE_OUTCOME_SOURCE,
-    FILE_USE_IGNORE_VALIDATION,
+    FILE_USE_FORENSIC_ANALYSIS,
     PREMIS_ADDRESS,
 )
 
@@ -140,7 +140,7 @@ class SipMetadataMusicArchive(SipMetadata):
             self.add_object_attribute(
                 obj_identifier=p_object.identifier,
                 name="use",
-                value=FILE_USE_IGNORE_VALIDATION,
+                value=FILE_USE_FORENSIC_ANALYSIS,
             )
 
     def descriptive_metadata_sources(

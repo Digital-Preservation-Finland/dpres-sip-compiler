@@ -351,23 +351,47 @@ def test_representation_properties():
 
 
 def test_scrape_dv_file():
-    """Test the scrape_objects method with DV file"""
+    """Test the scrape_objects method with DV conversion file case.
+
+    The DV file is the source object of a conversion event, this is
+    recorded by musicarchive in the CSV metadata. DV files
+    should additionally be forensically analysed by the musicarchive
+    adaptor, by running the dvanalyzer command during packaging and
+    documenting the results.
+
+    The test tests that both types of events are recorded in the SIP
+    METS document.
+    """
     sip_meta = SipMetadataMusicArchive()
     config = Config(conf_file="tests/data/musicarchive/config.conf")
-    sip_meta.populate("tests/data/musicarchive/source3", config)
-    sip_meta.scrape_objects("tests/data/musicarchive/source3", True)
+    sip_meta.populate(
+        "tests/data/musicarchive/conversion_dv_test_case", config)
+    sip_meta.scrape_objects(
+        "tests/data/musicarchive/conversion_dv_test_case", True)
     events = list(sip_meta.events)
     links = list(sip_meta.linkings)
+
+    # Check that forensic feature analysis event is created
     assert any(
         event.event_type == constants.EVENT_FORENSIC
         for event in events
     )
     assert any(
-        b'<event type="info" event_id="RAB">repeating arbitrary bit</event>'
+        (b'<event type="error" event_id="1" '
+         b'event_type="video error concealment">59.53% (893 F errors)</event>')
         in etree.tostring(event.event_outcome_detail_extension)
         for event in list(sip_meta.events)
         if event.event_outcome_detail_extension is not None
     )
+
+    # Check that the conversion event is recorded in the metadata
+    assert any(
+        event.event_type == constants.EVENT_CONVERSION
+        for event in events
+    )
+
+    # Check that the DV file is target and the dvanalyzer tool is the
+    # executing program
     assert any(
         (
             any(
@@ -379,6 +403,23 @@ def test_scrape_dv_file():
                 agt["linking_agent"] == "dvanalyzer"
                 and agt["agent_role"] == "executing program"
                 for agt in link.agent_links
+            )
+        )
+        for link in links
+    )
+
+    # Check that the DV file is source and the MP4 file is óutcome
+    assert any(
+        (
+            any(
+                obj["linking_object"] == "882d63db-c9b6-4f44-83ba-901b300821cc"
+                and obj["object_role"] == "source"
+                for obj in link.object_links
+            )
+            and any(
+                obj["linking_object"] == "982d63db-c9b6-4f44-83ba-901b300821cc"
+                and obj["object_role"] == "outcome"
+                for obj in link.object_links
             )
         )
         for link in links

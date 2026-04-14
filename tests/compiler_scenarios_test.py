@@ -9,6 +9,7 @@ from lxml import etree
 from dpres_sip_compiler.compiler import compile_sip
 from dpres_sip_compiler.constants import (
     FILE_USE_IGNORE_VALIDATION,
+    FILE_USE_FORENSIC_ANALYSIS,
     FILE_USE_NO_VALIDATION
 )
 
@@ -53,8 +54,6 @@ def _assert_migration_content(mets_filepath: str) -> None:
     # Files that should not have "USE" attribute, because they are
     # supported and have no issues during file-scraping
     no_use_files = [
-        # Conversion outcome
-        "test_file_converted_01.txt",
         # Migration outcome
         "test_file_migrated_01.txt",
         # Migration outcome
@@ -98,21 +97,6 @@ def _assert_migration_content(mets_filepath: str) -> None:
             == FILE_USE_NO_VALIDATION
         )
 
-    # Musicarchive's converted source should always ignore validation
-    # errors with "USE" and "fi-dpres-ignore-validation-errors"
-    source_used_for_converted_file_elem = xml_tree.xpath(
-        (
-            "./mets:fileSec/mets:fileGrp/mets:file["
-            ".//mets:FLocat["
-            '@xlink:href="file:///files/test_file_original_03.txt"]]'
-        ),
-        namespaces=_NAMESPACES,
-    )[0]
-    assert (
-        source_used_for_converted_file_elem.attrib.get("USE")
-        == FILE_USE_IGNORE_VALIDATION
-    )
-
     # Files that are supported, but outright broken, thus used as
     # migration or normalization source and use "USE" with
     # "fi-dpres-ignore-validation-errors"
@@ -127,6 +111,44 @@ def _assert_migration_content(mets_filepath: str) -> None:
     assert (
         broken_source_file_elem.attrib.get("USE")
         == FILE_USE_IGNORE_VALIDATION
+    )
+
+
+def _assert_conversion_content(mets_filepath: str) -> None:
+    """Shorthand function to validate the mets content of conversion
+    metadata for musicarchive.
+
+    :param mets_filepath: Path to the mets.xml file.
+    """
+    xml_tree = etree.parse(mets_filepath)
+
+    # Outcome file should not have a "USE" attribute, because it is
+    # supported and have no issues during file-scraping
+    no_use_target_file_elem = xml_tree.xpath(
+        (
+            "./mets:fileSec/mets:fileGrp/mets:file["
+            ".//mets:FLocat["
+            '@xlink:href="file:///video/h265_derivative_version.mp4"]]'
+        ),
+        namespaces=_NAMESPACES,
+    )[0]
+    assert no_use_target_file_elem.attrib.get("USE") is None
+
+    # Musicarchive's converted source should always ignore certain
+    # validation messages with "USE" and
+    # "fi-dpres-preserve-forensically-analysed-object"
+    source_used_for_converted_file_elem = xml_tree.xpath(
+        (
+            "./mets:fileSec/mets:fileGrp/mets:file["
+            ".//mets:FLocat["
+            '@xlink:href="file:///video/'
+            'dv_with_concealing_bitstream_errors.dv"]]'
+        ),
+        namespaces=_NAMESPACES,
+    )[0]
+    assert (
+        source_used_for_converted_file_elem.attrib.get("USE")
+        == FILE_USE_FORENSIC_ANALYSIS
     )
 
 
@@ -188,7 +210,10 @@ def test_compile_sip(tmpdir: Any,
 
 @pytest.mark.parametrize(
     "package_source",
-    ["accepted_html_files", "source1", "migration_test_files"],
+    ["accepted_html_files",
+     "source1",
+     "migration_test_files",
+     "conversion_dv_test_case"],
 )
 def test_musicarchive_compile(
         tmp_path: Any,
@@ -216,6 +241,8 @@ def test_musicarchive_compile(
         _assert_html_content(mets_filepath=str(tmp_tar_dir / "mets.xml"))
     elif package_source == "migration_test_files":
         _assert_migration_content(mets_filepath=str(tmp_tar_dir / "mets.xml"))
+    elif package_source == "conversion_dv_test_case":
+        _assert_conversion_content(mets_filepath=str(tmp_tar_dir / "mets.xml"))
 
 
 def test_postalmuseum_compile(

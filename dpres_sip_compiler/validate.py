@@ -8,6 +8,38 @@ from dpres_sip_compiler.base_adaptor import sip_metadata_class
 from dpres_sip_compiler.adaptor_list import ADAPTOR_DICT
 
 
+def ignore_concealing_bitstream_errors(scraper_result: dict) -> dict:
+    """
+    Checks if DV files contain only concealing bitstream errors. These
+    files are set to be well-formed. If any other errors exist, the
+    well-formedness value is returned as it is.
+
+    This functionality is copied from dpres-ipt, where special handling
+    for concealing bitstream errors has been implemented.
+    """
+
+    cleared_previous_error = False
+    other_errors_found = False
+
+    for scraper_info in scraper_result["tool_info"].values():
+        for error_string in scraper_info["errors"]:
+            for error in error_string.split("\n"):
+                if "Concealing bitstream errors" in error:
+                    cleared_previous_error = True
+                    continue
+                if "Last message repeated" in error and cleared_previous_error:
+                    cleared_previous_error = False
+                    continue
+                cleared_previous_error = False
+                if error:
+                    other_errors_found = True
+
+    if not other_errors_found:
+        scraper_result["well-formed"] = True
+
+    return scraper_result["well-formed"]
+
+
 def iterate_files(source_path, config):
     """
     Iterate files recursively with skipping the files that matches to pattern
@@ -74,5 +106,13 @@ def scrape_files(path, config):
             "well-formed": scraper.well_formed,
             "tool_info": scraper.info
         }
+
+        # If set, ignore concealing bitstream errors in DV files
+        if config.ignore_concealing_bitstream_errors:
+            # Only need to check invalid DV files
+            if all((results["well-formed"] is False,
+                    results["MIME type"] == "video/dv")):
+                results["well-formed"] = ignore_concealing_bitstream_errors(
+                    results)
 
         yield results

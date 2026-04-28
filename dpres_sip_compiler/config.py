@@ -8,6 +8,7 @@ import click
 _DEFAULT_DESC_METADATA_FORMAT = "DC"
 _DEFAULT_DESC_METADATA_VERSION = "2008"
 _DEFAULT_DESC_METADATA_SOURCE_FORMAT = "file"
+_DEFAULT_IGNORE_DV_CONCEALING_BITSTREAM_ERRORS = False
 
 
 def get_default_config_path():
@@ -97,3 +98,10 @@ class Config:
             self.csv_ending = self._conf["script"]["csv_ending"]
         except KeyError:
             self.csv_ending = None
+
+        try:
+            self.ignore_concealing_bitstream_errors = (self._conf["validate"][
+                "ignore_concealing_bitstream_errors"] == "true")
+        except KeyError:
+            self.ignore_concealing_bitstream_errors = (
+                _DEFAULT_IGNORE_DV_CONCEALING_BITSTREAM_ERRORS)

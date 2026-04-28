@@ -3,6 +3,7 @@ import os
 from dpres_sip_compiler.validate import (count_files, scrape_files,
                                          iterate_files)
 from dpres_sip_compiler.config import Config
+import pytest
 
 
 def test_iterate_files(tmpdir):
@@ -40,6 +41,31 @@ def test_scrape_files():
         assert file_dict['tool_info']
         assert file_dict['filename']
         assert file_dict['timestamp']
+
+
+@pytest.mark.parametrize(
+    ('conf_file', 'expected_valid_files', 'expected_invalid_files'),
+    [("tests/data/musicarchive/config.conf", 2, 0),
+     ("tests/data/postalmuseum/postalmuseum.conf", 1, 1)]
+)
+def test_scrape_files_dv_concealing_errors(
+        conf_file, expected_valid_files, expected_invalid_files):
+    """Tests the scrape_files function with a DV file case that contains
+    concealing bitstream errors only in addition to a valid file.
+
+    Musicarchive's config should result in both files being valid.
+    """
+    config = Config(conf_file=conf_file)
+    valid_files = 0
+    invalid_files = 0
+    for file_dict in scrape_files(
+            'tests/data/musicarchive/conversion_dv_test_case/video/', config):
+        if file_dict['well-formed']:
+            valid_files += 1
+        else:
+            invalid_files += 1
+    assert valid_files == expected_valid_files
+    assert invalid_files == expected_invalid_files
 
 
 def test_count_files():

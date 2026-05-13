@@ -205,64 +205,65 @@ class SipMetadataMusicArchive(SipMetadata):
                     mimetype = "text/plain; alt-format=text/html"
                     version = UNAP
 
-            if mimetype == "video/dv":
-                analyzer_output = run(
-                    [
-                        "dvanalyzer",
-                        os.path.join(source_path, obj.filepath),
-                        "--XML",
-                        "--verbosity=5",
-                    ],
-                    capture_output=True,
-                    check=True,
-                ).stdout
-                element = ET.fromstring(analyzer_output)
+            for stream in scraper.streams.values():
+                if stream["mimetype"] == "video/dv":
+                    analyzer_output = run(
+                        [
+                            "dvanalyzer",
+                            os.path.join(source_path, obj.filepath),
+                            "--XML",
+                            "--verbosity=5",
+                        ],
+                        capture_output=True,
+                        check=True,
+                    ).stdout
+                    element = ET.fromstring(analyzer_output)
 
-                event_id = str(uuid4())
-                event = PremisEvent(
-                    {
-                        "event_identifier_type": "UUID",
-                        "event_identifier_value": event_id,
-                        "event_type": EVENT_FORENSIC,
-                        "event_outcome": "success",
-                        "event_datetime": datetime.datetime.now(
-                            datetime.timezone.utc
-                        ).isoformat(),
-                        "event_detail": (
-                            "Analyzing DV stream frame-by-frame "
-                            "for structural errors using the DVAnalyzer "
-                            "quality control tool"
-                        ),
-                        "event_outcome_detail": "DVAnalyzer output as XML",
-                        "event_outcome_detail_extension": element,
-                    }
-                )
-
-                if "dvanalyzer" not in self.premis_agents:
-                    analyzer_version = element.xpath("//version/text()")[0]
-                    agent = PremisAgent(
+                    event_id = str(uuid4())
+                    event = PremisEvent(
                         {
-                            "agent_type": "software",
-                            "agent_name": f"dvanalyzer-{analyzer_version}",
-                            "agent_identifier_type": "local",
-                            "agent_identifier_value": "dvanalyzer",
+                            "event_identifier_type": "UUID",
+                            "event_identifier_value": event_id,
+                            "event_type": EVENT_FORENSIC,
+                            "event_outcome": "success",
+                            "event_datetime": datetime.datetime.now(
+                                datetime.timezone.utc
+                            ).isoformat(),
+                            "event_detail": (
+                                "Analyzing DV stream frame-by-frame "
+                                "for structural errors using the DVAnalyzer "
+                                "quality control tool"
+                            ),
+                            "event_outcome_detail": "DVAnalyzer output as XML",
+                            "event_outcome_detail_extension": element,
                         }
                     )
-                    self.add_agent(agent)
-                else:
-                    agent = self.premis_agents["dvanalyzer"]
 
-                link = PremisLinking()
-                link.identifier = event_id
+                    if "dvanalyzer" not in self.premis_agents:
+                        analyzer_version = element.xpath("//version/text()")[0]
+                        agent = PremisAgent(
+                            {
+                                "agent_type": "software",
+                                "agent_name": f"dvanalyzer-{analyzer_version}",
+                                "agent_identifier_type": "local",
+                                "agent_identifier_value": "dvanalyzer",
+                            }
+                        )
+                        self.add_agent(agent)
+                    else:
+                        agent = self.premis_agents["dvanalyzer"]
 
-                self.add_event(event)
-                self.add_linking(
-                    p_linking=link,
-                    object_id=obj_identifier,
-                    object_role="target",
-                    agent_id=agent.identifier,
-                    agent_role="executing program",
-                )
+                    link = PremisLinking()
+                    link.identifier = event_id
+
+                    self.add_event(event)
+                    self.add_linking(
+                        p_linking=link,
+                        object_id=obj_identifier,
+                        object_role="target",
+                        agent_id=agent.identifier,
+                        agent_role="executing program",
+                    )
 
             scraper_result = {
                 "streams": scraper.streams,

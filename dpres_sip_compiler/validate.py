@@ -107,12 +107,13 @@ def scrape_files(path, config):
             "tool_info": scraper.info
         }
 
-        # If set, ignore concealing bitstream errors in DV files
+        # If set, ignore concealing bitstream errors in DV streams
         if config.ignore_concealing_bitstream_errors:
-            # Only need to check invalid DV files
-            if all((results["well-formed"] is False,
-                    results["MIME type"] == "video/dv")):
-                results["well-formed"] = ignore_concealing_bitstream_errors(
-                    results)
+            for stream in results["metadata"].values():
+                # Only need to check invalid files
+                if all((results["well-formed"] is False,
+                        stream["mimetype"] == "video/dv")):
+                    results["well-formed"] = \
+                        ignore_concealing_bitstream_errors(results)
 
         yield results

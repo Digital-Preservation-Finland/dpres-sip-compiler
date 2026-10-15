@@ -79,12 +79,12 @@ class SipMetadataMusicArchive(SipMetadata):
         :param source_path: Source data path
         :param config: Basic configuration
         """
+        metadata_glob = os.path.join(source_path, f"*{config.csv_ending}")
+        glob_error_msg = f"CSV metadata file '{metadata_glob}' was not found!"
         try:
-            filename = glob.glob(
-                os.path.join(
-                    source_path, f"*{config.csv_ending}"))[0]
-        except KeyError:
-            raise OSError("CSV metadata file was not found!") from None
+            filename = glob.glob(metadata_glob)[0]
+        except IndexError:
+            raise OSError(glob_error_msg) from None
 
         self.objid = os.path.split(filename)[1].replace(config.csv_ending, "")
         self.content_id = self.objid
